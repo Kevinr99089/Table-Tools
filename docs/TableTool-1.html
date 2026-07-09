@@ -1,0 +1,893 @@
+<!doctype html>
+<html lang="fr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no" />
+  <title>TableTool v16</title>
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMiAzMiI+PHJlY3QgeD0iNCIgeT0iMyIgd2lkdGg9IjE4IiBoZWlnaHQ9IjI2IiByeD0iMyIgZmlsbD0iI2ZjZmJmOCIgc3Ryb2tlPSIjMWExYTJlIiBzdHJva2Utd2lkdGg9IjIuNSIvPjxjaXJjbGUgY3g9IjQiIGN5PSI4IiByPSIxLjYiIGZpbGw9IiMxYTFhMmUiLz48Y2lyY2xlIGN4PSI0IiBjeT0iMTUiIHI9IjEuNiIgZmlsbD0iIzFhMWEyZSIvPjxjaXJjbGUgY3g9IjQiIGN5PSIyMiIgcj0iMS42IiBmaWxsPSIjMWExYTJlIi8+PGxpbmUgeDE9IjkiIHkxPSIxMCIgeDI9IjE4IiB5Mj0iMTAiIHN0cm9rZT0iIzY2NiIgc3Ryb2tlLXdpZHRoPSIyIi8+PGxpbmUgeDE9IjkiIHkxPSIxNiIgeDI9IjE4IiB5Mj0iMTYiIHN0cm9rZT0iIzY2NiIgc3Ryb2tlLXdpZHRoPSIyIi8+PHBhdGggZD0iTTE2IDI3IEwyNyAxMCBMMzAgMTIgTDIwIDI5IFoiIGZpbGw9IiNjMDM5MmIiIHN0cm9rZT0iIzFhMWEyZSIgc3Ryb2tlLXdpZHRoPSIxLjUiIHN0cm9rZS1saW5lam9pbj0icm91bmQiLz48L3N2Zz4=" />
+  <style>
+    :root{--bg:#fcfbf8;--ink:#1a1a2e;--muted:#666;--red:#c0392b;--wood:#8d6e63;--ok:#2e7d32;--font:"Comic Sans MS","Chalkboard SE","Marker Felt",system-ui,sans-serif;}
+    *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;user-select:none}
+    body{margin:0;color:var(--ink);font-family:var(--font);background:var(--bg);
+      background-image:linear-gradient(#e0e0e0 1px,transparent 1px),linear-gradient(90deg,#e0e0e0 1px,transparent 1px);
+      background-size:20px 20px;background-blend-mode:multiply;padding-bottom:90px;}
+    .drawn{filter:url('#wiggle')}
+    header{position:sticky;top:0;z-index:50;background:var(--bg);border-bottom:2px solid var(--ink);padding:10px;display:flex;align-items:center;gap:10px;box-shadow:0 4px 10px rgba(0,0,0,.1)}
+    header button{background:transparent;border:2px solid var(--ink);border-radius:50%;width:40px;height:40px;font-size:18px;cursor:pointer;display:grid;place-items:center}
+    #wakeIcon,#fsIcon{opacity:.15;font-size:10px;line-height:1.1;text-align:right;transition:.2s}
+    #wakeIcon.on{opacity:1;color:var(--ok);font-weight:900}
+    #fsIcon.on{opacity:1;color:var(--wood);font-weight:900}
+    main{max-width:860px;margin:0 auto;padding:15px}
+    h2{margin:10px 0 8px}
+    .grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:15px}
+    @media(min-width:600px){.grid{grid-template-columns:repeat(3,minmax(0,1fr));}}
+    .card{background:#fff;border:2px solid var(--ink);border-radius:6px;padding:15px;display:flex;flex-direction:column;align-items:center;gap:6px;box-shadow:3px 3px 0 rgba(0,0,0,.1);cursor:pointer}
+    .card:active{transform:scale(.98)}
+    .card .ico{font-size:32px}
+    .card .tit{font-weight:900;font-size:16px}
+    .card .sub{font-size:11px;color:var(--muted);font-style:italic;text-align:center}
+    .panel{background:#fff;border:2px solid var(--ink);border-radius:10px;padding:14px;box-shadow:2px 2px 0 rgba(0,0,0,.12)}
+    .kicker{font-size:12px;color:var(--muted);font-style:italic;text-align:center}
+    .actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px}
+    .btn{flex:1;min-width:140px;padding:12px;background:#fff;border:2px solid var(--ink);border-radius:10px;font-family:var(--font);font-weight:900;cursor:pointer;box-shadow:2px 2px 0 var(--ink)}
+    .btn:active{transform:translate(2px,2px);box-shadow:none}
+    .btn.sec{border-style:dashed;opacity:.9;box-shadow:none}
+    .btn.red{color:var(--red);border-color:var(--red)}
+    input{background:transparent;border:none;border-bottom:1px dashed #999;font-family:var(--font);font-size:16px;width:100%;text-align:center;color:var(--ink);user-select:text;border-radius:0}
+    input:focus{outline:none;border-bottom:2px solid var(--ink);background:#f0f0f0}
+    .paper-table{width:100%;border-collapse:collapse;background:#fff;margin:12px 0}
+    .paper-table th{border:2px solid var(--ink);background:#eee;padding:6px;font-size:12px;text-transform:uppercase}
+    .paper-table td{border:2px solid var(--ink);padding:6px;text-align:center;height:36px}
+    .paper-table td.label{text-align:left;font-weight:900;background:#fafafa;width:140px;font-size:13px}
+    .belote-split{display:flex;border:3px solid var(--ink);height:300px;background:#fff;filter:url('#wiggle')}
+    .belote-col{flex:1;display:flex;flex-direction:column;border-right:2px solid var(--ink)}
+    .belote-col:last-child{border:none}
+    .b-head{background:#eee;padding:10px;text-align:center;font-weight:900;border-bottom:2px solid var(--ink)}
+    .b-tot{font-size:40px;text-align:center;padding:10px;font-weight:1000;border-bottom:2px dashed #ccc}
+    .b-list{flex:1;overflow-y:auto;font-size:14px;text-align:center;line-height:1.8}
+    .d3{display:flex;gap:12px;justify-content:center;align-items:center;margin:14px 0 6px}
+    .die{width:74px;height:74px;border:3px solid var(--ink);border-radius:14px;display:grid;place-items:center;font-size:34px;font-weight:1000;background:#fff;box-shadow:3px 3px 0 rgba(0,0,0,.12)}
+    .molkky-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:14px 0}
+    .pin-btn{aspect-ratio:1;border:2px solid var(--wood);border-radius:50%;background:#fff;color:var(--wood);font-weight:1000;font-size:20px;display:grid;place-items:center;cursor:pointer}
+    .pin-btn:active{background:var(--wood);color:#fff}
+    .m-player{padding:10px;border:2px solid var(--ink);margin-bottom:10px;border-radius:10px;background:#fff}
+    .m-player.active{border:4px solid var(--wood);background:#fff8e1}
+    .banner{position:sticky;top:64px;z-index:49;background:#fff;border:2px dashed var(--ink);padding:10px;border-radius:12px;box-shadow:2px 2px 0 rgba(0,0,0,.12);margin:10px 0;display:none}
+    .banner.show{display:block}
+    .banner b{color:var(--red)}
+    video{position:absolute;top:0;left:0;width:1px;height:1px;opacity:.01;pointer-events:none}
+  </style>
+</head>
+<body>
+  <noscript>
+    <div style="padding:16px;font-family:system-ui;background:#fff;border:2px solid #000;margin:12px;border-radius:10px">
+      JavaScript est désactivé → l'app ne peut pas fonctionner. Ouvre le fichier dans Samsung Internet/Chrome avec JavaScript activé.
+    </div>
+  </noscript>
+
+  <svg width="0" height="0" style="position:absolute">
+    <filter id="wiggle">
+      <feTurbulence type="fractalNoise" baseFrequency="0.01" numOctaves="3" result="noise" />
+      <feDisplacementMap in="SourceGraphic" in2="noise" scale="2" />
+    </filter>
+    <clipPath id="clipTop"><path d="M10,10 L90,10 L50,80 Z" /></clipPath>
+    <clipPath id="clipBot"><path d="M50,80 L90,150 L10,150 Z" /></clipPath>
+  </svg>
+
+  <video id="hackVid" playsinline loop muted>
+    <source src="data:video/mp4;base64,AAAAHGZ0eXBNUjRCAAAARU1SNIgAAABhYXJrdWR0YQAAAAxjb3ZlYXJrdWR0YQlmcm9tAAAAGHNvaWFhcnR3cmvDq2xpYnF1aWNrY2hhdAAAAAxtZGF0AAAAAAAAAAAAAA==" type="video/mp4">
+  </video>
+
+  <div id="appWrap">
+    <header>
+      <button id="backBtn" title="Retour">←</button>
+      <svg viewBox="0 0 32 32" width="30" height="30" class="drawn" style="flex-shrink:0">
+        <rect x="5" y="3" width="17" height="25" rx="2" fill="#fff" stroke="var(--ink)" stroke-width="2"/>
+        <circle cx="5" cy="7" r="1.4" fill="var(--ink)"/>
+        <circle cx="5" cy="13" r="1.4" fill="var(--ink)"/>
+        <circle cx="5" cy="19" r="1.4" fill="var(--ink)"/>
+        <circle cx="5" cy="25" r="1.4" fill="var(--ink)"/>
+        <line x1="9" y1="9" x2="18" y2="9" stroke="var(--muted)" stroke-width="1.5"/>
+        <line x1="9" y1="14" x2="18" y2="14" stroke="var(--muted)" stroke-width="1.5"/>
+        <line x1="9" y1="19" x2="15" y2="19" stroke="var(--muted)" stroke-width="1.5"/>
+        <path d="M17 26 L27 10 L30 12 L20 28 Z" fill="var(--red)" stroke="var(--ink)" stroke-width="1.3" stroke-linejoin="round"/>
+      </svg>
+      <div style="font-weight:1000;font-size:18px">TableTool</div>
+      <div style="flex:1"></div>
+
+      <div id="wakeIcon" title="Anti-veille">ANTI<br>VEILLE</div>
+      <button id="wakeBtn" title="Anti-veille">☀</button>
+
+      <div id="fsIcon" title="Plein écran">PLEIN<br>ÉCRAN</div>
+      <button id="fsBtn" title="Plein écran">⛶</button>
+
+      <button id="homeBtn" title="Accueil">⌂</button>
+    </header>
+
+    <main>
+      <div id="banner" class="banner drawn">
+        <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
+          <div style="flex:1;min-width:220px">
+            <div><b>Mode table :</b> anti‑veille / plein écran a été perdu.</div>
+            <div style="font-size:12px;color:var(--muted)">Appuie sur ☀ / ⛶ (ou touche l'écran).</div>
+          </div>
+          <button class="btn sec" id="bannerFix">RÉACTIVER</button>
+        </div>
+      </div>
+
+      <div id="app"></div>
+    </main>
+  </div>
+
+<script>
+(function(){
+  const $ = (s)=>document.querySelector(s);
+  const app = $("#app");
+  const appWrap = $("#appWrap");
+  const vid = $("#hackVid");
+
+  const wakeIcon = $("#wakeIcon");
+  const wakeBtn  = $("#wakeBtn");
+  const fsIcon   = $("#fsIcon");
+  const fsBtn    = $("#fsBtn");
+  const banner   = $("#banner");
+  const bannerFix= $("#bannerFix");
+
+  const backBtn  = $("#backBtn");
+  const homeBtn  = $("#homeBtn");
+
+  // Prefs
+  const PREF_WAKE = "tt15_pref_wake";
+  const PREF_FS   = "tt15_pref_fs";
+  const loadPref=(k,d)=>{try{const v=localStorage.getItem(k);return v===null?d:(v==="1");}catch(e){return d;}};
+  const savePref=(k,v)=>{try{localStorage.setItem(k,v?"1":"0");}catch(e){}};
+
+  let wantWake = loadPref(PREF_WAKE, true);
+  let wantFS   = loadPref(PREF_FS, false);
+  let wakeLock = null;
+  let keepAliveTimer = null;
+
+  function setWakeUI(on){ wakeIcon.classList.toggle("on", !!on); }
+  function setFSUI(on){ fsIcon.classList.toggle("on", !!on); }
+
+  // Storage for games
+  const load=(k,d)=>{try{ return JSON.parse(localStorage.getItem("tt15_"+k)) || d; }catch(e){ return d; }};
+  const save=(k,v)=>{ try{ localStorage.setItem("tt15_"+k, JSON.stringify(v)); }catch(e){} };
+  const esc=(s)=>String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#039;");
+
+  function showBanner(force){
+    // Dans le menu, l'anti-veille n'a pas d'importance : pas de banniere qui vient deranger.
+    const inMenu = (location.hash || "#home") === "#home";
+    if(inMenu){ banner.classList.remove("show"); return; }
+    const lostWake = wantWake && ("wakeLock" in navigator) && !wakeLock;
+    const lostFS = wantFS && !document.fullscreenElement;
+    banner.classList.toggle("show", !!force || lostWake || lostFS);
+  }
+
+  async function tryVideoKeepAlive(){
+    try{ if (vid && vid.paused) await vid.play(); }catch(e){}
+  }
+
+  async function tryWakeLock(){
+    if(!wantWake){ await releaseWakeLock(); return; }
+    await tryVideoKeepAlive();
+
+    if(!("wakeLock" in navigator) || !window.isSecureContext){
+      // API absente ou contexte non sécurisé (ex: fichier ouvert en file://) : impossible de
+      // garantir l'anti-veille natif. On ne ment pas à l'utilisateur, on affiche "désactivé".
+      setWakeUI(false);
+      return;
+    }
+
+    try{
+      if(!wakeLock){
+        wakeLock = await navigator.wakeLock.request("screen");
+        wakeLock.addEventListener("release", ()=>{ wakeLock=null; setWakeUI(false); });
+      }
+      setWakeUI(true);
+    }catch(e){
+      wakeLock = null;
+      setWakeUI(false);
+    }
+  }
+
+  async function releaseWakeLock(){
+    try{ if(wakeLock) await wakeLock.release(); }catch(e){}
+    wakeLock=null;
+    setWakeUI(false);
+  }
+
+  async function tryFullscreen(){
+    if(!wantFS){ setFSUI(false); return; }
+    try{
+      if(!document.fullscreenElement){ await document.documentElement.requestFullscreen(); }
+    }catch(e){}
+    setFSUI(!!document.fullscreenElement);
+  }
+
+  function scheduleKeepAlive(){
+    clearInterval(keepAliveTimer);
+    keepAliveTimer = setInterval(async ()=>{
+      if(document.visibilityState !== "visible") return;
+      if(wantWake){
+        if(!wakeLock && ("wakeLock" in navigator)) await tryWakeLock();
+        await tryVideoKeepAlive();
+      }
+      if(wantFS && !document.fullscreenElement) showBanner(true);
+    }, 5000);
+  }
+
+  async function boot(){
+    if(!location.hash) location.hash="#home";
+    render();
+    scheduleKeepAlive();
+    await tryWakeLock();
+    if(wantFS) await tryFullscreen();
+    showBanner(false);
+  }
+  boot();
+
+  document.addEventListener("click", async ()=>{
+    if(wantWake) await tryWakeLock();
+    if(wantFS && !document.fullscreenElement) await tryFullscreen();
+    showBanner(false);
+  }, {passive:true});
+
+  document.addEventListener("visibilitychange", async ()=>{
+    if(document.visibilityState==="visible"){
+      if(wantWake) await tryWakeLock();
+      if(wantFS) setTimeout(()=>tryFullscreen(), 250);
+      showBanner(false);
+    }
+  });
+
+  wakeBtn.addEventListener("click", async ()=>{
+    wantWake = !wantWake;
+    savePref(PREF_WAKE, wantWake);
+    if(wantWake) await tryWakeLock();
+    else await releaseWakeLock();
+    showBanner(false);
+  });
+
+  fsBtn.addEventListener("click", async ()=>{
+    wantFS = !wantFS;
+    savePref(PREF_FS, wantFS);
+    if(wantFS) await tryFullscreen();
+    else{ try{ if(document.fullscreenElement) await document.exitFullscreen(); }catch(e){} }
+    setFSUI(!!document.fullscreenElement);
+    showBanner(false);
+  });
+
+  bannerFix.addEventListener("click", async ()=>{ await releaseWakeLock(); await tryWakeLock(); await tryFullscreen(); showBanner(false); });
+
+  // Navigation
+  function nav(hash){ location.hash = hash; render(); }
+  backBtn.addEventListener("click", ()=> nav("#home"));
+  homeBtn.addEventListener("click", ()=> nav("#home"));
+  window.addEventListener("hashchange", render);
+
+  // Audio
+  const Aud = window.AudioContext || window.webkitAudioContext;
+  function ding(){
+    if(!Aud) return;
+    const c=new Aud(); const t=c.currentTime;
+    const o=c.createOscillator(); const g=c.createGain();
+    o.connect(g); g.connect(c.destination);
+    o.frequency.setValueAtTime(1200,t);
+    g.gain.linearRampToValueAtTime(0.5,t+0.01);
+    g.gain.exponentialRampToValueAtTime(0.01,t+1.2);
+    o.start(t); o.stop(t+1.2);
+  }
+
+  // Home
+  function rHome(){
+    backBtn.style.visibility="hidden"; homeBtn.disabled=true;
+    app.innerHTML = `
+      <h2>Jeux de score</h2>
+      <div class="grid">
+        <div class="card drawn" data-go="#belote"><div class="ico">🃏</div><div class="tit">Belote</div><div class="sub">Nous / Eux</div></div>
+        <div class="card drawn" data-go="#yams"><div class="ico">🎲</div><div class="tit">Yams</div><div class="sub">Feuille + bonus auto</div></div>
+        <div class="card drawn" data-go="#tarot"><div class="ico">🔮</div><div class="tit">Tarot</div><div class="sub">Contrat + scores</div></div>
+
+        <div class="card drawn" data-go="#rami"><div class="ico">🂡</div><div class="tit">Rami</div><div class="sub">Cartes en main = malus</div></div>
+        <div class="card drawn" data-go="#uno"><div class="ico">🔴</div><div class="tit">Uno</div><div class="sub">Le + haut gagne, fin à 500</div></div>
+        <div class="card drawn" data-go="#scrabble"><div class="ico">🅰️</div><div class="tit">Scrabble</div><div class="sub">Tours + total</div></div>
+        <div class="card drawn" data-go="#421"><div class="ico">🎲</div><div class="tit">421</div><div class="sub">3 dés + carnet</div></div>
+
+        <div class="card drawn" data-go="#molkky"><div class="ico">🪵</div><div class="tit">Mölkky</div><div class="sub">50 points pile</div></div>
+        <div class="card drawn" data-go="#skyjo"><div class="ico">🔢</div><div class="tit">Skyjo</div><div class="sub">Le + bas gagne, fin à 100</div></div>
+        <div class="card drawn" data-go="#petanque"><div class="ico">🎯</div><div class="tit">Pétanque</div><div class="sub">Nous / Eux, jusqu'à 13</div></div>
+
+        <div class="card drawn" data-go="#victoires"><div class="ico">🏆</div><div class="tit">Victoires</div><div class="sub">Dames, échecs, P4...</div></div>
+        <div class="card drawn" data-go="#custom"><div class="ico">📋</div><div class="tit">Tableau custom</div><div class="sub">Joueurs + manches</div></div>
+        <div class="card drawn" data-go="#free"><div class="ico">📝</div><div class="tit">Score libre</div><div class="sub">Tableau générique</div></div>
+      </div>
+
+      <h2 style="margin-top:18px">Outils</h2>
+      <div class="grid">
+        <div class="card drawn" data-go="#dice"><div class="ico">🎲</div><div class="tit">Dé (d6)</div><div class="sub">lancer rapide</div></div>
+        <div class="card drawn" data-go="#timer"><div class="ico">⏳</div><div class="tit">Sablier</div><div class="sub">presets</div></div>
+      </div>
+
+    `;
+    app.querySelectorAll("[data-go]").forEach(el=> el.addEventListener("click", ()=> nav(el.getAttribute("data-go"))) );
+  }
+
+  // Generic sheet renderer
+  function renderSheet(key, title, opts){
+    opts = opts || {};
+    const showContract = !!opts.contract;
+    const contractLabel = opts.contractLabel || "CONTRAT";
+    const d = load(key, {ps: opts.defaultPlayers || ["J1","J2"], r:[], meta:{date:""}});
+    if(!Array.isArray(d.ps) || d.ps.length<1) d.ps = opts.defaultPlayers || ["J1","J2"];
+    if(!Array.isArray(d.r)) d.r = [];
+    if(!d.meta) d.meta = {date:""};
+
+    const totals = d.ps.map((_,i)=> d.r.reduce((acc,row)=> acc + (Number((row.s||[])[i])||0), 0));
+
+    let leaderIdx = -1, ended = false;
+    if(opts.leader && totals.length){
+      const extreme = opts.leader==="low" ? Math.min(...totals) : Math.max(...totals);
+      leaderIdx = totals.indexOf(extreme);
+      if(opts.endAt) ended = opts.leader==="low" ? totals.some(t=>t<=opts.endAt) : totals.some(t=>t>=opts.endAt);
+    }
+
+    const head = d.ps.map((p,i)=>'<th><input class="'+key+'-n" data-i="'+i+'" value="'+esc(p)+'">'+(ended && i===leaderIdx?' 🏆':'')+'</th>').join("");
+    const leftHead = showContract ? '<th class="drawn" style="width:140px">'+esc(contractLabel)+'</th>' : '<th class="drawn" style="width:140px">'+esc(opts.leftHeader || "MANCHES")+'</th>';
+
+    const body = d.r.map((row,ri)=>{
+      const leftCell = showContract
+        ? '<td class="drawn"><input class="'+key+'-c" data-r="'+ri+'" value="'+esc(row.k||"")+'" placeholder="'+esc(contractLabel)+'"></td>'
+        : '<td class="drawn label">Manche '+(ri+1)+'</td>';
+      const cells = d.ps.map((_,ci)=>{
+        const v = (row.s||[])[ci] ?? "";
+        return '<td class="drawn"><input type="number" class="'+key+'-v" data-r="'+ri+'" data-c="'+ci+'" value="'+esc(v)+'"></td>';
+      }).join("");
+      return "<tr>"+leftCell+cells+"</tr>";
+    }).join("");
+
+    const foot = '<tr style="font-weight:1000;background:#eee"><td class="drawn label">'+esc(opts.totalLabel||"TOTAL")+'</td>'
+      + totals.map((t,i)=>'<td class="drawn" style="'+(i===leaderIdx?'color:var(--red)':'')+'">'+t+'</td>').join("")+"</tr>";
+
+    const endBanner = ended ? '<div style="text-align:center;margin-top:8px;font-weight:900;color:var(--red)">🏆 '+esc(d.ps[leaderIdx]||"?")+' remporte la partie avec '+totals[leaderIdx]+' pts !</div>' : '';
+
+    app.innerHTML = `
+      <div class="panel drawn">
+        <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;justify-content:space-between">
+          <div style="font-weight:1000;font-size:18px">${esc(title)}</div>
+          <div style="min-width:160px"><input id="${key}_date" placeholder="Date" value="${esc(d.meta.date||"")}"></div>
+        </div>
+        <div class="kicker">${esc(opts.subtitle || "Manches cumulées, total automatique.")}</div>
+        ${endBanner}
+      </div>
+
+      <div style="overflow-x:auto;margin-top:12px">
+        <table class="paper-table drawn">
+          <thead><tr>${leftHead}${head}</tr></thead>
+          <tbody>${body}${foot}</tbody>
+        </table>
+      </div>
+
+      <div class="actions">
+        <button class="btn" id="${key}_addR">+ ${esc(opts.addRoundLabel||"Manche")}</button>
+        <button class="btn sec" id="${key}_addP">+ Joueur</button>
+      </div>
+      <div class="actions">
+        <button class="btn sec" id="${key}_undo">Annuler</button>
+        <button class="btn sec red" id="${key}_reset">Reset</button>
+      </div>
+    `;
+
+    $("#"+key+"_date").addEventListener("input", (e)=>{ d.meta.date = e.target.value; save(key,d); });
+
+    $("#"+key+"_addP").addEventListener("click", ()=>{
+      d.ps.push("J"+(d.ps.length+1));
+      d.r.forEach(r=>{ if(!Array.isArray(r.s)) r.s=[]; r.s.push(0); });
+      save(key,d); render();
+    });
+    $("#"+key+"_addR").addEventListener("click", ()=>{
+      d.r.push({k:"", s:new Array(d.ps.length).fill(0)});
+      save(key,d); render();
+    });
+    $("#"+key+"_undo").addEventListener("click", ()=>{ d.r.pop(); save(key,d); render(); });
+    $("#"+key+"_reset").addEventListener("click", ()=>{
+      if(confirm("Nouveau ?")){
+        save(key, {ps: opts.defaultPlayers || ["J1","J2"], r:[], meta:{date:""}});
+        render();
+      }
+    });
+
+    app.querySelectorAll("."+key+"-n").forEach(inp=> inp.addEventListener("change",(e)=>{ d.ps[Number(e.target.dataset.i)] = e.target.value; save(key,d); }) );
+    if(showContract){
+      app.querySelectorAll("."+key+"-c").forEach(inp=> inp.addEventListener("change",(e)=>{ d.r[Number(e.target.dataset.r)].k = e.target.value; save(key,d); }) );
+    }
+    app.querySelectorAll("."+key+"-v").forEach(inp=> inp.addEventListener("input",(e)=>{
+      const r=Number(e.target.dataset.r), c=Number(e.target.dataset.c);
+      d.r[r].s[c] = e.target.value;
+      save(key,d);
+      const sel = "."+key+"-v[data-r='"+r+"'][data-c='"+c+"']";
+      render();
+      const el = document.querySelector(sel);
+      if(el){ el.focus(); const L=el.value.length; el.setSelectionRange(L,L); }
+    }) );
+  }
+
+  // Yams
+  const Y_CATS = [
+    {l:"Total 1",k:"1"},{l:"Total 2",k:"2"},{l:"Total 3",k:"3"},{l:"Total 4",k:"4"},{l:"Total 5",k:"5"},{l:"Total 6",k:"6"},
+    {l:"Total sup",auto:"u",bg:1},{l:"Bonus (+35)",auto:"bo",bg:1},
+    {l:"Brelan",k:"br"},{l:"Carré",k:"ca"},{l:"Full",k:"fu"},{l:"Petite suite",k:"ps"},{l:"Grande suite",k:"gs"},{l:"YAMS",k:"ya"},{l:"Chance",k:"ch"},
+    {l:"TOTAL",auto:"tot",bg:1,big:1}
+  ];
+  function rYams(){
+    const d = load("yams", {ps:["J1","J2"], s:{}});
+    if(!Array.isArray(d.ps) || d.ps.length<1) d.ps=["J1","J2"];
+    if(!d.s) d.s = {};
+    const calc = (pi)=>{
+      const s = d.s[pi] || {};
+      let u=0,l=0;
+      ["1","2","3","4","5","6"].forEach(k=>u += Number(s[k]||0));
+      const bo = u>=63 ? 35 : 0;
+      ["br","ca","fu","ps","gs","ya","ch"].forEach(k=> l += Number(s[k]||0));
+      return {u:u, bo:bo, tot:u+bo+l};
+    };
+
+    let html = '<div class="panel drawn"><div style="font-weight:1000;font-size:18px">Yams</div><div class="kicker">Bonus auto (>=63) + total auto.</div></div>';
+    html += '<div style="overflow-x:auto;margin-top:12px"><table class="paper-table drawn"><thead><tr><th class="drawn">YAMS</th>';
+    d.ps.forEach((p,i)=>{ html += '<th><input class="y-n" data-i="'+i+'" value="'+esc(p)+'"></th>'; });
+    html += '</tr></thead><tbody>';
+
+    Y_CATS.forEach(cat=>{
+      html += '<tr style="'+(cat.bg?'background:#eee;font-weight:1000':'')+'">';
+      html += '<td class="drawn label" style="'+(cat.big?'font-size:16px':'')+'">'+esc(cat.l)+'</td>';
+      d.ps.forEach((_,i)=>{
+        if(cat.auto){
+          html += '<td class="drawn">'+calc(i)[cat.auto]+'</td>';
+        }else{
+          const val = (d.s[i]||{})[cat.k] || "";
+          html += '<td class="drawn"><input type="number" class="y-v" data-p="'+i+'" data-k="'+cat.k+'" value="'+esc(val)+'"></td>';
+        }
+      });
+      html += '</tr>';
+    });
+
+    html += '</tbody></table></div>';
+    html += '<div class="actions"><button class="btn" id="yAdd">+ Joueur</button><button class="btn sec red" id="yReset">Reset</button></div>';
+    app.innerHTML = html;
+
+    app.querySelectorAll(".y-n").forEach(inp=> inp.addEventListener("change",(e)=>{ d.ps[Number(e.target.dataset.i)] = e.target.value; save("yams",d); }) );
+    app.querySelectorAll(".y-v").forEach(inp=> inp.addEventListener("input",(e)=>{
+      const p=Number(e.target.dataset.p), k=e.target.dataset.k;
+      if(!d.s[p]) d.s[p]={};
+      d.s[p][k]=e.target.value;
+      save("yams",d);
+      const sel = ".y-v[data-p='"+p+"'][data-k='"+k+"']";
+      render();
+      const el = document.querySelector(sel);
+      if(el){ el.focus(); const L=el.value.length; el.setSelectionRange(L,L); }
+    }) );
+    $("#yAdd").addEventListener("click", ()=>{ d.ps.push("J"+(d.ps.length+1)); save("yams",d); render(); });
+    $("#yReset").addEventListener("click", ()=>{ if(confirm("Reset ?")){ save("yams",{ps:["J1","J2"], s:{}}); render(); }});
+  }
+
+  // Belote
+  function rBelote(){
+    const d = load("belote", {r:[]});
+    if(!Array.isArray(d.r)) d.r = [];
+    const totU = d.r.reduce((a,b)=>a+(Number(b.u)||0),0);
+    const totT = d.r.reduce((a,b)=>a+(Number(b.t)||0),0);
+    const list = d.r.slice().reverse().map(r=>"<div>"+(Number(r.u)||0)+" - "+(Number(r.t)||0)+"</div>").join("");
+
+    app.innerHTML = `
+      <div class="belote-split drawn">
+        <div class="belote-col">
+          <div class="b-head">NOUS</div>
+          <div class="b-tot">${totU}</div>
+          <div class="b-list">${list}</div>
+        </div>
+        <div class="belote-col">
+          <div class="b-head">EUX</div>
+          <div class="b-tot">${totT}</div>
+          <div class="b-list" style="background:#f9f9f9"></div>
+        </div>
+      </div>
+
+      <div class="panel drawn" style="margin-top:14px">
+        <div class="grid" style="grid-template-columns:1fr 1fr">
+          <div><input type="number" id="bU" placeholder="Nous"></div>
+          <div><input type="number" id="bT" placeholder="Eux"></div>
+        </div>
+        <div class="actions">
+          <button class="btn sec" id="b162">162</button>
+          <button class="btn" id="bAdd">Ajouter</button>
+        </div>
+        <div class="actions">
+          <button class="btn sec" id="bUndo">Annuler</button>
+          <button class="btn sec red" id="bReset">Reset</button>
+        </div>
+      </div>
+    `;
+    $("#b162").addEventListener("click", ()=>{
+      const u = $("#bU").value, t = $("#bT").value;
+      if(u!=="") $("#bT").value = 162 - Number(u||0);
+      else if(t!=="") $("#bU").value = 162 - Number(t||0);
+    });
+    $("#bAdd").addEventListener("click", ()=>{
+      const u = Number($("#bU").value||0), t = Number($("#bT").value||0);
+      if(!u && !t) return;
+      d.r.push({u:u,t:t}); save("belote",d); render();
+    });
+    $("#bUndo").addEventListener("click", ()=>{ d.r.pop(); save("belote",d); render(); });
+    $("#bReset").addEventListener("click", ()=>{ if(confirm("Reset ?")){ save("belote",{r:[]}); render(); }});
+  }
+
+  // Simple routes
+  function rTarot(){ renderSheet("tarot","Tarot",{defaultPlayers:["J1","J2","J3","J4"], contract:true, contractLabel:"Contrat", addRoundLabel:"Donne", leftHeader:"DONNES", subtitle:"Contrat (optionnel) + scores, total auto."}); }
+  function rRami(){ renderSheet("rami","Rami",{defaultPlayers:["J1","J2"], addRoundLabel:"Manche", subtitle:"Cartes restées en main = points de malus. Le total le plus bas gagne.", leader:"low"}); }
+  function rUno(){ renderSheet("uno","Uno",{defaultPlayers:["J1","J2"], addRoundLabel:"Manche", subtitle:"Points des cartes adverses. Le total le plus haut gagne, fin à 500 pts.", leader:"high", endAt:500}); }
+  function rScrabble(){ renderSheet("scrabble","Scrabble",{defaultPlayers:["J1","J2"], leftHeader:"TOURS", addRoundLabel:"Tour", subtitle:"Tour par tour, total auto."}); }
+  function rFree(){ renderSheet("free","Score libre",{defaultPlayers:["J1","J2"], addRoundLabel:"Manche"}); }
+
+  // 421
+  function r421(){
+    const d = load("g421",{ps:["J1","J2"], r:[], dice:[4,2,1]});
+    if(!Array.isArray(d.ps) || d.ps.length<1) d.ps=["J1","J2"];
+    if(!Array.isArray(d.r)) d.r=[];
+    if(!Array.isArray(d.dice) || d.dice.length!==3) d.dice=[4,2,1];
+
+    const totals = d.ps.map((_,i)=> d.r.reduce((acc,row)=> acc + (Number((row.s||[])[i])||0), 0));
+    const head = d.ps.map((p,i)=>'<th><input class="g421-n" data-i="'+i+'" value="'+esc(p)+'"></th>').join("");
+    const body = d.r.map((row,ri)=>{
+      const cells = d.ps.map((_,ci)=>{
+        const v = (row.s||[])[ci] ?? "";
+        return '<td class="drawn"><input type="number" class="g421-v" data-r="'+ri+'" data-c="'+ci+'" value="'+esc(v)+'"></td>';
+      }).join("");
+      return '<tr><td class="drawn label">Manche '+(ri+1)+'</td>'+cells+'</tr>';
+    }).join("");
+
+    app.innerHTML = `
+      <div class="panel drawn">
+        <div style="font-weight:1000;font-size:18px">421</div>
+        <div class="kicker">3 dés + carnet de points.</div>
+        <div class="d3">
+          <div class="die drawn">${d.dice[0]}</div>
+          <div class="die drawn">${d.dice[1]}</div>
+          <div class="die drawn">${d.dice[2]}</div>
+        </div>
+        <div class="actions">
+          <button class="btn" id="gRoll">Lancer 3 dés</button>
+          <button class="btn sec" id="gAddR">+ Manche</button>
+          <button class="btn sec" id="gAddP">+ Joueur</button>
+        </div>
+        <div class="actions">
+          <button class="btn sec" id="gUndo">Annuler</button>
+          <button class="btn sec red" id="gReset">Reset</button>
+        </div>
+      </div>
+
+      <div style="overflow-x:auto;margin-top:12px">
+        <table class="paper-table drawn">
+          <thead><tr><th class="drawn" style="width:140px">MANCHES</th>${head}</tr></thead>
+          <tbody>${body}<tr style="font-weight:1000;background:#eee"><td class="drawn label">TOTAL</td>${totals.map(t=>'<td class="drawn">'+t+'</td>').join("")}</tr></tbody>
+        </table>
+      </div>
+    `;
+
+    $("#gRoll").addEventListener("click", ()=>{ d.dice=[1+Math.floor(Math.random()*6),1+Math.floor(Math.random()*6),1+Math.floor(Math.random()*6)]; save("g421",d); render(); ding(); });
+    $("#gAddR").addEventListener("click", ()=>{ d.r.push({s:new Array(d.ps.length).fill(0)}); save("g421",d); render(); });
+    $("#gAddP").addEventListener("click", ()=>{ d.ps.push("J"+(d.ps.length+1)); d.r.forEach(r=>{ if(!Array.isArray(r.s)) r.s=[]; r.s.push(0); }); save("g421",d); render(); });
+    $("#gUndo").addEventListener("click", ()=>{ d.r.pop(); save("g421",d); render(); });
+    $("#gReset").addEventListener("click", ()=>{ if(confirm("Reset ?")){ save("g421",{ps:["J1","J2"], r:[], dice:[4,2,1]}); render(); }});
+
+    app.querySelectorAll(".g421-n").forEach(inp=> inp.addEventListener("change",(e)=>{ d.ps[Number(e.target.dataset.i)]=e.target.value; save("g421",d); }) );
+    app.querySelectorAll(".g421-v").forEach(inp=> inp.addEventListener("input",(e)=>{
+      const r=Number(e.target.dataset.r), c=Number(e.target.dataset.c);
+      d.r[r].s[c]=e.target.value; save("g421",d);
+      const sel = ".g421-v[data-r='"+r+"'][data-c='"+c+"']";
+      render();
+      const el = document.querySelector(sel);
+      if(el){ el.focus(); const L=el.value.length; el.setSelectionRange(L,L); }
+    }) );
+  }
+
+  // Skyjo
+  function rSkyjo(){
+    const d = load("skyjo",{ps:["J1","J2"], r:[]});
+    if(!Array.isArray(d.ps) || d.ps.length<1) d.ps=["J1","J2"];
+    if(!Array.isArray(d.r)) d.r=[];
+
+    const totals = d.ps.map((_,i)=> d.r.reduce((acc,row)=> acc + (Number((row.s||[])[i])||0), 0));
+    const minTot = totals.length ? Math.min(...totals) : 0;
+    const ended = totals.some(t=> t>=100);
+    const winnerIdx = ended ? totals.indexOf(minTot) : -1;
+
+    const head = d.ps.map((p,i)=>'<th><input class="sk-n" data-i="'+i+'" value="'+esc(p)+'">'+(i===winnerIdx?' 🏆':'')+'</th>').join("");
+    const body = d.r.map((row,ri)=>{
+      const cells = d.ps.map((_,ci)=>{
+        const v = (row.s||[])[ci] ?? "";
+        return '<td class="drawn"><input type="number" class="sk-v" data-r="'+ri+'" data-c="'+ci+'" value="'+esc(v)+'"></td>';
+      }).join("");
+      return '<tr><td class="drawn label">Manche '+(ri+1)+'</td>'+cells+'</tr>';
+    }).join("");
+    const foot = '<tr style="font-weight:1000;background:#eee"><td class="drawn label">TOTAL</td>'
+      + totals.map(t=>'<td class="drawn" style="'+(t===minTot?'color:var(--red)':'')+'">'+t+'</td>').join("") + '</tr>';
+
+    app.innerHTML = `
+      <div class="panel drawn">
+        <div style="font-weight:1000;font-size:18px">Skyjo</div>
+        <div class="kicker">Le score le plus bas gagne. Fin de partie dès qu'un joueur atteint 100 pts.</div>
+        ${ended ? '<div style="text-align:center;margin-top:8px;font-weight:900;color:var(--red)">🏁 Partie terminée — '+esc(d.ps[winnerIdx]||"?")+' gagne avec '+minTot+' pts !</div>' : ''}
+        <div class="actions">
+          <button class="btn" id="skAddR">+ Manche</button>
+          <button class="btn sec" id="skAddP">+ Joueur</button>
+        </div>
+        <div class="actions">
+          <button class="btn sec" id="skUndo">Annuler</button>
+          <button class="btn sec red" id="skReset">Reset</button>
+        </div>
+      </div>
+
+      <div style="overflow-x:auto;margin-top:12px">
+        <table class="paper-table drawn">
+          <thead><tr><th class="drawn" style="width:140px">MANCHES</th>${head}</tr></thead>
+          <tbody>${body}${foot}</tbody>
+        </table>
+      </div>
+    `;
+
+    $("#skAddR").addEventListener("click", ()=>{ d.r.push({s:new Array(d.ps.length).fill(0)}); save("skyjo",d); render(); });
+    $("#skAddP").addEventListener("click", ()=>{ d.ps.push("J"+(d.ps.length+1)); d.r.forEach(r=>{ if(!Array.isArray(r.s)) r.s=[]; r.s.push(0); }); save("skyjo",d); render(); });
+    $("#skUndo").addEventListener("click", ()=>{ d.r.pop(); save("skyjo",d); render(); });
+    $("#skReset").addEventListener("click", ()=>{ if(confirm("Nouvelle partie ?")){ save("skyjo",{ps:["J1","J2"], r:[]}); render(); }});
+
+    app.querySelectorAll(".sk-n").forEach(inp=> inp.addEventListener("change",(e)=>{ d.ps[Number(e.target.dataset.i)]=e.target.value; save("skyjo",d); render(); }) );
+    app.querySelectorAll(".sk-v").forEach(inp=> inp.addEventListener("input",(e)=>{
+      const r=Number(e.target.dataset.r), c=Number(e.target.dataset.c);
+      d.r[r].s[c]=e.target.value; save("skyjo",d);
+      const sel = ".sk-v[data-r='"+r+"'][data-c='"+c+"']";
+      render();
+      const el = document.querySelector(sel);
+      if(el){ el.focus(); const L=el.value.length; el.setSelectionRange(L,L); }
+    }) );
+  }
+
+  // Pétanque
+  function rPetanque(){
+    const d = load("petanque", {r:[]});
+    if(!Array.isArray(d.r)) d.r = [];
+    const totU = d.r.reduce((a,b)=>a+(Number(b.u)||0),0);
+    const totT = d.r.reduce((a,b)=>a+(Number(b.t)||0),0);
+    const listU = d.r.slice().reverse().map(r=>"<div>+"+(Number(r.u)||0)+"</div>").join("");
+    const listT = d.r.slice().reverse().map(r=>"<div>+"+(Number(r.t)||0)+"</div>").join("");
+    const ended = totU>=13 || totT>=13;
+    const winner = totU>=13 ? "NOUS" : (totT>=13 ? "EUX" : null);
+
+    app.innerHTML = `
+      <div class="panel drawn">
+        <div style="font-weight:1000;font-size:18px">Pétanque</div>
+        <div class="kicker">Première équipe à 13 points gagne la partie.</div>
+        ${ended ? '<div style="text-align:center;margin-top:8px;font-weight:900;color:var(--red)">🏆 '+winner+' a gagné la partie !</div>' : ''}
+      </div>
+
+      <div class="belote-split drawn" style="margin-top:12px">
+        <div class="belote-col">
+          <div class="b-head">NOUS</div>
+          <div class="b-tot">${totU}</div>
+          <div class="b-list">${listU}</div>
+        </div>
+        <div class="belote-col">
+          <div class="b-head">EUX</div>
+          <div class="b-tot">${totT}</div>
+          <div class="b-list" style="background:#f9f9f9">${listT}</div>
+        </div>
+      </div>
+
+      <div class="panel drawn" style="margin-top:14px">
+        <div class="kicker">Points de la mène (un seul camp marque à la fois, 1 à 6 pts).</div>
+        <div class="grid" style="grid-template-columns:1fr 1fr">
+          <div><input type="number" id="pU" placeholder="Nous" min="0" max="6"></div>
+          <div><input type="number" id="pT" placeholder="Eux" min="0" max="6"></div>
+        </div>
+        <div class="actions">
+          <button class="btn" id="pAdd">+ Mène</button>
+        </div>
+        <div class="actions">
+          <button class="btn sec" id="pUndo">Annuler</button>
+          <button class="btn sec red" id="pReset">Reset</button>
+        </div>
+      </div>
+    `;
+    $("#pAdd").addEventListener("click", ()=>{
+      const u = Number($("#pU").value||0), t = Number($("#pT").value||0);
+      if(!u && !t) return;
+      d.r.push({u:u,t:t}); save("petanque",d); render();
+    });
+    $("#pUndo").addEventListener("click", ()=>{ d.r.pop(); save("petanque",d); render(); });
+    $("#pReset").addEventListener("click", ()=>{ if(confirm("Reset ?")){ save("petanque",{r:[]}); render(); }});
+  }
+
+  // Compteur de victoires
+  function rVictoires(){
+    const d = load("victoires", {ps:["J1","J2"], w:[0,0]});
+    if(!Array.isArray(d.ps) || d.ps.length<1) d.ps=["J1","J2"];
+    if(!Array.isArray(d.w)) d.w=[];
+    while(d.w.length < d.ps.length) d.w.push(0);
+
+    let html = '<div class="panel drawn"><div style="font-weight:1000;font-size:18px">Compteur de victoires</div><div class="kicker">Pour les jeux sans score chiffré (dames, échecs, puissance 4...). Une victoire = un point.</div></div>';
+    html += '<div class="grid" style="margin-top:12px;grid-template-columns:repeat(auto-fit,minmax(140px,1fr))">';
+    d.ps.forEach((p,i)=>{
+      html += '<div class="panel drawn" style="text-align:center">'
+        + '<input class="v-n" data-i="'+i+'" value="'+esc(p)+'" style="font-weight:900;text-align:center;margin-bottom:6px">'
+        + '<div style="font-size:44px;font-weight:1000">'+(d.w[i]||0)+'</div>'
+        + '<div class="actions" style="margin-top:8px">'
+        + '<button class="btn sec" data-minus="'+i+'" style="min-width:0;flex:1">−1</button>'
+        + '<button class="btn" data-plus="'+i+'" style="min-width:0;flex:1">+1</button>'
+        + '</div></div>';
+    });
+    html += '</div>';
+    html += '<div class="actions" style="margin-top:14px"><button class="btn sec" id="vAddP">+ Joueur</button><button class="btn sec red" id="vReset">Reset</button></div>';
+    app.innerHTML = html;
+
+    app.querySelectorAll(".v-n").forEach(inp=> inp.addEventListener("change",(e)=>{ d.ps[Number(e.target.dataset.i)]=e.target.value; save("victoires",d); }) );
+    app.querySelectorAll("[data-plus]").forEach(b=> b.addEventListener("click",()=>{ const i=Number(b.getAttribute("data-plus")); d.w[i]=(d.w[i]||0)+1; save("victoires",d); render(); ding(); }) );
+    app.querySelectorAll("[data-minus]").forEach(b=> b.addEventListener("click",()=>{ const i=Number(b.getAttribute("data-minus")); d.w[i]=Math.max(0,(d.w[i]||0)-1); save("victoires",d); render(); }) );
+    $("#vAddP").addEventListener("click", ()=>{ d.ps.push("J"+(d.ps.length+1)); d.w.push(0); save("victoires",d); render(); });
+    $("#vReset").addEventListener("click", ()=>{ if(confirm("Reset ?")){ save("victoires",{ps:["J1","J2"], w:[0,0]}); render(); }});
+  }
+
+  // Mölkky
+  function rMolkky(){
+    const d = load("molkky",{ps:[{n:"J1",s:0,m:0},{n:"J2",s:0,m:0}], cur:0});
+    if(!Array.isArray(d.ps) || d.ps.length<1) d.ps=[{n:"J1",s:0,m:0},{n:"J2",s:0,m:0}];
+    if(typeof d.cur!=="number") d.cur=0;
+    const cur = d.ps[d.cur] || d.ps[0];
+
+    let html = '<div class="actions"><button class="btn sec" id="mAddP">+ Joueur</button><button class="btn sec red" id="mReset">Reset</button></div><br>';
+    d.ps.forEach((pl,i)=>{
+      let state="";
+      if(pl.m>=3) state="💀 Éliminé";
+      else if(pl.s===50) state="🏆 Gagné !";
+      else if(pl.s>50) state="⬇ 25";
+      html += '<div class="m-player drawn '+(i===d.cur?'active':'')+'" data-p="'+i+'">'
+        + '<div style="display:flex;justify-content:space-between"><span style="font-weight:1000">'+esc(pl.n)+'</span><span style="font-weight:1000;font-size:18px">'+(pl.s||0)+' / 50</span></div>'
+        + '<div style="font-size:11px;color:var(--muted)">Ratés: '+(pl.m||0)+' '+state+'</div></div>';
+    });
+    html += '<div class="panel drawn"><div style="text-align:center;font-weight:1000;margin-bottom:10px">Tour de '+esc(cur.n)+'</div>'
+      + '<div class="molkky-grid">'+[1,2,3,4,5,6,7,8,9,10,11,12].map(n=>'<div class="pin-btn" data-hit="'+n+'">'+n+'</div>').join("")+'</div>'
+      + '<div class="actions"><button class="btn sec red" id="mMiss">RATÉ (X)</button></div></div>';
+    app.innerHTML = html;
+
+    app.querySelectorAll(".m-player").forEach(el=> el.addEventListener("click", ()=>{ d.cur=Number(el.getAttribute("data-p")); save("molkky",d); render(); }) );
+
+    function nextPlayer(){
+      let next=d.cur+1; if(next>=d.ps.length) next=0;
+      const start=next;
+      while(d.ps[next].m>=3 || d.ps[next].s===50){
+        next++; if(next>=d.ps.length) next=0;
+        if(next===start) break;
+      }
+      d.cur=next;
+    }
+    function hit(val){
+      const pl=d.ps[d.cur];
+      if(pl.m>=3 || pl.s===50) return;
+      if(val===0){ pl.m=(pl.m||0)+1; }
+      else{ pl.m=0; pl.s=(pl.s||0)+val; if(pl.s>50) pl.s=25; }
+      nextPlayer();
+      save("molkky",d); render();
+    }
+
+    $("#mAddP").addEventListener("click", ()=>{ d.ps.push({n:"J"+(d.ps.length+1),s:0,m:0}); save("molkky",d); render(); });
+    $("#mReset").addEventListener("click", ()=>{ if(confirm("Nouvelle partie ?")){ save("molkky",{ps:[{n:"J1",s:0,m:0},{n:"J2",s:0,m:0}],cur:0}); render(); }});
+    $("#mMiss").addEventListener("click", ()=> hit(0));
+    app.querySelectorAll("[data-hit]").forEach(b=> b.addEventListener("click", ()=> hit(Number(b.getAttribute("data-hit")))) );
+  }
+
+  // Tools
+  function rDice(){
+    app.innerHTML = '<div class="panel drawn" style="padding:34px;text-align:center">'
+      + '<div id="dRes" style="font-size:90px;font-weight:1000">?</div>'
+      + '<div class="actions"><button class="btn" id="dRoll">LANCER</button></div></div>';
+    $("#dRoll").addEventListener("click", ()=>{
+      let i=0; const el=$("#dRes");
+      const t=setInterval(()=>{ el.textContent = String(1+Math.floor(Math.random()*6)); if(++i>10){ clearInterval(t); ding(); }}, 50);
+    });
+  }
+
+  let tInt=null; let tS={t:60,r:60,run:false};
+  function stopTimer(){ if(tInt){ clearInterval(tInt); tInt=null; } tS.run=false; }
+  function rTimer(){
+    const mm=Math.floor(tS.r/60), ss=String(tS.r%60).padStart(2,"0");
+    app.innerHTML = '<div class="panel drawn" style="text-align:center">'
+      + '<div style="font-weight:1000;font-size:44px">'+mm+':'+ss+'</div>'
+      + '<div class="actions"><button class="btn" id="tStart">'+(tS.run?'PAUSE':'LANCER')+'</button><button class="btn sec" id="tReset">RESET</button></div>'
+      + '<div class="actions">'+[30,60,90,120,180,300].map(s=>'<button class="btn sec" data-p="'+s+'">'+(s<60? s+'s' : (s/60)+'m')+'</button>').join("")+'</div>'
+      + '</div>';
+    $("#tStart").addEventListener("click", ()=>{
+      if(tS.run){ stopTimer(); render(); return; }
+      if(tS.r<=0) tS.r=tS.t;
+      tS.run=true;
+      tInt=setInterval(()=>{ tS.r--; if(tS.r<=0){ tS.r=0; stopTimer(); ding(); setTimeout(ding,500);} render(); }, 1000);
+      render();
+    });
+    $("#tReset").addEventListener("click", ()=>{ stopTimer(); tS.r=tS.t; render(); });
+    app.querySelectorAll("[data-p]").forEach(b=> b.addEventListener("click", ()=>{ const s=Number(b.getAttribute("data-p")); stopTimer(); tS.t=s; tS.r=s; render(); }) );
+  }
+
+  function rCustom(){
+    const cfg = load("custom_cfg",{title:"Tableau custom", players:4, rounds:5});
+    app.innerHTML = `
+      <div class="panel drawn">
+        <div style="font-weight:1000;font-size:18px">Tableau custom</div>
+        <div class="kicker">Choisis joueurs + manches → on génère une feuille.</div>
+        <div class="actions" style="margin-top:10px">
+          <div style="flex:1;min-width:160px"><div style="font-size:12px;color:var(--muted);margin-bottom:6px">Titre</div><input id="ctTitle" value="${esc(cfg.title)}"></div>
+          <div style="flex:1;min-width:120px"><div style="font-size:12px;color:var(--muted);margin-bottom:6px">Joueurs</div><input id="ctPlayers" type="number" min="1" max="12" value="${cfg.players}"></div>
+          <div style="flex:1;min-width:120px"><div style="font-size:12px;color:var(--muted);margin-bottom:6px">Manches</div><input id="ctRounds" type="number" min="1" max="30" value="${cfg.rounds}"></div>
+        </div>
+        <div class="actions">
+          <button class="btn" id="ctGo">GÉNÉRER</button>
+          <button class="btn sec red" id="ctReset">Reset feuille</button>
+        </div>
+      </div>
+    `;
+    function saveCfg(){
+      cfg.title=$("#ctTitle").value||"Tableau custom";
+      cfg.players=Math.max(1,Math.min(12,Number($("#ctPlayers").value)||4));
+      cfg.rounds=Math.max(1,Math.min(30,Number($("#ctRounds").value)||5));
+      save("custom_cfg",cfg);
+    }
+    $("#ctTitle").addEventListener("input", saveCfg);
+    $("#ctPlayers").addEventListener("input", saveCfg);
+    $("#ctRounds").addEventListener("input", saveCfg);
+    $("#ctGo").addEventListener("click", ()=>{
+      saveCfg();
+      const ps=Array.from({length:cfg.players},(_,i)=>"J"+(i+1));
+      const r=Array.from({length:cfg.rounds},()=>({k:"", s:new Array(cfg.players).fill(0)}));
+      save("custom_sheet",{ps:ps, r:r, meta:{date:"", title:cfg.title}});
+      nav("#custom_sheet");
+    });
+    $("#ctReset").addEventListener("click", ()=>{ if(confirm("Reset ?")){ save("custom_sheet",{ps:["J1","J2"], r:[], meta:{date:"", title:"Tableau custom"}}); alert("OK."); }});
+  }
+  function rCustomSheet(){
+    const d = load("custom_sheet",{ps:["J1","J2"], r:[], meta:{date:"", title:"Tableau custom"}});
+    renderSheet("custom_sheet", (d.meta && d.meta.title) ? d.meta.title : "Tableau custom", {defaultPlayers:d.ps, addRoundLabel:"Manche"});
+  }
+
+  // Router
+  function render(){
+    const h = location.hash || "#home";
+    if(h==="#home"){ backBtn.style.visibility="hidden"; homeBtn.disabled=true; }
+    else{ backBtn.style.visibility="visible"; homeBtn.disabled=false; }
+
+    if(h!=="#timer") stopTimer();
+    showBanner(false);
+
+    switch(h){
+      case "#home": rHome(); break;
+      case "#belote": rBelote(); break;
+      case "#yams": rYams(); break;
+      case "#tarot": rTarot(); break;
+      case "#rami": rRami(); break;
+      case "#uno": rUno(); break;
+      case "#scrabble": rScrabble(); break;
+      case "#free": rFree(); break;
+      case "#421": r421(); break;
+      case "#skyjo": rSkyjo(); break;
+      case "#petanque": rPetanque(); break;
+      case "#victoires": rVictoires(); break;
+      case "#molkky": rMolkky(); break;
+      case "#dice": rDice(); break;
+      case "#timer": rTimer(); break;
+      case "#custom": rCustom(); break;
+      case "#custom_sheet": rCustomSheet(); break;
+      default: rHome();
+    }
+  }
+
+  // init icon state
+  setWakeUI(false); setFSUI(false);
+})();
+</script>
+</body>
+</html>
