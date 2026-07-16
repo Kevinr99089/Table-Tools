@@ -2,7 +2,7 @@
   "name": "Table Tools",
   "short_name": "Table Tools",
   "start_url": "./index.html",
-  "scope": "./",
+  "scope": "./#home",
   "display": "fullscreen",
   "display_override": ["fullscreen", "standalone"],
   "orientation": "any",
