@@ -1,1191 +1,1 @@
-<!doctype html>
-<html lang="fr">
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no" />
-  <title>TableTool v16</title>
-  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMiAzMiI+PHJlY3QgeD0iNCIgeT0iMyIgd2lkdGg9IjE4IiBoZWlnaHQ9IjI2IiByeD0iMyIgZmlsbD0iI2ZjZmJmOCIgc3Ryb2tlPSIjMWExYTJlIiBzdHJva2Utd2lkdGg9IjIuNSIvPjxjaXJjbGUgY3g9IjQiIGN5PSI4IiByPSIxLjYiIGZpbGw9IiMxYTFhMmUiLz48Y2lyY2xlIGN4PSI0IiBjeT0iMTUiIHI9IjEuNiIgZmlsbD0iIzFhMWEyZSIvPjxjaXJjbGUgY3g9IjQiIGN5PSIyMiIgcj0iMS42IiBmaWxsPSIjMWExYTJlIi8+PGxpbmUgeDE9IjkiIHkxPSIxMCIgeDI9IjE4IiB5Mj0iMTAiIHN0cm9rZT0iIzY2NiIgc3Ryb2tlLXdpZHRoPSIyIi8+PGxpbmUgeDE9IjkiIHkxPSIxNiIgeDI9IjE4IiB5Mj0iMTYiIHN0cm9rZT0iIzY2NiIgc3Ryb2tlLXdpZHRoPSIyIi8+PHBhdGggZD0iTTE2IDI3IEwyNyAxMCBMMzAgMTIgTDIwIDI5IFoiIGZpbGw9IiNjMDM5MmIiIHN0cm9rZT0iIzFhMWEyZSIgc3Ryb2tlLXdpZHRoPSIxLjUiIHN0cm9rZS1saW5lam9pbj0icm91bmQiLz48L3N2Zz4=" />
-  <style>
-    :root{--bg:#fcfbf8;--ink:#1a1a2e;--muted:#666;--red:#c0392b;--wood:#8d6e63;--ok:#2e7d32;--font:"Comic Sans MS","Chalkboard SE","Marker Felt",system-ui,sans-serif;}
-    *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;user-select:none}
-    body{margin:0;color:var(--ink);font-family:var(--font);background:var(--bg);
-      background-image:linear-gradient(#e0e0e0 1px,transparent 1px),linear-gradient(90deg,#e0e0e0 1px,transparent 1px);
-      background-size:20px 20px;background-blend-mode:multiply;padding-bottom:90px;}
-    .drawn{filter:url('#wiggle')}
-    header{position:sticky;top:0;z-index:50;background:var(--bg);border-bottom:2px solid var(--ink);padding:10px;display:flex;align-items:center;gap:10px;box-shadow:0 4px 10px rgba(0,0,0,.1)}
-    header button{background:transparent;border:2px solid var(--ink);border-radius:50%;width:40px;height:40px;font-size:18px;cursor:pointer;display:grid;place-items:center}
-    #wakeIcon,#fsIcon{opacity:.15;font-size:10px;line-height:1.1;text-align:right;transition:.2s}
-    #wakeIcon.on{opacity:1;color:var(--ok);font-weight:900}
-    #fsIcon.on{opacity:1;color:var(--wood);font-weight:900}
-    main{max-width:860px;margin:0 auto;padding:15px}
-    h2{margin:10px 0 8px}
-    .grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:15px}
-    @media(min-width:600px){.grid{grid-template-columns:repeat(3,minmax(0,1fr));}}
-    .card{background:#fff;border:2px solid var(--ink);border-radius:6px;padding:15px;display:flex;flex-direction:column;align-items:center;gap:6px;box-shadow:3px 3px 0 rgba(0,0,0,.1);cursor:pointer}
-    .card:active{transform:scale(.98)}
-    .card .ico{font-size:32px}
-    .card .tit{font-weight:900;font-size:16px}
-    .card .sub{font-size:11px;color:var(--muted);font-style:italic;text-align:center}
-    .panel{background:#fff;border:2px solid var(--ink);border-radius:10px;padding:14px;box-shadow:2px 2px 0 rgba(0,0,0,.12)}
-    .kicker{font-size:12px;color:var(--muted);font-style:italic;text-align:center}
-    .actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px}
-    .btn{flex:1;min-width:140px;padding:12px;background:#fff;border:2px solid var(--ink);border-radius:10px;font-family:var(--font);font-weight:900;cursor:pointer;box-shadow:2px 2px 0 var(--ink)}
-    .btn:active{transform:translate(2px,2px);box-shadow:none}
-    .btn.sec{border-style:dashed;opacity:.9;box-shadow:none}
-    .btn.red{color:var(--red);border-color:var(--red)}
-    input{background:transparent;border:none;border-bottom:1px dashed #999;font-family:var(--font);font-size:16px;width:100%;text-align:center;color:var(--ink);user-select:text;border-radius:0}
-    input:focus{outline:none;border-bottom:2px solid var(--ink);background:#f0f0f0}
-    .paper-table{width:100%;border-collapse:collapse;background:#fff;margin:12px 0}
-    .paper-table th{border:2px solid var(--ink);background:#eee;padding:6px;font-size:12px;text-transform:uppercase}
-    .paper-table td{border:2px solid var(--ink);padding:6px;text-align:center;height:36px}
-    .paper-table td.label{text-align:left;font-weight:900;background:#fafafa;width:140px;font-size:13px}
-    .belote-split{display:flex;border:3px solid var(--ink);height:300px;background:#fff;filter:url('#wiggle')}
-    .belote-col{flex:1;display:flex;flex-direction:column;border-right:2px solid var(--ink)}
-    .belote-col:last-child{border:none}
-    .b-head{background:#eee;padding:10px;text-align:center;font-weight:900;border-bottom:2px solid var(--ink)}
-    .b-tot{font-size:40px;text-align:center;padding:10px;font-weight:1000;border-bottom:2px dashed #ccc}
-    .b-list{flex:1;overflow-y:auto;font-size:14px;text-align:center;line-height:1.8}
-    .d3{display:flex;gap:12px;justify-content:center;align-items:center;margin:14px 0 6px}
-    .d3-check{display:flex;gap:12px;justify-content:center;align-items:center;margin:4px 0}
-    .die{width:74px;height:74px;border:3px solid var(--ink);border-radius:14px;display:grid;place-items:center;font-size:34px;font-weight:1000;background:#fff;box-shadow:3px 3px 0 rgba(0,0,0,.12)}
-    .molkky-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:14px 0}
-    .pin-btn{aspect-ratio:1;border:2px solid var(--wood);border-radius:50%;background:#fff;color:var(--wood);font-weight:1000;font-size:20px;display:grid;place-items:center;cursor:pointer}
-    .pin-btn:active{background:var(--wood);color:#fff}
-    .m-player{padding:10px;border:2px solid var(--ink);margin-bottom:10px;border-radius:10px;background:#fff}
-    .m-player.active{border:4px solid var(--wood);background:#fff8e1}
-    .banner{position:sticky;top:64px;z-index:49;background:#fff;border:2px dashed var(--ink);padding:10px;border-radius:12px;box-shadow:2px 2px 0 rgba(0,0,0,.12);margin:10px 0;display:none}
-    .banner.show{display:block}
-    .banner b{color:var(--red)}
-    #hgWrap{display:flex;justify-content:center;margin:12px 0}
-    #hgCanvas{border:3px solid var(--ink);border-radius:4px;background:#fff;box-shadow:3px 3px 0 rgba(0,0,0,.12);image-rendering:pixelated}
-    @keyframes hgFlip{ from{transform:rotate(0deg)} to{transform:rotate(180deg)} }
-    .hg-flip{animation:hgFlip .45s ease-in-out}
-    .t-unit{display:flex;flex-direction:column;align-items:center;gap:6px}
-    .t-val{font-weight:1000;font-size:20px;min-width:40px}
-    .qbtn{width:30px;height:30px;flex-shrink:0;border-radius:50%;border:2.5px solid var(--ink);background:#fff;color:var(--ink);
-      font-family:var(--font);font-weight:1000;font-size:15px;line-height:1;cursor:pointer;box-shadow:2px 2px 0 var(--ink);padding:0}
-    .qbtn:active{transform:translate(1px,1px);box-shadow:1px 1px 0 var(--ink)}
-    .modal-overlay{position:fixed;inset:0;z-index:6000;background:rgba(26,26,46,.55);display:none;align-items:flex-start;justify-content:center;padding:16px;overflow-y:auto}
-    .modal-overlay.show{display:flex}
-    .modal-box{background:var(--bg);border:3px solid var(--ink);border-radius:14px;max-width:480px;width:100%;margin-top:40px;padding:18px;box-shadow:5px 5px 0 var(--ink);font-size:14px}
-    video{position:absolute;top:0;left:0;width:1px;height:1px;opacity:.01;pointer-events:none}
-  </style>
-</head>
-<body>
-  <noscript>
-    <div style="padding:16px;font-family:system-ui;background:#fff;border:2px solid #000;margin:12px;border-radius:10px">
-      JavaScript est désactivé → l'app ne peut pas fonctionner. Ouvre le fichier dans Samsung Internet/Chrome avec JavaScript activé.
-    </div>
-  </noscript>
-
-  <svg width="0" height="0" style="position:absolute">
-    <filter id="wiggle">
-      <feTurbulence type="fractalNoise" baseFrequency="0.01" numOctaves="3" result="noise" />
-      <feDisplacementMap in="SourceGraphic" in2="noise" scale="2" />
-    </filter>
-    <clipPath id="clipTop"><path d="M10,10 L90,10 L50,80 Z" /></clipPath>
-    <clipPath id="clipBot"><path d="M50,80 L90,150 L10,150 Z" /></clipPath>
-  </svg>
-
-  <video id="hackVid" playsinline loop muted>
-    <source src="data:video/mp4;base64,AAAAHGZ0eXBNUjRCAAAARU1SNIgAAABhYXJrdWR0YQAAAAxjb3ZlYXJrdWR0YQlmcm9tAAAAGHNvaWFhcnR3cmvDq2xpYnF1aWNrY2hhdAAAAAxtZGF0AAAAAAAAAAAAAA==" type="video/mp4">
-  </video>
-
-  <div id="appWrap">
-    <header>
-      <button id="backBtn" title="Retour">←</button>
-      <svg viewBox="0 0 32 32" width="30" height="30" class="drawn" style="flex-shrink:0">
-        <rect x="5" y="3" width="17" height="25" rx="2" fill="#fff" stroke="var(--ink)" stroke-width="2"/>
-        <circle cx="5" cy="7" r="1.4" fill="var(--ink)"/>
-        <circle cx="5" cy="13" r="1.4" fill="var(--ink)"/>
-        <circle cx="5" cy="19" r="1.4" fill="var(--ink)"/>
-        <circle cx="5" cy="25" r="1.4" fill="var(--ink)"/>
-        <line x1="9" y1="9" x2="18" y2="9" stroke="var(--muted)" stroke-width="1.5"/>
-        <line x1="9" y1="14" x2="18" y2="14" stroke="var(--muted)" stroke-width="1.5"/>
-        <line x1="9" y1="19" x2="15" y2="19" stroke="var(--muted)" stroke-width="1.5"/>
-        <path d="M17 26 L27 10 L30 12 L20 28 Z" fill="var(--red)" stroke="var(--ink)" stroke-width="1.3" stroke-linejoin="round"/>
-      </svg>
-      <div style="font-weight:1000;font-size:18px">TableTool</div>
-      <div style="flex:1"></div>
-
-      <div id="wakeIcon" title="Anti-veille">ANTI<br>VEILLE</div>
-      <button id="wakeBtn" title="Anti-veille">☀</button>
-
-      <div id="fsIcon" title="Plein écran">PLEIN<br>ÉCRAN</div>
-      <button id="fsBtn" title="Plein écran">⛶</button>
-
-      <button id="homeBtn" title="Accueil">⌂</button>
-    </header>
-
-    <main>
-      <div id="banner" class="banner drawn">
-        <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
-          <div style="flex:1;min-width:220px">
-            <div><b>Mode table :</b> anti‑veille / plein écran a été perdu.</div>
-            <div style="font-size:12px;color:var(--muted)">Appuie sur ☀ / ⛶ (ou touche l'écran).</div>
-          </div>
-          <button class="btn sec" id="bannerFix">RÉACTIVER</button>
-        </div>
-      </div>
-
-      <div id="app"></div>
-    </main>
-  </div>
-
-  <div id="rulesModal" class="modal-overlay">
-    <div class="modal-box drawn">
-      <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:10px">
-        <div id="rulesTitle" style="font-weight:1000;font-size:20px"></div>
-        <button id="rulesClose" class="qbtn" title="Fermer">✕</button>
-      </div>
-      <div id="rulesBody"></div>
-    </div>
-  </div>
-
-<script>
-(function(){
-  const $ = (s)=>document.querySelector(s);
-  const app = $("#app");
-  const appWrap = $("#appWrap");
-  const vid = $("#hackVid");
-
-  const wakeIcon = $("#wakeIcon");
-  const wakeBtn  = $("#wakeBtn");
-  const fsIcon   = $("#fsIcon");
-  const fsBtn    = $("#fsBtn");
-  const banner   = $("#banner");
-  const bannerFix= $("#bannerFix");
-
-  const backBtn  = $("#backBtn");
-  const homeBtn  = $("#homeBtn");
-
-  // Prefs
-  const PREF_WAKE = "tt15_pref_wake";
-  const PREF_FS   = "tt15_pref_fs";
-  const loadPref=(k,d)=>{try{const v=localStorage.getItem(k);return v===null?d:(v==="1");}catch(e){return d;}};
-  const savePref=(k,v)=>{try{localStorage.setItem(k,v?"1":"0");}catch(e){}};
-
-  let wantWake = loadPref(PREF_WAKE, true);
-  let wantFS   = loadPref(PREF_FS, false);
-  let wakeLock = null;
-  let keepAliveTimer = null;
-
-  function setWakeUI(on){ wakeIcon.classList.toggle("on", !!on); }
-  function setFSUI(on){ fsIcon.classList.toggle("on", !!on); }
-
-  // Storage for games
-  const load=(k,d)=>{try{ return JSON.parse(localStorage.getItem("tt15_"+k)) || d; }catch(e){ return d; }};
-  const save=(k,v)=>{ try{ localStorage.setItem("tt15_"+k, JSON.stringify(v)); }catch(e){} };
-  const esc=(s)=>String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#039;");
-
-  // Règles réelles + comptage des points, par jeu
-  const RULES = {
-    belote:{
-      r:"32 cartes, 4 joueurs en 2 équipes (Nous/Eux). Le donneur retourne une carte : chacun annonce \"je prends\" ou \"je passe\" pour choisir l'atout (2 tours d'enchères, puis retournée face cachée si personne ne prend). L'équipe preneuse doit ramasser plus de la moitié des points de la donne.",
-      c:"162 points par donne (152 dans les plis + 10 pour le Dix de Der, dernier pli). À l'atout : Valet=20, 9=14, As=11, 10=10, Roi=4, Dame=3, 8/7=0. Aux autres couleurs : As=11, 10=10, Roi=4, Dame=3, Valet=2, 9/8/7=0. Belote-Rebelote (Roi+Dame d'atout dans la même main) = +20 pts. Si l'équipe preneuse n'atteint pas la majorité, elle est \"dedans\" : l'adversaire marque les 162 pts, elle marque 0."
-    },
-    yams:{
-      r:"5 dés, jusqu'à 3 lancers par tour (on garde de côté les dés qu'on veut entre les lancers). À chaque tour, on doit remplir une case de sa grille avec le résultat obtenu — impossible de passer une case sans la remplir (au pire à 0).",
-      c:"Section haute (1 à 6) : on additionne uniquement les dés de cette valeur ; bonus de +35 si le total de la section atteint 63 ou plus. Section basse : Brelan/Carré = somme des 5 dés, Full = 25, Petite suite = 30, Grande suite = 40, Yams (5 dés identiques) = 50 (+100 par Yams supplémentaire dans la partie), Chance = somme des 5 dés peu importe la combinaison."
-    },
-    tarot:{
-      r:"78 cartes (dont les 21 atouts + l'Excuse), 4 joueurs. Enchères à 4 niveaux (Petite, Garde, Garde Sans, Garde Contre) : le plus offrant devient preneur et joue seul contre les 3 autres. En Petite/Garde, le Chien (6 cartes écartées) revient au preneur ; en Garde Sans/Contre, il reste caché.",
-      c:"Le contrat se juge sur le nombre de \"bouts\" (Excuse, Petit, 21 d'atout) gardés par le preneur dans ses plis : 0 bout → il faut 56 pts sur 91, 1 bout → 51 pts, 2 bouts → 41 pts, 3 bouts → 36 pts. L'écart entre points réalisés et objectif est multiplié par le coefficient du contrat (Petite×1, Garde×2, Garde Sans×4, Garde Contre×6) pour donner le score final."
-    },
-    rami:{
-      r:"2 jeux de 52 cartes + jokers, 2 à 6 joueurs. À son tour, on pioche une carte (talon ou défausse) puis on en défausse une, en essayant de poser des combinaisons (brelans/carrés de même valeur, ou suites de 3+ cartes de même couleur) pour vider sa main.",
-      c:"Quand un joueur vide sa main, la manche s'arrête : les autres comptent les points des cartes qui leur restent en main (pénalité). Valeurs courantes : cartes numérotées = leur valeur, figures = 10, As = 1 ou 11 selon la variante, Joker = 15 à 25. Le gagnant de la manche marque 0. À la fin de la partie, le total le plus bas gagne."
-    },
-    uno:{
-      r:"7 cartes par joueur au départ. À son tour, on pose une carte de même couleur, même valeur, ou une carte spéciale (+2, Inversé, Passe, Joker, Joker +4) sur la couleur/valeur en cours. On doit annoncer \"UNO\" quand il ne reste qu'une carte en main.",
-      c:"Dès qu'un joueur pose sa dernière carte, il marque tous les points restés dans les mains des autres : cartes chiffrées = leur valeur, +2/Inversé/Passe = 20 pts, Joker/Joker+4 = 50 pts. Ces points s'ajoutent à son total cumulé sur plusieurs manches. Le premier joueur à atteindre 500 points remporte la partie."
-    },
-    scrabble:{
-      r:"Chaque joueur pioche 7 lettres et forme des mots sur la grille en les reliant à ceux déjà posés façon mots croisés, en utilisant les cases bonus (lettre compte double/triple, mot compte double/triple).",
-      c:"Chaque lettre a une valeur fixe (1 à 10 pts selon sa rareté). On additionne les valeurs des lettres du mot posé, puis on applique les multiplicateurs des cases utilisées (le bonus \"mot\" s'applique après les bonus \"lettre\"). Poser ses 7 lettres d'un coup (un \"scrabble\") rapporte +50 pts bonus sur le tour."
-    },
-    "421":{
-      r:"3 dés. Chaque joueur lance jusqu'à 3 fois par tour, en gardant de côté les dés qu'il veut garder entre les lancers, pour former la meilleure combinaison possible. Traditionnellement joué pour désigner qui règle la tournée.",
-      c:"Le \"421\" (4-2-1) est la combinaison reine. Viennent ensuite les brelans (trois dés identiques, le plus élevé gagne), puis les suites, puis simplement la somme des dés. Le perdant de chaque manche pose un jeton ou un gage ; celui qui a le plus de jetons à la fin de la partie paie sa tournée."
-    },
-    molkky:{
-      r:"Jeu de lancer finlandais. Douze quilles numérotées de 1 à 12 sont plantées debout, groupées serrées. Chaque joueur, à son tour, lance le \"molkky\" (bâton) pour faire tomber une ou plusieurs quilles, à une distance raisonnable.",
-      c:"Si une seule quille tombe, on marque le chiffre inscrit dessus. Si plusieurs quilles tombent au même lancer, on marque simplement le nombre de quilles tombées (peu importe leurs numéros). Le premier à atteindre exactement 50 points gagne ; s'il dépasse 50, son score retombe à 25. Trois lancers ratés d'affilée éliminent un joueur."
-    },
-    skyjo:{
-      r:"Chaque joueur reçoit une grille de 12 cartes face cachée et en retourne 2 au départ. À son tour, on pioche une carte (pioche ou défausse) : soit on l'échange contre une carte de sa grille (qui se révèle), soit on la défausse et on révèle une carte de sa grille à la place.",
-      c:"Chaque carte vaut sa valeur imprimée, de -2 à 12. Une colonne de 3 cartes identiques révélées est retirée du jeu et ne compte plus (0 pt). Dès qu'un joueur révèle sa dernière carte, la manche se termine aussitôt et tous les autres révèlent et totalisent leur grille. Le total le plus bas à la fin de la partie gagne ; la partie s'arrête dès qu'un joueur atteint 100 pts cumulés."
-    },
-    petanque:{
-      r:"Deux équipes s'affrontent. Chaque joueur lance ses boules le plus près possible du cochonnet (petite boule cible), en essayant soit de s'en approcher (\"pointer\"), soit de repousser une boule adverse (\"tirer\").",
-      c:"À la fin de chaque mène, seule l'équipe la plus proche du cochonnet marque des points : elle en gagne autant que de boules à elle plus proches du cochonnet que la meilleure boule adverse (donc 1 à 6 points selon les cas). La première équipe à atteindre 13 points remporte la partie."
-    }
-  };
-
-  function qbtn(key){ return '<button class="qbtn" data-rules="'+key+'" title="Règles du jeu">?</button>'; }
-
-  const rulesModal = $("#rulesModal");
-  function openRules(key){
-    const g = RULES[key];
-    if(!g || !rulesModal) return;
-    $("#rulesTitle").textContent = ruleTitleFor(key);
-    $("#rulesBody").innerHTML = '<div style="font-weight:1000;margin-bottom:4px">RÈGLES</div><div style="margin-bottom:14px;line-height:1.4">'+esc(g.r)+'</div>'
-      + '<div style="font-weight:1000;margin-bottom:4px">COMPTAGE DES POINTS</div><div style="line-height:1.4">'+esc(g.c)+'</div>';
-    rulesModal.classList.add("show");
-  }
-  function closeRules(){ if(rulesModal) rulesModal.classList.remove("show"); }
-  function ruleTitleFor(key){
-    const names = {belote:"Belote", yams:"Yams", tarot:"Tarot", rami:"Rami", uno:"Uno", scrabble:"Scrabble", "421":"421", molkky:"Mölkky", skyjo:"Skyjo", petanque:"Pétanque"};
-    return names[key] || key;
-  }
-  app.addEventListener("click", (e)=>{
-    const b = e.target.closest("[data-rules]");
-    if(b) openRules(b.getAttribute("data-rules"));
-  });
-  $("#rulesClose")?.addEventListener("click", closeRules);
-  rulesModal?.addEventListener("click", (e)=>{ if(e.target===rulesModal) closeRules(); });
-
-  function showBanner(force){
-    // Dans le menu, l'anti-veille n'a pas d'importance : pas de banniere qui vient deranger.
-    const inMenu = (location.hash || "#home") === "#home";
-    if(inMenu){ banner.classList.remove("show"); return; }
-    const lostWake = wantWake && ("wakeLock" in navigator) && !wakeLock;
-    const lostFS = wantFS && !document.fullscreenElement;
-    banner.classList.toggle("show", !!force || lostWake || lostFS);
-  }
-
-  async function tryVideoKeepAlive(){
-    try{ if (vid && vid.paused) await vid.play(); }catch(e){}
-  }
-
-  async function tryWakeLock(){
-    if(!wantWake){ await releaseWakeLock(); return; }
-    await tryVideoKeepAlive();
-
-    if(!("wakeLock" in navigator) || !window.isSecureContext){
-      // API absente ou contexte non sécurisé (ex: fichier ouvert en file://) : impossible de
-      // garantir l'anti-veille natif. On ne ment pas à l'utilisateur, on affiche "désactivé".
-      setWakeUI(false);
-      return;
-    }
-
-    try{
-      if(!wakeLock){
-        wakeLock = await navigator.wakeLock.request("screen");
-        wakeLock.addEventListener("release", ()=>{ wakeLock=null; setWakeUI(false); });
-      }
-      setWakeUI(true);
-    }catch(e){
-      wakeLock = null;
-      setWakeUI(false);
-    }
-  }
-
-  async function releaseWakeLock(){
-    try{ if(wakeLock) await wakeLock.release(); }catch(e){}
-    wakeLock=null;
-    setWakeUI(false);
-  }
-
-  async function tryFullscreen(){
-    if(!wantFS){ setFSUI(false); return; }
-    try{
-      if(!document.fullscreenElement){ await document.documentElement.requestFullscreen(); }
-    }catch(e){}
-    setFSUI(!!document.fullscreenElement);
-  }
-
-  function scheduleKeepAlive(){
-    clearInterval(keepAliveTimer);
-    keepAliveTimer = setInterval(async ()=>{
-      if(document.visibilityState !== "visible") return;
-      if(wantWake){
-        if(!wakeLock && ("wakeLock" in navigator)) await tryWakeLock();
-        await tryVideoKeepAlive();
-      }
-      if(wantFS && !document.fullscreenElement) showBanner(true);
-    }, 5000);
-  }
-
-  async function boot(){
-    if(!location.hash) location.hash="#home";
-    render();
-    scheduleKeepAlive();
-    await tryWakeLock();
-    if(wantFS) await tryFullscreen();
-    showBanner(false);
-  }
-  boot();
-
-  document.addEventListener("click", async ()=>{
-    if(wantWake) await tryWakeLock();
-    if(wantFS && !document.fullscreenElement) await tryFullscreen();
-    showBanner(false);
-  }, {passive:true});
-
-  document.addEventListener("visibilitychange", async ()=>{
-    if(document.visibilityState==="visible"){
-      if(wantWake) await tryWakeLock();
-      if(wantFS) setTimeout(()=>tryFullscreen(), 250);
-      showBanner(false);
-    }
-  });
-
-  wakeBtn.addEventListener("click", async ()=>{
-    wantWake = !wantWake;
-    savePref(PREF_WAKE, wantWake);
-    if(wantWake) await tryWakeLock();
-    else await releaseWakeLock();
-    showBanner(false);
-  });
-
-  fsBtn.addEventListener("click", async ()=>{
-    wantFS = !wantFS;
-    savePref(PREF_FS, wantFS);
-    if(wantFS) await tryFullscreen();
-    else{ try{ if(document.fullscreenElement) await document.exitFullscreen(); }catch(e){} }
-    setFSUI(!!document.fullscreenElement);
-    showBanner(false);
-  });
-
-  bannerFix.addEventListener("click", async ()=>{ await releaseWakeLock(); await tryWakeLock(); await tryFullscreen(); showBanner(false); });
-
-  // Navigation
-  function nav(hash){ location.hash = hash; render(); }
-  backBtn.addEventListener("click", ()=> nav("#home"));
-  homeBtn.addEventListener("click", ()=> nav("#home"));
-  window.addEventListener("hashchange", render);
-
-  // Audio
-  const Aud = window.AudioContext || window.webkitAudioContext;
-  function ding(){
-    if(!Aud) return;
-    const c=new Aud(); const t=c.currentTime;
-    const o=c.createOscillator(); const g=c.createGain();
-    o.connect(g); g.connect(c.destination);
-    o.frequency.setValueAtTime(1200,t);
-    g.gain.linearRampToValueAtTime(0.5,t+0.01);
-    g.gain.exponentialRampToValueAtTime(0.01,t+1.2);
-    o.start(t); o.stop(t+1.2);
-  }
-
-  // Home
-  function rHome(){
-    backBtn.style.visibility="hidden"; homeBtn.disabled=true;
-    app.innerHTML = `
-      <h2>Jeux de score</h2>
-      <div class="grid">
-        <div class="card drawn" data-go="#belote"><div class="ico">🃏</div><div class="tit">Belote</div><div class="sub">Nous / Eux</div></div>
-        <div class="card drawn" data-go="#yams"><div class="ico">🎲</div><div class="tit">Yams</div><div class="sub">Feuille + bonus auto</div></div>
-        <div class="card drawn" data-go="#tarot"><div class="ico">🔮</div><div class="tit">Tarot</div><div class="sub">Contrat + scores</div></div>
-
-        <div class="card drawn" data-go="#rami"><div class="ico">🂡</div><div class="tit">Rami</div><div class="sub">Cartes en main = malus</div></div>
-        <div class="card drawn" data-go="#uno"><div class="ico">🔴</div><div class="tit">Uno</div><div class="sub">Le + haut gagne, fin à 500</div></div>
-        <div class="card drawn" data-go="#scrabble"><div class="ico">🅰️</div><div class="tit">Scrabble</div><div class="sub">Tours + total</div></div>
-        <div class="card drawn" data-go="#421"><div class="ico">🎲</div><div class="tit">421</div><div class="sub">3 dés + carnet</div></div>
-
-        <div class="card drawn" data-go="#molkky"><div class="ico">🪵</div><div class="tit">Mölkky</div><div class="sub">50 points pile</div></div>
-        <div class="card drawn" data-go="#skyjo"><div class="ico">🔢</div><div class="tit">Skyjo</div><div class="sub">Le + bas gagne, fin à 100</div></div>
-        <div class="card drawn" data-go="#petanque"><div class="ico">🎯</div><div class="tit">Pétanque</div><div class="sub">Nous / Eux, jusqu'à 13</div></div>
-
-        <div class="card drawn" data-go="#victoires"><div class="ico">🏆</div><div class="tit">Victoires</div><div class="sub">Dames, échecs, P4...</div></div>
-        <div class="card drawn" data-go="#custom"><div class="ico">📋</div><div class="tit">Tableau custom</div><div class="sub">Joueurs + manches</div></div>
-        <div class="card drawn" data-go="#free"><div class="ico">📝</div><div class="tit">Score libre</div><div class="sub">Tableau générique</div></div>
-      </div>
-
-      <h2 style="margin-top:18px">Outils</h2>
-      <div class="grid">
-        <div class="card drawn" data-go="#dice"><div class="ico">🎲</div><div class="tit">Dé (d6)</div><div class="sub">lancer rapide</div></div>
-        <div class="card drawn" data-go="#timer"><div class="ico">⏳</div><div class="tit">Sablier</div><div class="sub">presets</div></div>
-      </div>
-
-    `;
-    app.querySelectorAll("[data-go]").forEach(el=> el.addEventListener("click", ()=> nav(el.getAttribute("data-go"))) );
-  }
-
-  // Generic sheet renderer
-  function renderSheet(key, title, opts){
-    opts = opts || {};
-    const showContract = !!opts.contract;
-    const contractLabel = opts.contractLabel || "CONTRAT";
-    const d = load(key, {ps: opts.defaultPlayers || ["J1","J2"], r:[], meta:{date:""}});
-    if(!Array.isArray(d.ps) || d.ps.length<1) d.ps = opts.defaultPlayers || ["J1","J2"];
-    if(!Array.isArray(d.r)) d.r = [];
-    if(!d.meta) d.meta = {date:""};
-
-    const totals = d.ps.map((_,i)=> d.r.reduce((acc,row)=> acc + (Number((row.s||[])[i])||0), 0));
-
-    let leaderIdx = -1, ended = false;
-    if(opts.leader && totals.length){
-      const extreme = opts.leader==="low" ? Math.min(...totals) : Math.max(...totals);
-      leaderIdx = totals.indexOf(extreme);
-      if(opts.endAt) ended = opts.leader==="low" ? totals.some(t=>t<=opts.endAt) : totals.some(t=>t>=opts.endAt);
-    }
-
-    const head = d.ps.map((p,i)=>'<th><input class="'+key+'-n" data-i="'+i+'" value="'+esc(p)+'">'+(ended && i===leaderIdx?' 🏆':'')+'</th>').join("");
-    const leftHead = showContract ? '<th class="drawn" style="width:140px">'+esc(contractLabel)+'</th>' : '<th class="drawn" style="width:140px">'+esc(opts.leftHeader || "MANCHES")+'</th>';
-
-    const body = d.r.map((row,ri)=>{
-      const leftCell = showContract
-        ? '<td class="drawn"><input class="'+key+'-c" data-r="'+ri+'" value="'+esc(row.k||"")+'" placeholder="'+esc(contractLabel)+'"></td>'
-        : '<td class="drawn label">Manche '+(ri+1)+'</td>';
-      const cells = d.ps.map((_,ci)=>{
-        const v = (row.s||[])[ci] ?? "";
-        return '<td class="drawn"><input type="number" class="'+key+'-v" data-r="'+ri+'" data-c="'+ci+'" value="'+esc(v)+'"></td>';
-      }).join("");
-      return "<tr>"+leftCell+cells+"</tr>";
-    }).join("");
-
-    const foot = '<tr style="font-weight:1000;background:#eee"><td class="drawn label">'+esc(opts.totalLabel||"TOTAL")+'</td>'
-      + totals.map((t,i)=>'<td class="drawn" style="'+(i===leaderIdx?'color:var(--red)':'')+'">'+t+'</td>').join("")+"</tr>";
-
-    const endBanner = ended ? '<div style="text-align:center;margin-top:8px;font-weight:900;color:var(--red)">🏆 '+esc(d.ps[leaderIdx]||"?")+' remporte la partie avec '+totals[leaderIdx]+' pts !</div>' : '';
-
-    app.innerHTML = `
-      <div class="panel drawn">
-        <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;justify-content:space-between">
-          <div style="display:flex;gap:8px;align-items:center">
-            <div style="font-weight:1000;font-size:18px">${esc(title)}</div>
-            ${opts.rulesKey ? qbtn(opts.rulesKey) : ""}
-          </div>
-          <div style="min-width:160px"><input id="${key}_date" placeholder="Date" value="${esc(d.meta.date||"")}"></div>
-        </div>
-        <div class="kicker">${esc(opts.subtitle || "Manches cumulées, total automatique.")}</div>
-        ${endBanner}
-      </div>
-
-      <div style="overflow-x:auto;margin-top:12px">
-        <table class="paper-table drawn">
-          <thead><tr>${leftHead}${head}</tr></thead>
-          <tbody>${body}${foot}</tbody>
-        </table>
-      </div>
-
-      <div class="actions">
-        <button class="btn" id="${key}_addR">+ ${esc(opts.addRoundLabel||"Manche")}</button>
-        <button class="btn sec" id="${key}_addP">+ Joueur</button>
-      </div>
-      <div class="actions">
-        <button class="btn sec" id="${key}_undo">Annuler</button>
-        <button class="btn sec red" id="${key}_reset">Reset</button>
-      </div>
-    `;
-
-    $("#"+key+"_date").addEventListener("input", (e)=>{ d.meta.date = e.target.value; save(key,d); });
-
-    $("#"+key+"_addP").addEventListener("click", ()=>{
-      d.ps.push("J"+(d.ps.length+1));
-      d.r.forEach(r=>{ if(!Array.isArray(r.s)) r.s=[]; r.s.push(0); });
-      save(key,d); render();
-    });
-    $("#"+key+"_addR").addEventListener("click", ()=>{
-      d.r.push({k:"", s:new Array(d.ps.length).fill(0)});
-      save(key,d); render();
-    });
-    $("#"+key+"_undo").addEventListener("click", ()=>{ d.r.pop(); save(key,d); render(); });
-    $("#"+key+"_reset").addEventListener("click", ()=>{
-      if(confirm("Nouveau ?")){
-        save(key, {ps: opts.defaultPlayers || ["J1","J2"], r:[], meta:{date:""}});
-        render();
-      }
-    });
-
-    app.querySelectorAll("."+key+"-n").forEach(inp=> inp.addEventListener("change",(e)=>{ d.ps[Number(e.target.dataset.i)] = e.target.value; save(key,d); }) );
-    if(showContract){
-      app.querySelectorAll("."+key+"-c").forEach(inp=> inp.addEventListener("change",(e)=>{ d.r[Number(e.target.dataset.r)].k = e.target.value; save(key,d); }) );
-    }
-    app.querySelectorAll("."+key+"-v").forEach(inp=> inp.addEventListener("input",(e)=>{
-      const r=Number(e.target.dataset.r), c=Number(e.target.dataset.c);
-      d.r[r].s[c] = e.target.value;
-      save(key,d);
-      const sel = "."+key+"-v[data-r='"+r+"'][data-c='"+c+"']";
-      render();
-      const el = document.querySelector(sel);
-      if(el){ el.focus(); }
-    }) );
-  }
-
-  // Yams
-  const Y_CATS = [
-    {l:"Total 1",k:"1"},{l:"Total 2",k:"2"},{l:"Total 3",k:"3"},{l:"Total 4",k:"4"},{l:"Total 5",k:"5"},{l:"Total 6",k:"6"},
-    {l:"Total sup",auto:"u",bg:1},{l:"Bonus (+35)",auto:"bo",bg:1},
-    {l:"Brelan",k:"br"},{l:"Carré",k:"ca"},{l:"Full",k:"fu"},{l:"Petite suite",k:"ps"},{l:"Grande suite",k:"gs"},{l:"YAMS",k:"ya"},{l:"Chance",k:"ch"},
-    {l:"TOTAL",auto:"tot",bg:1,big:1}
-  ];
-  function rYams(){
-    const d = load("yams", {ps:["J1","J2"], s:{}});
-    if(!Array.isArray(d.ps) || d.ps.length<1) d.ps=["J1","J2"];
-    if(!d.s) d.s = {};
-    const calc = (pi)=>{
-      const s = d.s[pi] || {};
-      let u=0,l=0;
-      ["1","2","3","4","5","6"].forEach(k=>u += Number(s[k]||0));
-      const bo = u>=63 ? 35 : 0;
-      ["br","ca","fu","ps","gs","ya","ch"].forEach(k=> l += Number(s[k]||0));
-      return {u:u, bo:bo, tot:u+bo+l};
-    };
-
-    let html = '<div class="panel drawn"><div style="display:flex;gap:8px;align-items:center"><div style="font-weight:1000;font-size:18px">Yams</div>'+qbtn("yams")+'</div><div class="kicker">Bonus auto (>=63) + total auto.</div></div>';
-    html += '<div style="overflow-x:auto;margin-top:12px"><table class="paper-table drawn"><thead><tr><th class="drawn">YAMS</th>';
-    d.ps.forEach((p,i)=>{ html += '<th><input class="y-n" data-i="'+i+'" value="'+esc(p)+'"></th>'; });
-    html += '</tr></thead><tbody>';
-
-    Y_CATS.forEach(cat=>{
-      html += '<tr style="'+(cat.bg?'background:#eee;font-weight:1000':'')+'">';
-      html += '<td class="drawn label" style="'+(cat.big?'font-size:16px':'')+'">'+esc(cat.l)+'</td>';
-      d.ps.forEach((_,i)=>{
-        if(cat.auto){
-          html += '<td class="drawn">'+calc(i)[cat.auto]+'</td>';
-        }else{
-          const val = (d.s[i]||{})[cat.k] || "";
-          html += '<td class="drawn"><input type="number" class="y-v" data-p="'+i+'" data-k="'+cat.k+'" value="'+esc(val)+'"></td>';
-        }
-      });
-      html += '</tr>';
-    });
-
-    html += '</tbody></table></div>';
-    html += '<div class="actions"><button class="btn" id="yAdd">+ Joueur</button><button class="btn sec red" id="yReset">Reset</button></div>';
-    app.innerHTML = html;
-
-    app.querySelectorAll(".y-n").forEach(inp=> inp.addEventListener("change",(e)=>{ d.ps[Number(e.target.dataset.i)] = e.target.value; save("yams",d); }) );
-    app.querySelectorAll(".y-v").forEach(inp=> inp.addEventListener("input",(e)=>{
-      const p=Number(e.target.dataset.p), k=e.target.dataset.k;
-      if(!d.s[p]) d.s[p]={};
-      d.s[p][k]=e.target.value;
-      save("yams",d);
-      const sel = ".y-v[data-p='"+p+"'][data-k='"+k+"']";
-      render();
-      const el = document.querySelector(sel);
-      if(el){ el.focus(); }
-    }) );
-    $("#yAdd").addEventListener("click", ()=>{ d.ps.push("J"+(d.ps.length+1)); save("yams",d); render(); });
-    $("#yReset").addEventListener("click", ()=>{ if(confirm("Reset ?")){ save("yams",{ps:["J1","J2"], s:{}}); render(); }});
-  }
-
-  // Belote
-  function rBelote(){
-    const d = load("belote", {r:[]});
-    if(!Array.isArray(d.r)) d.r = [];
-    const totU = d.r.reduce((a,b)=>a+(Number(b.u)||0),0);
-    const totT = d.r.reduce((a,b)=>a+(Number(b.t)||0),0);
-    const list = d.r.slice().reverse().map(r=>"<div>"+(Number(r.u)||0)+" - "+(Number(r.t)||0)+"</div>").join("");
-
-    app.innerHTML = `
-      <div class="panel drawn" style="display:flex;gap:8px;align-items:center">
-        <div style="font-weight:1000;font-size:18px">Belote</div>
-        ${qbtn("belote")}
-      </div>
-
-      <div class="belote-split drawn" style="margin-top:12px">
-        <div class="belote-col">
-          <div class="b-head">NOUS</div>
-          <div class="b-tot">${totU}</div>
-          <div class="b-list">${list}</div>
-        </div>
-        <div class="belote-col">
-          <div class="b-head">EUX</div>
-          <div class="b-tot">${totT}</div>
-          <div class="b-list" style="background:#f9f9f9"></div>
-        </div>
-      </div>
-
-      <div class="panel drawn" style="margin-top:14px">
-        <div class="grid" style="grid-template-columns:1fr 1fr">
-          <div><input type="number" id="bU" placeholder="Nous"></div>
-          <div><input type="number" id="bT" placeholder="Eux"></div>
-        </div>
-        <div class="actions">
-          <button class="btn sec" id="b162">162</button>
-          <button class="btn" id="bAdd">Ajouter</button>
-        </div>
-        <div class="actions">
-          <button class="btn sec" id="bUndo">Annuler</button>
-          <button class="btn sec red" id="bReset">Reset</button>
-        </div>
-      </div>
-    `;
-    $("#b162").addEventListener("click", ()=>{
-      const u = $("#bU").value, t = $("#bT").value;
-      if(u!=="") $("#bT").value = 162 - Number(u||0);
-      else if(t!=="") $("#bU").value = 162 - Number(t||0);
-    });
-    $("#bAdd").addEventListener("click", ()=>{
-      const u = Number($("#bU").value||0), t = Number($("#bT").value||0);
-      if(!u && !t) return;
-      d.r.push({u:u,t:t}); save("belote",d); render();
-    });
-    $("#bUndo").addEventListener("click", ()=>{ d.r.pop(); save("belote",d); render(); });
-    $("#bReset").addEventListener("click", ()=>{ if(confirm("Reset ?")){ save("belote",{r:[]}); render(); }});
-  }
-
-  // Simple routes
-  function rTarot(){ renderSheet("tarot","Tarot",{defaultPlayers:["J1","J2","J3","J4"], contract:true, contractLabel:"Contrat", addRoundLabel:"Donne", leftHeader:"DONNES", subtitle:"Contrat (optionnel) + scores, total auto.", rulesKey:"tarot"}); }
-  function rRami(){ renderSheet("rami","Rami",{defaultPlayers:["J1","J2"], addRoundLabel:"Manche", subtitle:"Cartes restées en main = points de malus. Le total le plus bas gagne.", leader:"low", rulesKey:"rami"}); }
-  function rUno(){ renderSheet("uno","Uno",{defaultPlayers:["J1","J2"], addRoundLabel:"Manche", subtitle:"Points des cartes adverses. Le total le plus haut gagne, fin à 500 pts.", leader:"high", endAt:500, rulesKey:"uno"}); }
-  function rScrabble(){ renderSheet("scrabble","Scrabble",{defaultPlayers:["J1","J2"], leftHeader:"TOURS", addRoundLabel:"Tour", subtitle:"Tour par tour, total auto.", rulesKey:"scrabble"}); }
-  function rFree(){ renderSheet("free","Score libre",{defaultPlayers:["J1","J2"], addRoundLabel:"Manche"}); }
-
-  // 421
-  function r421(){
-    const d = load("g421",{ps:["J1","J2"], r:[], dice:[4,2,1], throws:0, cur:0});
-    if(!Array.isArray(d.ps) || d.ps.length<1) d.ps=["J1","J2"];
-    if(!Array.isArray(d.r)) d.r=[];
-    if(!Array.isArray(d.dice) || d.dice.length!==3) d.dice=[4,2,1];
-    if(typeof d.throws!=="number") d.throws=0;
-    if(typeof d.cur!=="number" || d.cur>=d.ps.length || d.cur<0) d.cur=0;
-    const rand6 = ()=> 1+Math.floor(Math.random()*6);
-
-    const totals = d.ps.map((_,i)=> d.r.reduce((acc,row)=> acc + (Number((row.s||[])[i])||0), 0));
-    const head = d.ps.map((p,i)=>'<th><input class="g421-n" data-i="'+i+'" value="'+esc(p)+'"></th>').join("");
-    const body = d.r.map((row,ri)=>{
-      const cells = d.ps.map((_,ci)=>{
-        const v = (row.s||[])[ci] ?? "";
-        return '<td class="drawn"><input type="number" class="g421-v" data-r="'+ri+'" data-c="'+ci+'" value="'+esc(v)+'"></td>';
-      }).join("");
-      return '<tr><td class="drawn label">Manche '+(ri+1)+'</td>'+cells+'</tr>';
-    }).join("");
-
-    const mid = d.throws>0 && d.throws<3;
-    const done = d.throws>=3;
-    const curName = esc(d.ps[d.cur] || "?");
-
-    const rollZone = d.throws===0
-      ? '<div class="actions"><button class="btn" id="gRoll">Lancer 3 dés</button></div>'
-      : '<div class="d3-check">'
-        + [0,1,2].map(i=>'<div style="width:74px;text-align:center"><input type="checkbox" class="g421-chk" data-die="'+i+'" style="width:22px;height:22px"></div>').join("")
-        + '</div>'
-        + '<div style="font-size:12px;color:var(--muted);margin-top:4px">Coche les dés à relancer</div>'
-        + '<div class="actions">'
-        +   (mid ? '<button class="btn" id="gReroll" disabled>Relancer les dés cochés</button>' : '')
-        +   '<button class="btn sec" id="gNext">Joueur suivant →</button>'
-        + '</div>'
-        + (done ? '<div style="text-align:center;font-weight:900;color:var(--red);margin-top:6px">Lancers épuisés (3/3) — au tour du joueur suivant.</div>' : '');
-
-    app.innerHTML = `
-      <div class="panel drawn">
-        <div style="display:flex;gap:8px;align-items:center">
-          <div style="font-weight:1000;font-size:18px">421</div>
-          ${qbtn("421")}
-        </div>
-        <div class="kicker">Tour de <b>${curName}</b> — lancer ${d.throws}/3.</div>
-        <div class="d3">
-          <div class="die drawn">${d.dice[0]}</div>
-          <div class="die drawn">${d.dice[1]}</div>
-          <div class="die drawn">${d.dice[2]}</div>
-        </div>
-        ${rollZone}
-        <div class="actions">
-          <button class="btn sec" id="gAddR">+ Manche</button>
-          <button class="btn sec" id="gAddP">+ Joueur</button>
-        </div>
-        <div class="actions">
-          <button class="btn sec" id="gUndo">Annuler</button>
-          <button class="btn sec red" id="gReset">Reset</button>
-        </div>
-      </div>
-
-      <div style="overflow-x:auto;margin-top:12px">
-        <table class="paper-table drawn">
-          <thead><tr><th class="drawn" style="width:140px">MANCHES</th>${head}</tr></thead>
-          <tbody>${body}<tr style="font-weight:1000;background:#eee"><td class="drawn label">TOTAL</td>${totals.map(t=>'<td class="drawn">'+t+'</td>').join("")}</tr></tbody>
-        </table>
-      </div>
-    `;
-
-    $("#gRoll")?.addEventListener("click", ()=>{
-      d.dice=[rand6(),rand6(),rand6()];
-      d.throws=1;
-      save("g421",d); render(); ding();
-    });
-    $("#gReroll")?.addEventListener("click", ()=>{
-      const checks = app.querySelectorAll(".g421-chk:checked");
-      if(checks.length===0) return;
-      checks.forEach(chk=>{ d.dice[Number(chk.getAttribute("data-die"))] = rand6(); });
-      d.throws++;
-      save("g421",d); render(); ding();
-    });
-    app.querySelectorAll(".g421-chk").forEach(chk=> chk.addEventListener("change", ()=>{
-      const any = app.querySelector(".g421-chk:checked");
-      const btn=$("#gReroll"); if(btn) btn.disabled=!any;
-    }));
-    $("#gNext")?.addEventListener("click", ()=>{
-      d.cur = (d.cur+1) % d.ps.length;
-      d.throws = 0;
-      save("g421",d); render();
-    });
-    $("#gAddR").addEventListener("click", ()=>{ d.r.push({s:new Array(d.ps.length).fill(0)}); save("g421",d); render(); });
-    $("#gAddP").addEventListener("click", ()=>{ d.ps.push("J"+(d.ps.length+1)); d.r.forEach(r=>{ if(!Array.isArray(r.s)) r.s=[]; r.s.push(0); }); save("g421",d); render(); });
-    $("#gUndo").addEventListener("click", ()=>{ d.r.pop(); save("g421",d); render(); });
-    $("#gReset").addEventListener("click", ()=>{ if(confirm("Reset ?")){ save("g421",{ps:["J1","J2"], r:[], dice:[4,2,1], throws:0, cur:0}); render(); }});
-
-    app.querySelectorAll(".g421-n").forEach(inp=> inp.addEventListener("change",(e)=>{ d.ps[Number(e.target.dataset.i)]=e.target.value; save("g421",d); }) );
-    app.querySelectorAll(".g421-v").forEach(inp=> inp.addEventListener("input",(e)=>{
-      const r=Number(e.target.dataset.r), c=Number(e.target.dataset.c);
-      d.r[r].s[c]=e.target.value; save("g421",d);
-      const sel = ".g421-v[data-r='"+r+"'][data-c='"+c+"']";
-      render();
-      const el = document.querySelector(sel);
-      if(el){ el.focus(); }
-    }) );
-  }
-
-  // Skyjo
-  function rSkyjo(){
-    const d = load("skyjo",{ps:["J1","J2"], r:[]});
-    if(!Array.isArray(d.ps) || d.ps.length<1) d.ps=["J1","J2"];
-    if(!Array.isArray(d.r)) d.r=[];
-
-    const totals = d.ps.map((_,i)=> d.r.reduce((acc,row)=> acc + (Number((row.s||[])[i])||0), 0));
-    const minTot = totals.length ? Math.min(...totals) : 0;
-    const ended = totals.some(t=> t>=100);
-    const winnerIdx = ended ? totals.indexOf(minTot) : -1;
-
-    const head = d.ps.map((p,i)=>'<th><input class="sk-n" data-i="'+i+'" value="'+esc(p)+'">'+(i===winnerIdx?' 🏆':'')+'</th>').join("");
-    const body = d.r.map((row,ri)=>{
-      const cells = d.ps.map((_,ci)=>{
-        const v = (row.s||[])[ci] ?? "";
-        return '<td class="drawn"><input type="number" class="sk-v" data-r="'+ri+'" data-c="'+ci+'" value="'+esc(v)+'"></td>';
-      }).join("");
-      return '<tr><td class="drawn label">Manche '+(ri+1)+'</td>'+cells+'</tr>';
-    }).join("");
-    const foot = '<tr style="font-weight:1000;background:#eee"><td class="drawn label">TOTAL</td>'
-      + totals.map(t=>'<td class="drawn" style="'+(t===minTot?'color:var(--red)':'')+'">'+t+'</td>').join("") + '</tr>';
-
-    app.innerHTML = `
-      <div class="panel drawn">
-        <div style="display:flex;gap:8px;align-items:center">
-          <div style="font-weight:1000;font-size:18px">Skyjo</div>
-          ${qbtn("skyjo")}
-        </div>
-        <div class="kicker">Le score le plus bas gagne. Fin de partie dès qu'un joueur atteint 100 pts.</div>
-        ${ended ? '<div style="text-align:center;margin-top:8px;font-weight:900;color:var(--red)">🏁 Partie terminée — '+esc(d.ps[winnerIdx]||"?")+' gagne avec '+minTot+' pts !</div>' : ''}
-        <div class="actions">
-          <button class="btn" id="skAddR">+ Manche</button>
-          <button class="btn sec" id="skAddP">+ Joueur</button>
-        </div>
-        <div class="actions">
-          <button class="btn sec" id="skUndo">Annuler</button>
-          <button class="btn sec red" id="skReset">Reset</button>
-        </div>
-      </div>
-
-      <div style="overflow-x:auto;margin-top:12px">
-        <table class="paper-table drawn">
-          <thead><tr><th class="drawn" style="width:140px">MANCHES</th>${head}</tr></thead>
-          <tbody>${body}${foot}</tbody>
-        </table>
-      </div>
-    `;
-
-    $("#skAddR").addEventListener("click", ()=>{ d.r.push({s:new Array(d.ps.length).fill(0)}); save("skyjo",d); render(); });
-    $("#skAddP").addEventListener("click", ()=>{ d.ps.push("J"+(d.ps.length+1)); d.r.forEach(r=>{ if(!Array.isArray(r.s)) r.s=[]; r.s.push(0); }); save("skyjo",d); render(); });
-    $("#skUndo").addEventListener("click", ()=>{ d.r.pop(); save("skyjo",d); render(); });
-    $("#skReset").addEventListener("click", ()=>{ if(confirm("Nouvelle partie ?")){ save("skyjo",{ps:["J1","J2"], r:[]}); render(); }});
-
-    app.querySelectorAll(".sk-n").forEach(inp=> inp.addEventListener("change",(e)=>{ d.ps[Number(e.target.dataset.i)]=e.target.value; save("skyjo",d); render(); }) );
-    app.querySelectorAll(".sk-v").forEach(inp=> inp.addEventListener("input",(e)=>{
-      const r=Number(e.target.dataset.r), c=Number(e.target.dataset.c);
-      d.r[r].s[c]=e.target.value; save("skyjo",d);
-      const sel = ".sk-v[data-r='"+r+"'][data-c='"+c+"']";
-      render();
-      const el = document.querySelector(sel);
-      if(el){ el.focus(); }
-    }) );
-  }
-
-  // Pétanque
-  function rPetanque(){
-    const d = load("petanque", {r:[]});
-    if(!Array.isArray(d.r)) d.r = [];
-    const totU = d.r.reduce((a,b)=>a+(Number(b.u)||0),0);
-    const totT = d.r.reduce((a,b)=>a+(Number(b.t)||0),0);
-    const listU = d.r.slice().reverse().map(r=>"<div>+"+(Number(r.u)||0)+"</div>").join("");
-    const listT = d.r.slice().reverse().map(r=>"<div>+"+(Number(r.t)||0)+"</div>").join("");
-    const ended = totU>=13 || totT>=13;
-    const winner = totU>=13 ? "NOUS" : (totT>=13 ? "EUX" : null);
-
-    app.innerHTML = `
-      <div class="panel drawn">
-        <div style="display:flex;gap:8px;align-items:center">
-          <div style="font-weight:1000;font-size:18px">Pétanque</div>
-          ${qbtn("petanque")}
-        </div>
-        <div class="kicker">Première équipe à 13 points gagne la partie.</div>
-        ${ended ? '<div style="text-align:center;margin-top:8px;font-weight:900;color:var(--red)">🏆 '+winner+' a gagné la partie !</div>' : ''}
-      </div>
-
-      <div class="belote-split drawn" style="margin-top:12px">
-        <div class="belote-col">
-          <div class="b-head">NOUS</div>
-          <div class="b-tot">${totU}</div>
-          <div class="b-list">${listU}</div>
-        </div>
-        <div class="belote-col">
-          <div class="b-head">EUX</div>
-          <div class="b-tot">${totT}</div>
-          <div class="b-list" style="background:#f9f9f9">${listT}</div>
-        </div>
-      </div>
-
-      <div class="panel drawn" style="margin-top:14px">
-        <div class="kicker">Points de la mène (un seul camp marque à la fois, 1 à 6 pts).</div>
-        <div class="grid" style="grid-template-columns:1fr 1fr">
-          <div><input type="number" id="pU" placeholder="Nous" min="0" max="6"></div>
-          <div><input type="number" id="pT" placeholder="Eux" min="0" max="6"></div>
-        </div>
-        <div class="actions">
-          <button class="btn" id="pAdd">+ Mène</button>
-        </div>
-        <div class="actions">
-          <button class="btn sec" id="pUndo">Annuler</button>
-          <button class="btn sec red" id="pReset">Reset</button>
-        </div>
-      </div>
-    `;
-    $("#pAdd").addEventListener("click", ()=>{
-      const u = Number($("#pU").value||0), t = Number($("#pT").value||0);
-      if(!u && !t) return;
-      d.r.push({u:u,t:t}); save("petanque",d); render();
-    });
-    $("#pUndo").addEventListener("click", ()=>{ d.r.pop(); save("petanque",d); render(); });
-    $("#pReset").addEventListener("click", ()=>{ if(confirm("Reset ?")){ save("petanque",{r:[]}); render(); }});
-  }
-
-  // Compteur de victoires
-  function rVictoires(){
-    const d = load("victoires", {ps:["J1","J2"], w:[0,0]});
-    if(!Array.isArray(d.ps) || d.ps.length<1) d.ps=["J1","J2"];
-    if(!Array.isArray(d.w)) d.w=[];
-    while(d.w.length < d.ps.length) d.w.push(0);
-
-    let html = '<div class="panel drawn"><div style="font-weight:1000;font-size:18px">Compteur de victoires</div><div class="kicker">Pour les jeux sans score chiffré (dames, échecs, puissance 4...). Une victoire = un point.</div></div>';
-    html += '<div class="grid" style="margin-top:12px;grid-template-columns:repeat(auto-fit,minmax(140px,1fr))">';
-    d.ps.forEach((p,i)=>{
-      html += '<div class="panel drawn" style="text-align:center">'
-        + '<input class="v-n" data-i="'+i+'" value="'+esc(p)+'" style="font-weight:900;text-align:center;margin-bottom:6px">'
-        + '<div style="font-size:44px;font-weight:1000">'+(d.w[i]||0)+'</div>'
-        + '<div class="actions" style="margin-top:8px">'
-        + '<button class="btn sec" data-minus="'+i+'" style="min-width:0;flex:1">−1</button>'
-        + '<button class="btn" data-plus="'+i+'" style="min-width:0;flex:1">+1</button>'
-        + '</div></div>';
-    });
-    html += '</div>';
-    html += '<div class="actions" style="margin-top:14px"><button class="btn sec" id="vAddP">+ Joueur</button><button class="btn sec red" id="vReset">Reset</button></div>';
-    app.innerHTML = html;
-
-    app.querySelectorAll(".v-n").forEach(inp=> inp.addEventListener("change",(e)=>{ d.ps[Number(e.target.dataset.i)]=e.target.value; save("victoires",d); }) );
-    app.querySelectorAll("[data-plus]").forEach(b=> b.addEventListener("click",()=>{ const i=Number(b.getAttribute("data-plus")); d.w[i]=(d.w[i]||0)+1; save("victoires",d); render(); ding(); }) );
-    app.querySelectorAll("[data-minus]").forEach(b=> b.addEventListener("click",()=>{ const i=Number(b.getAttribute("data-minus")); d.w[i]=Math.max(0,(d.w[i]||0)-1); save("victoires",d); render(); }) );
-    $("#vAddP").addEventListener("click", ()=>{ d.ps.push("J"+(d.ps.length+1)); d.w.push(0); save("victoires",d); render(); });
-    $("#vReset").addEventListener("click", ()=>{ if(confirm("Reset ?")){ save("victoires",{ps:["J1","J2"], w:[0,0]}); render(); }});
-  }
-
-  // Mölkky
-  function rMolkky(){
-    const d = load("molkky",{ps:[{n:"J1",s:0,m:0},{n:"J2",s:0,m:0}], cur:0});
-    if(!Array.isArray(d.ps) || d.ps.length<1) d.ps=[{n:"J1",s:0,m:0},{n:"J2",s:0,m:0}];
-    if(typeof d.cur!=="number") d.cur=0;
-    const cur = d.ps[d.cur] || d.ps[0];
-
-    let html = '<div class="panel drawn" style="display:flex;gap:8px;align-items:center"><div style="font-weight:1000;font-size:18px">Mölkky</div>'+qbtn("molkky")+'</div>';
-    html += '<div class="actions"><button class="btn sec" id="mAddP">+ Joueur</button><button class="btn sec red" id="mReset">Reset</button></div><br>';
-    d.ps.forEach((pl,i)=>{
-      let state="";
-      if(pl.m>=3) state="💀 Éliminé";
-      else if(pl.s===50) state="🏆 Gagné !";
-      else if(pl.s>50) state="⬇ 25";
-      html += '<div class="m-player drawn '+(i===d.cur?'active':'')+'" data-p="'+i+'">'
-        + '<div style="display:flex;justify-content:space-between"><span style="font-weight:1000">'+esc(pl.n)+'</span><span style="font-weight:1000;font-size:18px">'+(pl.s||0)+' / 50</span></div>'
-        + '<div style="font-size:11px;color:var(--muted)">Ratés: '+(pl.m||0)+' '+state+'</div></div>';
-    });
-    html += '<div class="panel drawn"><div style="text-align:center;font-weight:1000;margin-bottom:10px">Tour de '+esc(cur.n)+'</div>'
-      + '<div class="molkky-grid">'+[1,2,3,4,5,6,7,8,9,10,11,12].map(n=>'<div class="pin-btn" data-hit="'+n+'">'+n+'</div>').join("")+'</div>'
-      + '<div class="actions"><button class="btn sec red" id="mMiss">RATÉ (X)</button></div></div>';
-    app.innerHTML = html;
-
-    app.querySelectorAll(".m-player").forEach(el=> el.addEventListener("click", ()=>{ d.cur=Number(el.getAttribute("data-p")); save("molkky",d); render(); }) );
-
-    function nextPlayer(){
-      let next=d.cur+1; if(next>=d.ps.length) next=0;
-      const start=next;
-      while(d.ps[next].m>=3 || d.ps[next].s===50){
-        next++; if(next>=d.ps.length) next=0;
-        if(next===start) break;
-      }
-      d.cur=next;
-    }
-    function hit(val){
-      const pl=d.ps[d.cur];
-      if(pl.m>=3 || pl.s===50) return;
-      if(val===0){ pl.m=(pl.m||0)+1; }
-      else{ pl.m=0; pl.s=(pl.s||0)+val; if(pl.s>50) pl.s=25; }
-      nextPlayer();
-      save("molkky",d); render();
-    }
-
-    $("#mAddP").addEventListener("click", ()=>{ d.ps.push({n:"J"+(d.ps.length+1),s:0,m:0}); save("molkky",d); render(); });
-    $("#mReset").addEventListener("click", ()=>{ if(confirm("Nouvelle partie ?")){ save("molkky",{ps:[{n:"J1",s:0,m:0},{n:"J2",s:0,m:0}],cur:0}); render(); }});
-    $("#mMiss").addEventListener("click", ()=> hit(0));
-    app.querySelectorAll("[data-hit]").forEach(b=> b.addEventListener("click", ()=> hit(Number(b.getAttribute("data-hit")))) );
-  }
-
-  // Tools
-  let diceCount = 1;
-  function rDice(){
-    app.innerHTML = '<div class="panel drawn" style="text-align:center">'
-      + '<div style="font-weight:1000;font-size:18px">Dé (d6)</div>'
-      + '<div class="kicker">Lancer rapide — choisis le nombre de dés.</div>'
-      + '<div class="actions" style="justify-content:center">'
-      +   [1,2,3,4,5,6].map(n=>'<button class="btn'+(n===diceCount?'':' sec')+'" data-count="'+n+'">'+n+'</button>').join("")
-      + '</div>'
-      + '<div id="dGrid" style="display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin:20px 0">'
-      +   Array.from({length:diceCount}).map((_,i)=>'<div class="die drawn" id="dDie'+i+'">?</div>').join("")
-      + '</div>'
-      + '<div id="dTotal" style="font-weight:1000;font-size:16px;color:var(--muted);min-height:20px"></div>'
-      + '<div class="actions"><button class="btn" id="dRoll">LANCER</button></div>'
-      + '</div>';
-
-    app.querySelectorAll("[data-count]").forEach(b=> b.addEventListener("click", ()=>{ diceCount=Number(b.getAttribute("data-count")); render(); }) );
-
-    $("#dRoll").addEventListener("click", ()=>{
-      let i=0;
-      const dice = Array.from({length:diceCount}, (_,k)=> $("#dDie"+k));
-      const t=setInterval(()=>{
-        dice.forEach(el=> el.textContent = String(1+Math.floor(Math.random()*6)));
-        if(++i>10){
-          clearInterval(t);
-          const vals = dice.map(el=> Number(el.textContent));
-          $("#dTotal").textContent = diceCount>1 ? ("Total : "+vals.reduce((a,b)=>a+b,0)) : "";
-          ding();
-        }
-      }, 50);
-    });
-  }
-
-  let tInt=null, hgInt=null, hgPhase=0;
-  let tS={t:60,r:60,run:false};
-
-  function stopTimer(){
-    if(tInt){ clearInterval(tInt); tInt=null; }
-    if(hgInt){ clearInterval(hgInt); hgInt=null; }
-    tS.run=false;
-  }
-
-  function formatTime(total){
-    total = Math.max(0, total);
-    const h=Math.floor(total/3600), m=Math.floor((total%3600)/60), s=total%60;
-    const mm=String(m).padStart(2,"0"), ss=String(s).padStart(2,"0");
-    return h>0 ? (h+":"+mm+":"+ss) : (mm+":"+ss);
-  }
-
-  function adjustTime(unit, dir){
-    let h=Math.floor(tS.t/3600), rem=tS.t%3600, m=Math.floor(rem/60), s=rem%60;
-    if(unit==="h") h=Math.max(0,Math.min(23,h+dir));
-    if(unit==="m") m=Math.max(0,Math.min(59,m+dir));
-    if(unit==="s") s=Math.max(0,Math.min(59,s+dir));
-    stopTimer();
-    tS.t = h*3600+m*60+s;
-    tS.r = tS.t;
-    render();
-  }
-
-  // Sablier pixel-art (grille basse résolution dessinée en "gros pixels" carrés)
-  const HG_COLS=18, HG_ROWS=30, HG_CELL=7;
-  const HG_WIDE=[2,15], HG_NARROW=[8,9]; // [left,right] col bounds
-  function hgRowBounds(i, n, reverse){ // i:0..n-1 -> {left,right}
-    const f = n<=1 ? 0 : i/(n-1);
-    const a = reverse ? HG_NARROW : HG_WIDE;
-    const b = reverse ? HG_WIDE : HG_NARROW;
-    return { left: Math.round(a[0] + (b[0]-a[0])*f), right: Math.round(a[1] + (b[1]-a[1])*f) };
-  }
-  function drawHourglass(){
-    const cv = $("#hgCanvas");
-    if(!cv) return;
-    const ctx = cv.getContext("2d");
-    ctx.clearRect(0,0,cv.width,cv.height);
-    const px = (col,row,color)=>{ ctx.fillStyle=color; ctx.fillRect(col*HG_CELL,row*HG_CELL,HG_CELL,HG_CELL); };
-
-    const INK="#1a1a2e", WOOD="#8d6e63", SAND="#eba83a", GLASS="#f2f0ea";
-    const frac = tS.t>0 ? Math.max(0,Math.min(1, tS.r/tS.t)) : 0;
-
-    // Capuchons haut/bas (bois)
-    for(let c=0;c<HG_COLS;c++){ px(c,0,WOOD); px(c,1,WOOD); px(c,HG_ROWS-2,WOOD); px(c,HG_ROWS-1,WOOD); }
-
-    const topN=12, botN=12, topStart=2, neckStart=14, botStart=16;
-    const fillTop = Math.round(topN * frac);       // rangées de sable restant en haut (près du col)
-    const fillBot = Math.round(botN * (1-frac));   // rangées de sable accumulé en bas
-
-    // Bulbe du haut (large -> étroit)
-    for(let i=0;i<topN;i++){
-      const row = topStart+i;
-      const {left,right} = hgRowBounds(i, topN, false);
-      px(left,row,INK); px(right,row,INK);
-      const isSand = i >= (topN - fillTop);
-      for(let c=left+1;c<right;c++) px(c,row, isSand ? SAND : GLASS);
-    }
-    // Col (étroit)
-    for(let row=neckStart; row<neckStart+2; row++){
-      px(HG_NARROW[0],row,INK); px(HG_NARROW[1],row,INK);
-      for(let c=HG_NARROW[0]+1;c<HG_NARROW[1];c++) px(c,row,GLASS);
-    }
-    // Grain qui tombe (animation, seulement si actif et il reste du sable)
-    if(tS.run && frac>0 && frac<1){
-      const gRow = neckStart + (hgPhase%2);
-      px(HG_NARROW[0]+1, gRow, SAND);
-    }
-    // Bulbe du bas (étroit -> large)
-    for(let i=0;i<botN;i++){
-      const row = botStart+i;
-      const {left,right} = hgRowBounds(i, botN, true);
-      px(left,row,INK); px(right,row,INK);
-      const isSand = i >= (botN - fillBot);
-      for(let c=left+1;c<right;c++) px(c,row, isSand ? SAND : GLASS);
-    }
-  }
-
-  function beginRun(){
-    tS.run=true;
-    tInt=setInterval(()=>{
-      tS.r--;
-      if(tS.r<=0){ tS.r=0; stopTimer(); drawHourglass(); ding(); setTimeout(ding,500); updateTimerText(); return; }
-      updateTimerText();
-    }, 1000);
-    hgInt=setInterval(()=>{ hgPhase++; drawHourglass(); }, 180);
-    updateTimerText();
-  }
-
-  function updateTimerText(){
-    const el=$("#tTime"); if(el) el.textContent = formatTime(tS.r);
-    const btn=$("#tStart"); if(btn) btn.textContent = tS.run ? "PAUSE" : "LANCER";
-  }
-
-  function rTimer(){
-    const H=Math.floor(tS.t/3600), Mrem=tS.t%3600, M=Math.floor(Mrem/60), S=Mrem%60;
-    app.innerHTML = '<div class="panel drawn" style="text-align:center">'
-      + '<div style="font-weight:1000;font-size:18px">Minuteur</div>'
-      + '<div id="hgWrap"><canvas id="hgCanvas" width="'+(HG_COLS*HG_CELL)+'" height="'+(HG_ROWS*HG_CELL)+'"></canvas></div>'
-      + '<div id="tTime" style="font-weight:1000;font-size:40px">'+formatTime(tS.r)+'</div>'
-      + '<div class="actions"><button class="btn" id="tStart">'+(tS.run?'PAUSE':'LANCER')+'</button><button class="btn sec" id="tReset">RESET</button></div>'
-      + '<div class="actions">'+[30,60,90,120,180,300].map(s=>'<button class="btn sec" data-p="'+s+'">'+(s<60? s+'s' : (s/60)+'m')+'</button>').join("")+'</div>'
-      + '</div>'
-      + '<div class="panel drawn" style="margin-top:14px">'
-      + '<div class="kicker" style="text-align:center">Régler soi-même</div>'
-      + '<div style="display:flex;justify-content:center;gap:22px;margin-top:6px">'
-      +   ['h','m','s'].map(u=>{
-            const label = u==="h"?"H":(u==="m"?"MIN":"SEC");
-            const val = u==="h"?H:(u==="m"?M:S);
-            return '<div class="t-unit">'
-              + '<button class="qbtn" data-unit="'+u+'" data-dir="1">+</button>'
-              + '<div class="t-val">'+String(val).padStart(2,"0")+'</div>'
-              + '<div style="font-size:10px;color:var(--muted);font-weight:900">'+label+'</div>'
-              + '<button class="qbtn" data-unit="'+u+'" data-dir="-1">−</button>'
-              + '</div>';
-          }).join("")
-      + '</div>'
-      + '</div>';
-
-    drawHourglass();
-
-    $("#tStart").addEventListener("click", ()=>{
-      if(tS.run){ stopTimer(); updateTimerText(); return; }
-      if(tS.t<=0) return;
-      const fresh = tS.r>=tS.t || tS.r<=0;
-      if(fresh){
-        const cv=$("#hgCanvas");
-        let done=false;
-        const finish=()=>{
-          if(done) return; done=true;
-          cv.classList.remove("hg-flip");
-          tS.r=tS.t; drawHourglass();
-          beginRun();
-        };
-        cv.classList.add("hg-flip");
-        cv.addEventListener("animationend", finish, {once:true});
-        setTimeout(finish, 500);
-      }else{
-        beginRun();
-      }
-    });
-    $("#tReset").addEventListener("click", ()=>{ stopTimer(); tS.r=tS.t; render(); });
-    app.querySelectorAll("[data-p]").forEach(b=> b.addEventListener("click", ()=>{ const s=Number(b.getAttribute("data-p")); stopTimer(); tS.t=s; tS.r=s; render(); }) );
-    app.querySelectorAll("[data-unit]").forEach(b=> b.addEventListener("click", ()=>{ adjustTime(b.getAttribute("data-unit"), Number(b.getAttribute("data-dir"))); }) );
-  }
-
-  function rCustom(){
-    const cfg = load("custom_cfg",{title:"Tableau custom", players:4, rounds:5});
-    app.innerHTML = `
-      <div class="panel drawn">
-        <div style="font-weight:1000;font-size:18px">Tableau custom</div>
-        <div class="kicker">Choisis joueurs + manches → on génère une feuille.</div>
-        <div class="actions" style="margin-top:10px">
-          <div style="flex:1;min-width:160px"><div style="font-size:12px;color:var(--muted);margin-bottom:6px">Titre</div><input id="ctTitle" value="${esc(cfg.title)}"></div>
-          <div style="flex:1;min-width:120px"><div style="font-size:12px;color:var(--muted);margin-bottom:6px">Joueurs</div><input id="ctPlayers" type="number" min="1" max="12" value="${cfg.players}"></div>
-          <div style="flex:1;min-width:120px"><div style="font-size:12px;color:var(--muted);margin-bottom:6px">Manches</div><input id="ctRounds" type="number" min="1" max="30" value="${cfg.rounds}"></div>
-        </div>
-        <div class="actions">
-          <button class="btn" id="ctGo">GÉNÉRER</button>
-          <button class="btn sec red" id="ctReset">Reset feuille</button>
-        </div>
-      </div>
-    `;
-    function saveCfg(){
-      cfg.title=$("#ctTitle").value||"Tableau custom";
-      cfg.players=Math.max(1,Math.min(12,Number($("#ctPlayers").value)||4));
-      cfg.rounds=Math.max(1,Math.min(30,Number($("#ctRounds").value)||5));
-      save("custom_cfg",cfg);
-    }
-    $("#ctTitle").addEventListener("input", saveCfg);
-    $("#ctPlayers").addEventListener("input", saveCfg);
-    $("#ctRounds").addEventListener("input", saveCfg);
-    $("#ctGo").addEventListener("click", ()=>{
-      saveCfg();
-      const ps=Array.from({length:cfg.players},(_,i)=>"J"+(i+1));
-      const r=Array.from({length:cfg.rounds},()=>({k:"", s:new Array(cfg.players).fill(0)}));
-      save("custom_sheet",{ps:ps, r:r, meta:{date:"", title:cfg.title}});
-      nav("#custom_sheet");
-    });
-    $("#ctReset").addEventListener("click", ()=>{ if(confirm("Reset ?")){ save("custom_sheet",{ps:["J1","J2"], r:[], meta:{date:"", title:"Tableau custom"}}); alert("OK."); }});
-  }
-  function rCustomSheet(){
-    const d = load("custom_sheet",{ps:["J1","J2"], r:[], meta:{date:"", title:"Tableau custom"}});
-    renderSheet("custom_sheet", (d.meta && d.meta.title) ? d.meta.title : "Tableau custom", {defaultPlayers:d.ps, addRoundLabel:"Manche"});
-  }
-
-  // Router
-  function render(){
-    const h = location.hash || "#home";
-    if(h==="#home"){ backBtn.style.visibility="hidden"; homeBtn.disabled=true; }
-    else{ backBtn.style.visibility="visible"; homeBtn.disabled=false; }
-
-    if(h!=="#timer") stopTimer();
-    showBanner(false);
-
-    switch(h){
-      case "#home": rHome(); break;
-      case "#belote": rBelote(); break;
-      case "#yams": rYams(); break;
-      case "#tarot": rTarot(); break;
-      case "#rami": rRami(); break;
-      case "#uno": rUno(); break;
-      case "#scrabble": rScrabble(); break;
-      case "#free": rFree(); break;
-      case "#421": r421(); break;
-      case "#skyjo": rSkyjo(); break;
-      case "#petanque": rPetanque(); break;
-      case "#victoires": rVictoires(); break;
-      case "#molkky": rMolkky(); break;
-      case "#dice": rDice(); break;
-      case "#timer": rTimer(); break;
-      case "#custom": rCustom(); break;
-      case "#custom_sheet": rCustomSheet(); break;
-      default: rHome();
-    }
-  }
-
-  // init icon state
-  setWakeUI(false); setFSUI(false);
-})();
-</script>
-</body>
-</html>
+<!doctype html><html lang="fr"><head>  <meta charset="utf-8" />  <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no" />  <title>TableTool v16</title>  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMiAzMiI+PHJlY3QgeD0iNCIgeT0iMyIgd2lkdGg9IjE4IiBoZWlnaHQ9IjI2IiByeD0iMyIgZmlsbD0iI2ZjZmJmOCIgc3Ryb2tlPSIjMWExYTJlIiBzdHJva2Utd2lkdGg9IjIuNSIvPjxjaXJjbGUgY3g9IjQiIGN5PSI4IiByPSIxLjYiIGZpbGw9IiMxYTFhMmUiLz48Y2lyY2xlIGN4PSI0IiBjeT0iMTUiIHI9IjEuNiIgZmlsbD0iIzFhMWEyZSIvPjxjaXJjbGUgY3g9IjQiIGN5PSIyMiIgcj0iMS42IiBmaWxsPSIjMWExYTJlIi8+PGxpbmUgeDE9IjkiIHkxPSIxMCIgeDI9IjE4IiB5Mj0iMTAiIHN0cm9rZT0iIzY2NiIgc3Ryb2tlLXdpZHRoPSIyIi8+PGxpbmUgeDE9IjkiIHkxPSIxNiIgeDI9IjE4IiB5Mj0iMTYiIHN0cm9rZT0iIzY2NiIgc3Ryb2tlLXdpZHRoPSIyIi8+PHBhdGggZD0iTTE2IDI3IEwyNyAxMCBMMzAgMTIgTDIwIDI5IFoiIGZpbGw9IiNjMDM5MmIiIHN0cm9rZT0iIzFhMWEyZSIgc3Ryb2tlLXdpZHRoPSIxLjUiIHN0cm9rZS1saW5lam9pbj0icm91bmQiLz48L3N2Zz4=" />  <style>    :root{--bg:#fcfbf8;--ink:#1a1a2e;--muted:#666;--red:#c0392b;--wood:#8d6e63;--ok:#2e7d32;--font:"Comic Sans MS","Chalkboard SE","Marker Felt",system-ui,sans-serif;}    *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;user-select:none}    body{margin:0;color:var(--ink);font-family:var(--font);background:var(--bg);      background-image:linear-gradient(#e0e0e0 1px,transparent 1px),linear-gradient(90deg,#e0e0e0 1px,transparent 1px);      background-size:20px 20px;background-blend-mode:multiply;padding-bottom:90px;}    .drawn{filter:url('#wiggle')}    header{position:sticky;top:0;z-index:50;background:var(--bg);border-bottom:2px solid var(--ink);padding:10px;display:flex;align-items:center;gap:10px;box-shadow:0 4px 10px rgba(0,0,0,.1)}    header button{background:transparent;border:2px solid var(--ink);border-radius:50%;width:40px;height:40px;font-size:18px;cursor:pointer;display:grid;place-items:center}    #wakeIcon,#fsIcon{opacity:.15;font-size:10px;line-height:1.1;text-align:right;transition:.2s}    #wakeIcon.on{opacity:1;color:var(--ok);font-weight:900}    #fsIcon.on{opacity:1;color:var(--wood);font-weight:900}    main{max-width:860px;margin:0 auto;padding:15px}    h2{margin:10px 0 8px}    .grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:15px}    @media(min-width:600px){.grid{grid-template-columns:repeat(3,minmax(0,1fr));}}    .card{background:#fff;border:2px solid var(--ink);border-radius:6px;padding:15px;display:flex;flex-direction:column;align-items:center;gap:6px;box-shadow:3px 3px 0 rgba(0,0,0,.1);cursor:pointer}    .card:active{transform:scale(.98)}    .card .ico{font-size:32px}    .card .tit{font-weight:900;font-size:16px}    .card .sub{font-size:11px;color:var(--muted);font-style:italic;text-align:center}    .panel{background:#fff;border:2px solid var(--ink);border-radius:10px;padding:14px;box-shadow:2px 2px 0 rgba(0,0,0,.12)}    .kicker{font-size:12px;color:var(--muted);font-style:italic;text-align:center}    .actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px}    .btn{flex:1;min-width:140px;padding:12px;background:#fff;border:2px solid var(--ink);border-radius:10px;font-family:var(--font);font-weight:900;cursor:pointer;box-shadow:2px 2px 0 var(--ink)}    .btn:active{transform:translate(2px,2px);box-shadow:none}    .btn.sec{border-style:dashed;opacity:.9;box-shadow:none}    .btn.red{color:var(--red);border-color:var(--red)}    input{background:transparent;border:none;border-bottom:1px dashed #999;font-family:var(--font);font-size:16px;width:100%;text-align:center;color:var(--ink);user-select:text;border-radius:0}    input:focus{outline:none;border-bottom:2px solid var(--ink);background:#f0f0f0}    .paper-table{width:100%;border-collapse:collapse;background:#fff;margin:12px 0}    .paper-table th{border:2px solid var(--ink);background:#eee;padding:6px;font-size:12px;text-transform:uppercase}    .paper-table td{border:2px solid var(--ink);padding:6px;text-align:center;height:36px}    .paper-table td.label{text-align:left;font-weight:900;background:#fafafa;width:140px;font-size:13px}    .belote-split{display:flex;border:3px solid var(--ink);height:300px;background:#fff;filter:url('#wiggle')}    .belote-col{flex:1;display:flex;flex-direction:column;border-right:2px solid var(--ink)}    .belote-col:last-child{border:none}    .b-head{background:#eee;padding:10px;text-align:center;font-weight:900;border-bottom:2px solid var(--ink)}    .b-tot{font-size:40px;text-align:center;padding:10px;font-weight:1000;border-bottom:2px dashed #ccc}    .b-list{flex:1;overflow-y:auto;font-size:14px;text-align:center;line-height:1.8}    .d3{display:flex;gap:12px;justify-content:center;align-items:center;margin:14px 0 6px}    .d3-check{display:flex;gap:12px;justify-content:center;align-items:center;margin:4px 0}    .die{width:74px;height:74px;border:3px solid var(--ink);border-radius:14px;display:grid;place-items:center;font-size:34px;font-weight:1000;background:#fff;box-shadow:3px 3px 0 rgba(0,0,0,.12)}    .molkky-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:14px 0}    .pin-btn{aspect-ratio:1;border:2px solid var(--wood);border-radius:50%;background:#fff;color:var(--wood);font-weight:1000;font-size:20px;display:grid;place-items:center;cursor:pointer}    .pin-btn:active{background:var(--wood);color:#fff}    .m-player{padding:10px;border:2px solid var(--ink);margin-bottom:10px;border-radius:10px;background:#fff}    #alarmFlash{position:fixed;inset:0;z-index:500;pointer-events:none;opacity:0;background:#ffcf3f}    #alarmFlash.flashing{animation:alarmFlashKf .5s ease-in-out infinite}    @keyframes alarmFlashKf{0%,100%{opacity:0}50%{opacity:.55}}    .m-player.active{border:4px solid var(--wood);background:#fff8e1}    .bac-big{width:130px;height:130px;border:3px solid var(--ink);border-radius:16px;display:grid;place-items:center;font-size:64px;font-weight:1000;background:#fff;box-shadow:4px 4px 0 rgba(0,0,0,.15);margin:14px auto}    .bac-grid{display:grid;grid-template-columns:repeat(26,1fr);gap:2px;margin:14px 0}    .bac-dur-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:12px}    .bac-dur-grid .btn{min-width:0;flex:none;padding:8px 4px;font-size:12px}    .bac-letter{aspect-ratio:auto;height:24px;border:1px solid var(--ink);border-radius:4px;display:grid;place-items:center;font-weight:1000;font-size:10px;background:#fff;padding:0}    .bac-letter.used{opacity:.35;text-decoration:line-through}    .bac-letter.excluded{opacity:.2;border-style:dashed}    .bac-letter.current{background:var(--red);color:#fff;border-color:var(--red)}    .banner{position:sticky;top:64px;z-index:49;background:#fff;border:2px dashed var(--ink);padding:10px;border-radius:12px;box-shadow:2px 2px 0 rgba(0,0,0,.12);margin:10px 0;display:none}    .banner.show{display:block}    .banner b{color:var(--red)}    #hgWrap{display:flex;justify-content:center;margin:12px 0}    #hgCanvas{border:3px solid var(--ink);border-radius:4px;background:#fff;box-shadow:3px 3px 0 rgba(0,0,0,.12);image-rendering:pixelated}    @keyframes hgFlip{ from{transform:rotate(0deg)} to{transform:rotate(180deg)} }    .hg-flip{animation:hgFlip .45s ease-in-out}    .t-unit{display:flex;flex-direction:column;align-items:center;gap:6px}    .t-val{font-weight:1000;font-size:20px;min-width:40px}    .qbtn{width:30px;height:30px;flex-shrink:0;border-radius:50%;border:2.5px solid var(--ink);background:#fff;color:var(--ink);      font-family:var(--font);font-weight:1000;font-size:15px;line-height:1;cursor:pointer;box-shadow:2px 2px 0 var(--ink);padding:0}    .qbtn:active{transform:translate(1px,1px);box-shadow:1px 1px 0 var(--ink)}    .modal-overlay{position:fixed;inset:0;z-index:6000;background:rgba(26,26,46,.55);display:none;align-items:flex-start;justify-content:center;padding:16px;overflow-y:auto}    .modal-overlay.show{display:flex}    .modal-box{background:var(--bg);border:3px solid var(--ink);border-radius:14px;max-width:480px;width:100%;margin-top:40px;padding:18px;box-shadow:5px 5px 0 var(--ink);font-size:14px}    video{position:absolute;top:0;left:0;width:1px;height:1px;opacity:.01;pointer-events:none}  </style></head><body>  <noscript>    <div style="padding:16px;font-family:system-ui;background:#fff;border:2px solid #000;margin:12px;border-radius:10px">      JavaScript est désactivé → l'app ne peut pas fonctionner. Ouvre le fichier dans Samsung Internet/Chrome avec JavaScript activé.    </div>  </noscript>  <svg width="0" height="0" style="position:absolute">    <filter id="wiggle">      <feTurbulence type="fractalNoise" baseFrequency="0.01" numOctaves="3" result="noise" />      <feDisplacementMap in="SourceGraphic" in2="noise" scale="2" />    </filter>    <clipPath id="clipTop"><path d="M10,10 L90,10 L50,80 Z" /></clipPath>    <clipPath id="clipBot"><path d="M50,80 L90,150 L10,150 Z" /></clipPath>  </svg>  <video id="hackVid" playsinline loop muted>    <source src="data:video/mp4;base64,AAAAHGZ0eXBNUjRCAAAARU1SNIgAAABhYXJrdWR0YQAAAAxjb3ZlYXJrdWR0YQlmcm9tAAAAGHNvaWFhcnR3cmvDq2xpYnF1aWNrY2hhdAAAAAxtZGF0AAAAAAAAAAAAAA==" type="video/mp4">  </video>  <div id="appWrap">    <header>      <button id="backBtn" title="Retour">←</button>      <svg viewBox="0 0 32 32" width="30" height="30" class="drawn" style="flex-shrink:0">        <rect x="5" y="3" width="17" height="25" rx="2" fill="#fff" stroke="var(--ink)" stroke-width="2"/>        <circle cx="5" cy="7" r="1.4" fill="var(--ink)"/>        <circle cx="5" cy="13" r="1.4" fill="var(--ink)"/>        <circle cx="5" cy="19" r="1.4" fill="var(--ink)"/>        <circle cx="5" cy="25" r="1.4" fill="var(--ink)"/>        <line x1="9" y1="9" x2="18" y2="9" stroke="var(--muted)" stroke-width="1.5"/>        <line x1="9" y1="14" x2="18" y2="14" stroke="var(--muted)" stroke-width="1.5"/>        <line x1="9" y1="19" x2="15" y2="19" stroke="var(--muted)" stroke-width="1.5"/>        <path d="M17 26 L27 10 L30 12 L20 28 Z" fill="var(--red)" stroke="var(--ink)" stroke-width="1.3" stroke-linejoin="round"/>      </svg>      <div style="font-weight:1000;font-size:18px">TableTool</div>      <div style="flex:1"></div>      <div id="wakeIcon" title="Anti-veille">ANTI<br>VEILLE</div>      <button id="wakeBtn" title="Anti-veille">☀</button>      <div id="fsIcon" title="Plein écran">PLEIN<br>ÉCRAN</div>      <button id="fsBtn" title="Plein écran">⛶</button>      <button id="homeBtn" title="Accueil">⌂</button>    </header>    <main>      <div id="banner" class="banner drawn">        <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">          <div style="flex:1;min-width:220px">            <div><b>Mode table :</b> anti‑veille / plein écran a été perdu.</div>            <div style="font-size:12px;color:var(--muted)">Appuie sur ☀ / ⛶ (ou touche l'écran).</div>          </div>          <button class="btn sec" id="bannerFix">RÉACTIVER</button>        </div>      </div>      <div id="app"></div>    </main>  </div>  <div id="alarmFlash"></div>  <div id="rulesModal" class="modal-overlay">    <div class="modal-box drawn">      <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:10px">        <div id="rulesTitle" style="font-weight:1000;font-size:20px"></div>        <button id="rulesClose" class="qbtn" title="Fermer">✕</button>      </div>      <div id="rulesBody"></div>    </div>  </div><script>(function(){  const $ = (s)=>document.querySelector(s);  const app = $("#app");  const appWrap = $("#appWrap");  const vid = $("#hackVid");  const wakeIcon = $("#wakeIcon");  const wakeBtn  = $("#wakeBtn");  const fsIcon   = $("#fsIcon");  const fsBtn    = $("#fsBtn");  const banner   = $("#banner");  const bannerFix= $("#bannerFix");  const backBtn  = $("#backBtn");  const homeBtn  = $("#homeBtn");  const alarmFlashEl = $("#alarmFlash");  const PREF_WAKE = "tt15_pref_wake";  const PREF_FS   = "tt15_pref_fs";  const loadPref=(k,d)=>{try{const v=localStorage.getItem(k);return v===null?d:(v==="1");}catch(e){return d;}};  const savePref=(k,v)=>{try{localStorage.setItem(k,v?"1":"0");}catch(e){}};  let wantWake = loadPref(PREF_WAKE, true);  let wantFS   = loadPref(PREF_FS, false);  let wakeLock = null;  let keepAliveTimer = null;  function setWakeUI(on){ wakeIcon.classList.toggle("on", !!on); }  function setFSUI(on){ fsIcon.classList.toggle("on", !!on); }  const load=(k,d)=>{try{ return JSON.parse(localStorage.getItem("tt15_"+k)) || d; }catch(e){ return d; }};  const save=(k,v)=>{ try{ localStorage.setItem("tt15_"+k, JSON.stringify(v)); }catch(e){} };  const esc=(s)=>String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#039;");  const RULES = {    belote:{      r:"32 cartes, 4 joueurs en 2 équipes (Nous/Eux). Le donneur retourne une carte : chacun annonce \"je prends\" ou \"je passe\" pour choisir l'atout (2 tours d'enchères, puis retournée face cachée si personne ne prend). L'équipe preneuse doit ramasser plus de la moitié des points de la donne.",      c:"162 points par donne (152 dans les plis + 10 pour le Dix de Der, dernier pli). À l'atout : Valet=20, 9=14, As=11, 10=10, Roi=4, Dame=3, 8/7=0. Aux autres couleurs : As=11, 10=10, Roi=4, Dame=3, Valet=2, 9/8/7=0. Belote-Rebelote (Roi+Dame d'atout dans la même main) = +20 pts. Si l'équipe preneuse n'atteint pas la majorité, elle est \"dedans\" : l'adversaire marque les 162 pts, elle marque 0."    },    yams:{      r:"5 dés, jusqu'à 3 lancers par tour (on garde de côté les dés qu'on veut entre les lancers). À chaque tour, on doit remplir une case de sa grille avec le résultat obtenu — impossible de passer une case sans la remplir (au pire à 0).",      c:"Section haute (1 à 6) : on additionne uniquement les dés de cette valeur ; bonus de +35 si le total de la section atteint 63 ou plus. Section basse : Brelan/Carré = somme des 5 dés, Full = 25, Petite suite = 30, Grande suite = 40, Yams (5 dés identiques) = 50 (+100 par Yams supplémentaire dans la partie), Chance = somme des 5 dés peu importe la combinaison."    },    tarot:{      r:"78 cartes (dont les 21 atouts + l'Excuse), 4 joueurs. Enchères à 4 niveaux (Petite, Garde, Garde Sans, Garde Contre) : le plus offrant devient preneur et joue seul contre les 3 autres. En Petite/Garde, le Chien (6 cartes écartées) revient au preneur ; en Garde Sans/Contre, il reste caché.",      c:"Le contrat se juge sur le nombre de \"bouts\" (Excuse, Petit, 21 d'atout) gardés par le preneur dans ses plis : 0 bout → il faut 56 pts sur 91, 1 bout → 51 pts, 2 bouts → 41 pts, 3 bouts → 36 pts. L'écart entre points réalisés et objectif est multiplié par le coefficient du contrat (Petite×1, Garde×2, Garde Sans×4, Garde Contre×6) pour donner le score final."    },    rami:{      r:"2 jeux de 52 cartes + jokers, 2 à 6 joueurs. À son tour, on pioche une carte (talon ou défausse) puis on en défausse une, en essayant de poser des combinaisons (brelans/carrés de même valeur, ou suites de 3+ cartes de même couleur) pour vider sa main.",      c:"Quand un joueur vide sa main, la manche s'arrête : les autres comptent les points des cartes qui leur restent en main (pénalité). Valeurs courantes : cartes numérotées = leur valeur, figures = 10, As = 1 ou 11 selon la variante, Joker = 15 à 25. Le gagnant de la manche marque 0. À la fin de la partie, le total le plus bas gagne."    },    uno:{      r:"7 cartes par joueur au départ. À son tour, on pose une carte de même couleur, même valeur, ou une carte spéciale (+2, Inversé, Passe, Joker, Joker +4) sur la couleur/valeur en cours. On doit annoncer \"UNO\" quand il ne reste qu'une carte en main.",      c:"Dès qu'un joueur pose sa dernière carte, il marque tous les points restés dans les mains des autres : cartes chiffrées = leur valeur, +2/Inversé/Passe = 20 pts, Joker/Joker+4 = 50 pts. Ces points s'ajoutent à son total cumulé sur plusieurs manches. Le premier joueur à atteindre 500 points remporte la partie."    },    scrabble:{      r:"Chaque joueur pioche 7 lettres et forme des mots sur la grille en les reliant à ceux déjà posés façon mots croisés, en utilisant les cases bonus (lettre compte double/triple, mot compte double/triple).",      c:"Chaque lettre a une valeur fixe (1 à 10 pts selon sa rareté). On additionne les valeurs des lettres du mot posé, puis on applique les multiplicateurs des cases utilisées (le bonus \"mot\" s'applique après les bonus \"lettre\"). Poser ses 7 lettres d'un coup (un \"scrabble\") rapporte +50 pts bonus sur le tour."    },    "421":{      r:"3 dés. Chaque joueur lance jusqu'à 3 fois par tour, en gardant de côté les dés qu'il veut garder entre les lancers, pour former la meilleure combinaison possible. Traditionnellement joué pour désigner qui règle la tournée.",      c:"Le \"421\" (4-2-1) est la combinaison reine. Viennent ensuite les brelans (trois dés identiques, le plus élevé gagne), puis les suites, puis simplement la somme des dés. Le perdant de chaque manche pose un jeton ou un gage ; celui qui a le plus de jetons à la fin de la partie paie sa tournée."    },    molkky:{      r:"Jeu de lancer finlandais. Douze quilles numérotées de 1 à 12 sont plantées debout, groupées serrées. Chaque joueur, à son tour, lance le \"molkky\" (bâton) pour faire tomber une ou plusieurs quilles, à une distance raisonnable.",      c:"Si une seule quille tombe, on marque le chiffre inscrit dessus. Si plusieurs quilles tombent au même lancer, on marque simplement le nombre de quilles tombées (peu importe leurs numéros). Le premier à atteindre exactement 50 points gagne ; s'il dépasse 50, son score retombe à 25. Trois lancers ratés d'affilée éliminent un joueur."    },    skyjo:{      r:"Chaque joueur reçoit une grille de 12 cartes face cachée et en retourne 2 au départ. À son tour, on pioche une carte (pioche ou défausse) : soit on l'échange contre une carte de sa grille (qui se révèle), soit on la défausse et on révèle une carte de sa grille à la place.",      c:"Chaque carte vaut sa valeur imprimée, de -2 à 12. Une colonne de 3 cartes identiques révélées est retirée du jeu et ne compte plus (0 pt). Dès qu'un joueur révèle sa dernière carte, la manche se termine aussitôt et tous les autres révèlent et totalisent leur grille. Le total le plus bas à la fin de la partie gagne ; la partie s'arrête dès qu'un joueur atteint 100 pts cumulés."    },    petanque:{      r:"Deux équipes s'affrontent. Chaque joueur lance ses boules le plus près possible du cochonnet (petite boule cible), en essayant soit de s'en approcher (\"pointer\"), soit de repousser une boule adverse (\"tirer\").",      c:"À la fin de chaque mène, seule l'équipe la plus proche du cochonnet marque des points : elle en gagne autant que de boules à elle plus proches du cochonnet que la meilleure boule adverse (donc 1 à 6 points selon les cas). La première équipe à atteindre 13 points remporte la partie."    },    bac:{      r:"Chaque joueur a une feuille avec les mêmes catégories (prénom, animal, ville, pays, métier, fruit/légume, objet...). Une lettre est tirée au sort : dans le temps imparti, chacun doit trouver un mot commençant par cette lettre pour chaque catégorie. On s'arrête à la fin du minuteur, ou dès qu'un joueur a tout rempli et crie \"Stop !\".",      c:"Pour chaque catégorie : mot valide trouvé par un seul joueur = 10 points, mot valide trouvé par plusieurs joueurs = 5 points chacun, catégorie vide ou mot invalide = 0 point. On additionne les points de toutes les catégories à chaque tour ; le premier à atteindre le score visé (souvent 100 pts) remporte la partie."    }  };  function qbtn(key){ return '<button class="qbtn" data-rules="'+key+'" title="Règles du jeu">?</button>'; }  const rulesModal = $("#rulesModal");  function openRules(key){    const g = RULES[key];    if(!g || !rulesModal) return;    $("#rulesTitle").textContent = ruleTitleFor(key);    $("#rulesBody").innerHTML = '<div style="font-weight:1000;margin-bottom:4px">RÈGLES</div><div style="margin-bottom:14px;line-height:1.4">'+esc(g.r)+'</div>'      + '<div style="font-weight:1000;margin-bottom:4px">COMPTAGE DES POINTS</div><div style="line-height:1.4">'+esc(g.c)+'</div>';    rulesModal.classList.add("show");  }  function closeRules(){ if(rulesModal) rulesModal.classList.remove("show"); }  function ruleTitleFor(key){    const names = {belote:"Belote", yams:"Yams", tarot:"Tarot", rami:"Rami", uno:"Uno", scrabble:"Scrabble", "421":"421", molkky:"Mölkky", skyjo:"Skyjo", petanque:"Pétanque", bac:"Jeu du Bac"};    return names[key] || key;  }  app.addEventListener("click", (e)=>{    const b = e.target.closest("[data-rules]");    if(b) openRules(b.getAttribute("data-rules"));  });  $("#rulesClose")?.addEventListener("click", closeRules);  rulesModal?.addEventListener("click", (e)=>{ if(e.target===rulesModal) closeRules(); });  function showBanner(force){    const inMenu = (location.hash || "#home") === "#home";    if(inMenu){ banner.classList.remove("show"); return; }    const lostWake = wantWake && ("wakeLock" in navigator) && !wakeLock;    const lostFS = wantFS && !document.fullscreenElement;    banner.classList.toggle("show", !!force || lostWake || lostFS);  }  async function tryVideoKeepAlive(){    try{ if (vid && vid.paused) await vid.play(); }catch(e){}  }  async function tryWakeLock(){    if(!wantWake){ await releaseWakeLock(); return; }    await tryVideoKeepAlive();    if(!("wakeLock" in navigator) || !window.isSecureContext){      setWakeUI(false);      return;    }    try{      if(!wakeLock){        wakeLock = await navigator.wakeLock.request("screen");        wakeLock.addEventListener("release", ()=>{ wakeLock=null; setWakeUI(false); });      }      setWakeUI(true);    }catch(e){      wakeLock = null;      setWakeUI(false);    }  }  async function releaseWakeLock(){    try{ if(wakeLock) await wakeLock.release(); }catch(e){}    wakeLock=null;    setWakeUI(false);  }  async function tryFullscreen(){    if(!wantFS){ setFSUI(false); return; }    try{      if(!document.fullscreenElement){ await document.documentElement.requestFullscreen(); }    }catch(e){}    setFSUI(!!document.fullscreenElement);  }  function scheduleKeepAlive(){    clearInterval(keepAliveTimer);    keepAliveTimer = setInterval(async ()=>{      if(document.visibilityState !== "visible") return;      if(wantWake){        if(!wakeLock && ("wakeLock" in navigator)) await tryWakeLock();        await tryVideoKeepAlive();      }      if(wantFS && !document.fullscreenElement) showBanner(true);    }, 5000);  }  async function boot(){    if(!location.hash) location.hash="#home";    render();    scheduleKeepAlive();    await tryWakeLock();    if(wantFS) await tryFullscreen();    showBanner(false);  }  document.addEventListener("click", async ()=>{    if(wantWake) await tryWakeLock();    if(wantFS && !document.fullscreenElement) await tryFullscreen();    showBanner(false);    unlockAudioCtx();  }, {passive:true});  document.addEventListener("visibilitychange", async ()=>{    if(document.visibilityState==="visible"){      if(wantWake) await tryWakeLock();      if(wantFS) setTimeout(()=>tryFullscreen(), 250);      showBanner(false);    }  });  wakeBtn.addEventListener("click", async ()=>{    wantWake = !wantWake;    savePref(PREF_WAKE, wantWake);    if(wantWake) await tryWakeLock();    else await releaseWakeLock();    showBanner(false);  });  fsBtn.addEventListener("click", async ()=>{    wantFS = !wantFS;    savePref(PREF_FS, wantFS);    if(wantFS) await tryFullscreen();    else{ try{ if(document.fullscreenElement) await document.exitFullscreen(); }catch(e){} }    setFSUI(!!document.fullscreenElement);    showBanner(false);  });  bannerFix.addEventListener("click", async ()=>{ await releaseWakeLock(); await tryWakeLock(); await tryFullscreen(); showBanner(false); });  function nav(hash){ location.hash = hash; render(); }  backBtn.addEventListener("click", ()=> nav("#home"));  homeBtn.addEventListener("click", ()=> nav("#home"));  window.addEventListener("hashchange", render);  const Aud = window.AudioContext || window.webkitAudioContext;  let sharedAudioCtx = null;  function unlockAudioCtx(){    if(!Aud) return null;    if(!sharedAudioCtx) sharedAudioCtx = new Aud();    if(sharedAudioCtx.state === "suspended") sharedAudioCtx.resume().catch(()=>{});    return sharedAudioCtx;  }  function ding(){    const c=unlockAudioCtx(); if(!c) return;    const t=c.currentTime;    const o=c.createOscillator(); const g=c.createGain();    o.connect(g); g.connect(c.destination);    o.frequency.setValueAtTime(1200,t);    g.gain.linearRampToValueAtTime(0.5,t+0.01);    g.gain.exponentialRampToValueAtTime(0.01,t+1.2);    o.start(t); o.stop(t+1.2);  }  function ringAlarm(){    const c=unlockAudioCtx();    if(navigator.vibrate) navigator.vibrate([180,120,180,120,180,400,180,120,180,120,180,400,180,120,180,120,180]);    const beepDur=0.16, gap=0.11, groupGap=0.38, groups=3, perGroup=3;    const totalMs = Math.round((groups*(perGroup*(beepDur+gap)+groupGap))*1000);    if(alarmFlashEl){      alarmFlashEl.classList.add("flashing");      setTimeout(()=> alarmFlashEl.classList.remove("flashing"), totalMs+300);    }    if(!c) return;    let t=c.currentTime+0.03;    for(let g2=0; g2<groups; g2++){      for(let i=0;i<perGroup;i++){        const o=c.createOscillator(); const g=c.createGain();        o.type="square";        o.connect(g); g.connect(c.destination);        o.frequency.setValueAtTime(i%2===0 ? 1046.5 : 1318.5, t);        g.gain.setValueAtTime(0.0001, t);        g.gain.linearRampToValueAtTime(0.55, t+0.015);        g.gain.setValueAtTime(0.55, t+beepDur-0.02);        g.gain.linearRampToValueAtTime(0.0001, t+beepDur);        o.start(t); o.stop(t+beepDur+0.02);        t += beepDur+gap;      }      t += groupGap;    }  }  function rHome(){    backBtn.style.visibility="hidden"; homeBtn.disabled=true;    app.innerHTML = `      <h2>Jeux de score</h2>      <div class="grid">        <div class="card drawn" data-go="#belote"><div class="ico">🃏</div><div class="tit">Belote</div><div class="sub">Nous / Eux</div></div>        <div class="card drawn" data-go="#yams"><div class="ico">🎲</div><div class="tit">Yams</div><div class="sub">Feuille + bonus auto</div></div>        <div class="card drawn" data-go="#tarot"><div class="ico">🔮</div><div class="tit">Tarot</div><div class="sub">Contrat + scores</div></div>        <div class="card drawn" data-go="#rami"><div class="ico">🂡</div><div class="tit">Rami</div><div class="sub">Cartes en main = malus</div></div>        <div class="card drawn" data-go="#uno"><div class="ico">🔴</div><div class="tit">Uno</div><div class="sub">Le + haut gagne, fin à 500</div></div>        <div class="card drawn" data-go="#scrabble"><div class="ico">🅰️</div><div class="tit">Scrabble</div><div class="sub">Tours + total</div></div>        <div class="card drawn" data-go="#bac"><div class="ico">🔤</div><div class="tit">Jeu du Bac</div><div class="sub">Lettre + minuteur</div></div>        <div class="card drawn" data-go="#421"><div class="ico">🎲</div><div class="tit">421</div><div class="sub">3 dés + carnet</div></div>        <div class="card drawn" data-go="#molkky"><div class="ico">🪵</div><div class="tit">Mölkky</div><div class="sub">50 points pile</div></div>        <div class="card drawn" data-go="#skyjo"><div class="ico">🔢</div><div class="tit">Skyjo</div><div class="sub">Le + bas gagne, fin à 100</div></div>        <div class="card drawn" data-go="#petanque"><div class="ico">🎯</div><div class="tit">Pétanque</div><div class="sub">Nous / Eux, jusqu'à 13</div></div>        <div class="card drawn" data-go="#victoires"><div class="ico">🏆</div><div class="tit">Victoires</div><div class="sub">Dames, échecs, P4...</div></div>        <div class="card drawn" data-go="#custom"><div class="ico">📋</div><div class="tit">Tableau custom</div><div class="sub">Joueurs + manches</div></div>        <div class="card drawn" data-go="#free"><div class="ico">📝</div><div class="tit">Score libre</div><div class="sub">Tableau générique</div></div>      </div>      <h2 style="margin-top:18px">Outils</h2>      <div class="grid">        <div class="card drawn" data-go="#dice"><div class="ico">🎲</div><div class="tit">Dé (d6)</div><div class="sub">lancer rapide</div></div>        <div class="card drawn" data-go="#timer"><div class="ico">⏳</div><div class="tit">Sablier</div><div class="sub">presets</div></div>      </div>    `;    app.querySelectorAll("[data-go]").forEach(el=> el.addEventListener("click", ()=> nav(el.getAttribute("data-go"))) );  }  function renderSheet(key, title, opts){    opts = opts || {};    const showContract = !!opts.contract;    const contractLabel = opts.contractLabel || "CONTRAT";    const d = load(key, {ps: opts.defaultPlayers || ["J1","J2"], r:[], meta:{date:""}});    if(!Array.isArray(d.ps) || d.ps.length<1) d.ps = opts.defaultPlayers || ["J1","J2"];    if(!Array.isArray(d.r)) d.r = [];    if(!d.meta) d.meta = {date:""};    const totals = d.ps.map((_,i)=> d.r.reduce((acc,row)=> acc + (Number((row.s||[])[i])||0), 0));    let leaderIdx = -1, ended = false;    if(opts.leader && totals.length){      const extreme = opts.leader==="low" ? Math.min(...totals) : Math.max(...totals);      leaderIdx = totals.indexOf(extreme);      if(opts.endAt) ended = opts.leader==="low" ? totals.some(t=>t<=opts.endAt) : totals.some(t=>t>=opts.endAt);    }    const head = d.ps.map((p,i)=>'<th><input class="'+key+'-n" data-i="'+i+'" value="'+esc(p)+'">'+(ended && i===leaderIdx?' 🏆':'')+'</th>').join("");    const leftHead = showContract ? '<th class="drawn" style="width:140px">'+esc(contractLabel)+'</th>' : '<th class="drawn" style="width:140px">'+esc(opts.leftHeader || "MANCHES")+'</th>';    const body = d.r.map((row,ri)=>{      const leftCell = showContract        ? '<td class="drawn"><input class="'+key+'-c" data-r="'+ri+'" value="'+esc(row.k||"")+'" placeholder="'+esc(contractLabel)+'"></td>'        : '<td class="drawn label">Manche '+(ri+1)+'</td>';      const cells = d.ps.map((_,ci)=>{        const v = (row.s||[])[ci] ?? "";        return '<td class="drawn"><input type="number" class="'+key+'-v" data-r="'+ri+'" data-c="'+ci+'" value="'+esc(v)+'"></td>';      }).join("");      return "<tr>"+leftCell+cells+"</tr>";    }).join("");    const foot = '<tr style="font-weight:1000;background:#eee"><td class="drawn label">'+esc(opts.totalLabel||"TOTAL")+'</td>'      + totals.map((t,i)=>'<td class="drawn" style="'+(i===leaderIdx?'color:var(--red)':'')+'">'+t+'</td>').join("")+"</tr>";    const endBanner = ended ? '<div style="text-align:center;margin-top:8px;font-weight:900;color:var(--red)">🏆 '+esc(d.ps[leaderIdx]||"?")+' remporte la partie avec '+totals[leaderIdx]+' pts !</div>' : '';    app.innerHTML = `      <div class="panel drawn">        <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;justify-content:space-between">          <div style="display:flex;gap:8px;align-items:center">            <div style="font-weight:1000;font-size:18px">${esc(title)}</div>            ${opts.rulesKey ? qbtn(opts.rulesKey) : ""}          </div>          <div style="min-width:160px"><input id="${key}_date" placeholder="Date" value="${esc(d.meta.date||"")}"></div>        </div>        <div class="kicker">${esc(opts.subtitle || "Manches cumulées, total automatique.")}</div>        ${endBanner}      </div>      <div style="overflow-x:auto;margin-top:12px">        <table class="paper-table drawn">          <thead><tr>${leftHead}${head}</tr></thead>          <tbody>${body}${foot}</tbody>        </table>      </div>      <div class="actions">        <button class="btn" id="${key}_addR">+ ${esc(opts.addRoundLabel||"Manche")}</button>        <button class="btn sec" id="${key}_addP">+ Joueur</button>      </div>      <div class="actions">        <button class="btn sec" id="${key}_undo">Annuler</button>        <button class="btn sec red" id="${key}_reset">Reset</button>      </div>    `;    $("#"+key+"_date").addEventListener("input", (e)=>{ d.meta.date = e.target.value; save(key,d); });    $("#"+key+"_addP").addEventListener("click", ()=>{      d.ps.push("J"+(d.ps.length+1));      d.r.forEach(r=>{ if(!Array.isArray(r.s)) r.s=[]; r.s.push(0); });      save(key,d); render();    });    $("#"+key+"_addR").addEventListener("click", ()=>{      d.r.push({k:"", s:new Array(d.ps.length).fill(0)});      save(key,d); render();    });    $("#"+key+"_undo").addEventListener("click", ()=>{ d.r.pop(); save(key,d); render(); });    $("#"+key+"_reset").addEventListener("click", ()=>{      if(confirm("Nouveau ?")){        save(key, {ps: opts.defaultPlayers || ["J1","J2"], r:[], meta:{date:""}});        render();      }    });    app.querySelectorAll("."+key+"-n").forEach(inp=> inp.addEventListener("change",(e)=>{ d.ps[Number(e.target.dataset.i)] = e.target.value; save(key,d); }) );    if(showContract){      app.querySelectorAll("."+key+"-c").forEach(inp=> inp.addEventListener("change",(e)=>{ d.r[Number(e.target.dataset.r)].k = e.target.value; save(key,d); }) );    }    app.querySelectorAll("."+key+"-v").forEach(inp=> inp.addEventListener("input",(e)=>{      const r=Number(e.target.dataset.r), c=Number(e.target.dataset.c);      d.r[r].s[c] = e.target.value;      save(key,d);      const sel = "."+key+"-v[data-r='"+r+"'][data-c='"+c+"']";      render();      const el = document.querySelector(sel);      if(el){ el.focus(); }    }) );  }  const Y_CATS = [    {l:"Total 1",k:"1"},{l:"Total 2",k:"2"},{l:"Total 3",k:"3"},{l:"Total 4",k:"4"},{l:"Total 5",k:"5"},{l:"Total 6",k:"6"},    {l:"Total sup",auto:"u",bg:1},{l:"Bonus (+35)",auto:"bo",bg:1},    {l:"Brelan",k:"br"},{l:"Carré",k:"ca"},{l:"Full",k:"fu"},{l:"Petite suite",k:"ps"},{l:"Grande suite",k:"gs"},{l:"YAMS",k:"ya"},{l:"Chance",k:"ch"},    {l:"TOTAL",auto:"tot",bg:1,big:1}  ];  function rYams(){    const d = load("yams", {ps:["J1","J2"], s:{}});    if(!Array.isArray(d.ps) || d.ps.length<1) d.ps=["J1","J2"];    if(!d.s) d.s = {};    const calc = (pi)=>{      const s = d.s[pi] || {};      let u=0,l=0;      ["1","2","3","4","5","6"].forEach(k=>u += Number(s[k]||0));      const bo = u>=63 ? 35 : 0;      ["br","ca","fu","ps","gs","ya","ch"].forEach(k=> l += Number(s[k]||0));      return {u:u, bo:bo, tot:u+bo+l};    };    let html = '<div class="panel drawn"><div style="display:flex;gap:8px;align-items:center"><div style="font-weight:1000;font-size:18px">Yams</div>'+qbtn("yams")+'</div><div class="kicker">Bonus auto (>=63) + total auto.</div></div>';    html += '<div style="overflow-x:auto;margin-top:12px"><table class="paper-table drawn"><thead><tr><th class="drawn">YAMS</th>';    d.ps.forEach((p,i)=>{ html += '<th><input class="y-n" data-i="'+i+'" value="'+esc(p)+'"></th>'; });    html += '</tr></thead><tbody>';    Y_CATS.forEach(cat=>{      html += '<tr style="'+(cat.bg?'background:#eee;font-weight:1000':'')+'">';      html += '<td class="drawn label" style="'+(cat.big?'font-size:16px':'')+'">'+esc(cat.l)+'</td>';      d.ps.forEach((_,i)=>{        if(cat.auto){          html += '<td class="drawn">'+calc(i)[cat.auto]+'</td>';        }else{          const val = (d.s[i]||{})[cat.k] || "";          html += '<td class="drawn"><input type="number" class="y-v" data-p="'+i+'" data-k="'+cat.k+'" value="'+esc(val)+'"></td>';        }      });      html += '</tr>';    });    html += '</tbody></table></div>';    html += '<div class="actions"><button class="btn" id="yAdd">+ Joueur</button><button class="btn sec red" id="yReset">Reset</button></div>';    app.innerHTML = html;    app.querySelectorAll(".y-n").forEach(inp=> inp.addEventListener("change",(e)=>{ d.ps[Number(e.target.dataset.i)] = e.target.value; save("yams",d); }) );    app.querySelectorAll(".y-v").forEach(inp=> inp.addEventListener("input",(e)=>{      const p=Number(e.target.dataset.p), k=e.target.dataset.k;      if(!d.s[p]) d.s[p]={};      d.s[p][k]=e.target.value;      save("yams",d);      const sel = ".y-v[data-p='"+p+"'][data-k='"+k+"']";      render();      const el = document.querySelector(sel);      if(el){ el.focus(); }    }) );    $("#yAdd").addEventListener("click", ()=>{ d.ps.push("J"+(d.ps.length+1)); save("yams",d); render(); });    $("#yReset").addEventListener("click", ()=>{ if(confirm("Reset ?")){ save("yams",{ps:["J1","J2"], s:{}}); render(); }});  }  function rBelote(){    const d = load("belote", {r:[]});    if(!Array.isArray(d.r)) d.r = [];    const totU = d.r.reduce((a,b)=>a+(Number(b.u)||0),0);    const totT = d.r.reduce((a,b)=>a+(Number(b.t)||0),0);    const list = d.r.slice().reverse().map(r=>"<div>"+(Number(r.u)||0)+" - "+(Number(r.t)||0)+"</div>").join("");    app.innerHTML = `      <div class="panel drawn" style="display:flex;gap:8px;align-items:center">        <div style="font-weight:1000;font-size:18px">Belote</div>        ${qbtn("belote")}      </div>      <div class="belote-split drawn" style="margin-top:12px">        <div class="belote-col">          <div class="b-head">NOUS</div>          <div class="b-tot">${totU}</div>          <div class="b-list">${list}</div>        </div>        <div class="belote-col">          <div class="b-head">EUX</div>          <div class="b-tot">${totT}</div>          <div class="b-list" style="background:#f9f9f9"></div>        </div>      </div>      <div class="panel drawn" style="margin-top:14px">        <div class="grid" style="grid-template-columns:1fr 1fr">          <div><input type="number" id="bU" placeholder="Nous"></div>          <div><input type="number" id="bT" placeholder="Eux"></div>        </div>        <div class="actions">          <button class="btn sec" id="b162">162</button>          <button class="btn" id="bAdd">Ajouter</button>        </div>        <div class="actions">          <button class="btn sec" id="bUndo">Annuler</button>          <button class="btn sec red" id="bReset">Reset</button>        </div>      </div>    `;    $("#b162").addEventListener("click", ()=>{      const u = $("#bU").value, t = $("#bT").value;      if(u!=="") $("#bT").value = 162 - Number(u||0);      else if(t!=="") $("#bU").value = 162 - Number(t||0);    });    $("#bAdd").addEventListener("click", ()=>{      const u = Number($("#bU").value||0), t = Number($("#bT").value||0);      if(!u && !t) return;      d.r.push({u:u,t:t}); save("belote",d); render();    });    $("#bUndo").addEventListener("click", ()=>{ d.r.pop(); save("belote",d); render(); });    $("#bReset").addEventListener("click", ()=>{ if(confirm("Reset ?")){ save("belote",{r:[]}); render(); }});  }  function rTarot(){ renderSheet("tarot","Tarot",{defaultPlayers:["J1","J2","J3","J4"], contract:true, contractLabel:"Contrat", addRoundLabel:"Donne", leftHeader:"DONNES", subtitle:"Contrat (optionnel) + scores, total auto.", rulesKey:"tarot"}); }  function rRami(){ renderSheet("rami","Rami",{defaultPlayers:["J1","J2"], addRoundLabel:"Manche", subtitle:"Cartes restées en main = points de malus. Le total le plus bas gagne.", leader:"low", rulesKey:"rami"}); }  function rUno(){ renderSheet("uno","Uno",{defaultPlayers:["J1","J2"], addRoundLabel:"Manche", subtitle:"Points des cartes adverses. Le total le plus haut gagne, fin à 500 pts.", leader:"high", endAt:500, rulesKey:"uno"}); }  function rScrabble(){ renderSheet("scrabble","Scrabble",{defaultPlayers:["J1","J2"], leftHeader:"TOURS", addRoundLabel:"Tour", subtitle:"Tour par tour, total auto.", rulesKey:"scrabble"}); }  function rFree(){ renderSheet("free","Score libre",{defaultPlayers:["J1","J2"], addRoundLabel:"Manche"}); }  function r421(){    const d = load("g421",{ps:["J1","J2"], r:[], dice:[4,2,1], throws:0, cur:0});    if(!Array.isArray(d.ps) || d.ps.length<1) d.ps=["J1","J2"];    if(!Array.isArray(d.r)) d.r=[];    if(!Array.isArray(d.dice) || d.dice.length!==3) d.dice=[4,2,1];    if(typeof d.throws!=="number") d.throws=0;    if(typeof d.cur!=="number" || d.cur>=d.ps.length || d.cur<0) d.cur=0;    const rand6 = ()=> 1+Math.floor(Math.random()*6);    const totals = d.ps.map((_,i)=> d.r.reduce((acc,row)=> acc + (Number((row.s||[])[i])||0), 0));    const head = d.ps.map((p,i)=>'<th><input class="g421-n" data-i="'+i+'" value="'+esc(p)+'"></th>').join("");    const body = d.r.map((row,ri)=>{      const cells = d.ps.map((_,ci)=>{        const v = (row.s||[])[ci] ?? "";        return '<td class="drawn"><input type="number" class="g421-v" data-r="'+ri+'" data-c="'+ci+'" value="'+esc(v)+'"></td>';      }).join("");      return '<tr><td class="drawn label">Manche '+(ri+1)+'</td>'+cells+'</tr>';    }).join("");    const mid = d.throws>0 && d.throws<3;    const done = d.throws>=3;    const curName = esc(d.ps[d.cur] || "?");    const rollZone = d.throws===0      ? '<div class="actions"><button class="btn" id="gRoll">Lancer 3 dés</button></div>'      : '<div class="d3-check">'        + [0,1,2].map(i=>'<div style="width:74px;text-align:center"><input type="checkbox" class="g421-chk" data-die="'+i+'" style="width:22px;height:22px"></div>').join("")        + '</div>'        + '<div style="font-size:12px;color:var(--muted);margin-top:4px">Coche les dés à relancer</div>'        + '<div class="actions">'        +   (mid ? '<button class="btn" id="gReroll" disabled>Relancer les dés cochés</button>' : '')        +   '<button class="btn sec" id="gNext">Joueur suivant →</button>'        + '</div>'        + (done ? '<div style="text-align:center;font-weight:900;color:var(--red);margin-top:6px">Lancers épuisés (3/3) — au tour du joueur suivant.</div>' : '');    app.innerHTML = `      <div class="panel drawn">        <div style="display:flex;gap:8px;align-items:center">          <div style="font-weight:1000;font-size:18px">421</div>          ${qbtn("421")}        </div>        <div class="kicker">Tour de <b>${curName}</b> — lancer ${d.throws}/3.</div>        <div class="d3">          <div class="die drawn">${d.dice[0]}</div>          <div class="die drawn">${d.dice[1]}</div>          <div class="die drawn">${d.dice[2]}</div>        </div>        ${rollZone}        <div class="actions">          <button class="btn sec" id="gAddR">+ Manche</button>          <button class="btn sec" id="gAddP">+ Joueur</button>        </div>        <div class="actions">          <button class="btn sec" id="gUndo">Annuler</button>          <button class="btn sec red" id="gReset">Reset</button>        </div>      </div>      <div style="overflow-x:auto;margin-top:12px">        <table class="paper-table drawn">          <thead><tr><th class="drawn" style="width:140px">MANCHES</th>${head}</tr></thead>          <tbody>${body}<tr style="font-weight:1000;background:#eee"><td class="drawn label">TOTAL</td>${totals.map(t=>'<td class="drawn">'+t+'</td>').join("")}</tr></tbody>        </table>      </div>    `;    $("#gRoll")?.addEventListener("click", ()=>{      d.dice=[rand6(),rand6(),rand6()];      d.throws=1;      save("g421",d); render(); ding();    });    $("#gReroll")?.addEventListener("click", ()=>{      const checks = app.querySelectorAll(".g421-chk:checked");      if(checks.length===0) return;      checks.forEach(chk=>{ d.dice[Number(chk.getAttribute("data-die"))] = rand6(); });      d.throws++;      save("g421",d); render(); ding();    });    app.querySelectorAll(".g421-chk").forEach(chk=> chk.addEventListener("change", ()=>{      const any = app.querySelector(".g421-chk:checked");      const btn=$("#gReroll"); if(btn) btn.disabled=!any;    }));    $("#gNext")?.addEventListener("click", ()=>{      d.cur = (d.cur+1) % d.ps.length;      d.throws = 0;      save("g421",d); render();    });    $("#gAddR").addEventListener("click", ()=>{ d.r.push({s:new Array(d.ps.length).fill(0)}); save("g421",d); render(); });    $("#gAddP").addEventListener("click", ()=>{ d.ps.push("J"+(d.ps.length+1)); d.r.forEach(r=>{ if(!Array.isArray(r.s)) r.s=[]; r.s.push(0); }); save("g421",d); render(); });    $("#gUndo").addEventListener("click", ()=>{ d.r.pop(); save("g421",d); render(); });    $("#gReset").addEventListener("click", ()=>{ if(confirm("Reset ?")){ save("g421",{ps:["J1","J2"], r:[], dice:[4,2,1], throws:0, cur:0}); render(); }});    app.querySelectorAll(".g421-n").forEach(inp=> inp.addEventListener("change",(e)=>{ d.ps[Number(e.target.dataset.i)]=e.target.value; save("g421",d); }) );    app.querySelectorAll(".g421-v").forEach(inp=> inp.addEventListener("input",(e)=>{      const r=Number(e.target.dataset.r), c=Number(e.target.dataset.c);      d.r[r].s[c]=e.target.value; save("g421",d);      const sel = ".g421-v[data-r='"+r+"'][data-c='"+c+"']";      render();      const el = document.querySelector(sel);      if(el){ el.focus(); }    }) );  }  function rSkyjo(){    const d = load("skyjo",{ps:["J1","J2"], r:[]});    if(!Array.isArray(d.ps) || d.ps.length<1) d.ps=["J1","J2"];    if(!Array.isArray(d.r)) d.r=[];    const totals = d.ps.map((_,i)=> d.r.reduce((acc,row)=> acc + (Number((row.s||[])[i])||0), 0));    const minTot = totals.length ? Math.min(...totals) : 0;    const ended = totals.some(t=> t>=100);    const winnerIdx = ended ? totals.indexOf(minTot) : -1;    const head = d.ps.map((p,i)=>'<th><input class="sk-n" data-i="'+i+'" value="'+esc(p)+'">'+(i===winnerIdx?' 🏆':'')+'</th>').join("");    const body = d.r.map((row,ri)=>{      const cells = d.ps.map((_,ci)=>{        const v = (row.s||[])[ci] ?? "";        return '<td class="drawn"><input type="number" class="sk-v" data-r="'+ri+'" data-c="'+ci+'" value="'+esc(v)+'"></td>';      }).join("");      return '<tr><td class="drawn label">Manche '+(ri+1)+'</td>'+cells+'</tr>';    }).join("");    const foot = '<tr style="font-weight:1000;background:#eee"><td class="drawn label">TOTAL</td>'      + totals.map(t=>'<td class="drawn" style="'+(t===minTot?'color:var(--red)':'')+'">'+t+'</td>').join("") + '</tr>';    app.innerHTML = `      <div class="panel drawn">        <div style="display:flex;gap:8px;align-items:center">          <div style="font-weight:1000;font-size:18px">Skyjo</div>          ${qbtn("skyjo")}        </div>        <div class="kicker">Le score le plus bas gagne. Fin de partie dès qu'un joueur atteint 100 pts.</div>        ${ended ? '<div style="text-align:center;margin-top:8px;font-weight:900;color:var(--red)">🏁 Partie terminée — '+esc(d.ps[winnerIdx]||"?")+' gagne avec '+minTot+' pts !</div>' : ''}        <div class="actions">          <button class="btn" id="skAddR">+ Manche</button>          <button class="btn sec" id="skAddP">+ Joueur</button>        </div>        <div class="actions">          <button class="btn sec" id="skUndo">Annuler</button>          <button class="btn sec red" id="skReset">Reset</button>        </div>      </div>      <div style="overflow-x:auto;margin-top:12px">        <table class="paper-table drawn">          <thead><tr><th class="drawn" style="width:140px">MANCHES</th>${head}</tr></thead>          <tbody>${body}${foot}</tbody>        </table>      </div>    `;    $("#skAddR").addEventListener("click", ()=>{ d.r.push({s:new Array(d.ps.length).fill(0)}); save("skyjo",d); render(); });    $("#skAddP").addEventListener("click", ()=>{ d.ps.push("J"+(d.ps.length+1)); d.r.forEach(r=>{ if(!Array.isArray(r.s)) r.s=[]; r.s.push(0); }); save("skyjo",d); render(); });    $("#skUndo").addEventListener("click", ()=>{ d.r.pop(); save("skyjo",d); render(); });    $("#skReset").addEventListener("click", ()=>{ if(confirm("Nouvelle partie ?")){ save("skyjo",{ps:["J1","J2"], r:[]}); render(); }});    app.querySelectorAll(".sk-n").forEach(inp=> inp.addEventListener("change",(e)=>{ d.ps[Number(e.target.dataset.i)]=e.target.value; save("skyjo",d); render(); }) );    app.querySelectorAll(".sk-v").forEach(inp=> inp.addEventListener("input",(e)=>{      const r=Number(e.target.dataset.r), c=Number(e.target.dataset.c);      d.r[r].s[c]=e.target.value; save("skyjo",d);      const sel = ".sk-v[data-r='"+r+"'][data-c='"+c+"']";      render();      const el = document.querySelector(sel);      if(el){ el.focus(); }    }) );  }  function rPetanque(){    const d = load("petanque", {r:[]});    if(!Array.isArray(d.r)) d.r = [];    const totU = d.r.reduce((a,b)=>a+(Number(b.u)||0),0);    const totT = d.r.reduce((a,b)=>a+(Number(b.t)||0),0);    const listU = d.r.slice().reverse().map(r=>"<div>+"+(Number(r.u)||0)+"</div>").join("");    const listT = d.r.slice().reverse().map(r=>"<div>+"+(Number(r.t)||0)+"</div>").join("");    const ended = totU>=13 || totT>=13;    const winner = totU>=13 ? "NOUS" : (totT>=13 ? "EUX" : null);    app.innerHTML = `      <div class="panel drawn">        <div style="display:flex;gap:8px;align-items:center">          <div style="font-weight:1000;font-size:18px">Pétanque</div>          ${qbtn("petanque")}        </div>        <div class="kicker">Première équipe à 13 points gagne la partie.</div>        ${ended ? '<div style="text-align:center;margin-top:8px;font-weight:900;color:var(--red)">🏆 '+winner+' a gagné la partie !</div>' : ''}      </div>      <div class="belote-split drawn" style="margin-top:12px">        <div class="belote-col">          <div class="b-head">NOUS</div>          <div class="b-tot">${totU}</div>          <div class="b-list">${listU}</div>        </div>        <div class="belote-col">          <div class="b-head">EUX</div>          <div class="b-tot">${totT}</div>          <div class="b-list" style="background:#f9f9f9">${listT}</div>        </div>      </div>      <div class="panel drawn" style="margin-top:14px">        <div class="kicker">Points de la mène (un seul camp marque à la fois, 1 à 6 pts).</div>        <div class="grid" style="grid-template-columns:1fr 1fr">          <div><input type="number" id="pU" placeholder="Nous" min="0" max="6"></div>          <div><input type="number" id="pT" placeholder="Eux" min="0" max="6"></div>        </div>        <div class="actions">          <button class="btn" id="pAdd">+ Mène</button>        </div>        <div class="actions">          <button class="btn sec" id="pUndo">Annuler</button>          <button class="btn sec red" id="pReset">Reset</button>        </div>      </div>    `;    $("#pAdd").addEventListener("click", ()=>{      const u = Number($("#pU").value||0), t = Number($("#pT").value||0);      if(!u && !t) return;      d.r.push({u:u,t:t}); save("petanque",d); render();    });    $("#pUndo").addEventListener("click", ()=>{ d.r.pop(); save("petanque",d); render(); });    $("#pReset").addEventListener("click", ()=>{ if(confirm("Reset ?")){ save("petanque",{r:[]}); render(); }});  }  function rVictoires(){    const d = load("victoires", {ps:["J1","J2"], w:[0,0]});    if(!Array.isArray(d.ps) || d.ps.length<1) d.ps=["J1","J2"];    if(!Array.isArray(d.w)) d.w=[];    while(d.w.length < d.ps.length) d.w.push(0);    let html = '<div class="panel drawn"><div style="font-weight:1000;font-size:18px">Compteur de victoires</div><div class="kicker">Pour les jeux sans score chiffré (dames, échecs, puissance 4...). Une victoire = un point.</div></div>';    html += '<div class="grid" style="margin-top:12px;grid-template-columns:repeat(auto-fit,minmax(140px,1fr))">';    d.ps.forEach((p,i)=>{      html += '<div class="panel drawn" style="text-align:center">'        + '<input class="v-n" data-i="'+i+'" value="'+esc(p)+'" style="font-weight:900;text-align:center;margin-bottom:6px">'        + '<div style="font-size:44px;font-weight:1000">'+(d.w[i]||0)+'</div>'        + '<div class="actions" style="margin-top:8px">'        + '<button class="btn sec" data-minus="'+i+'" style="min-width:0;flex:1">−1</button>'        + '<button class="btn" data-plus="'+i+'" style="min-width:0;flex:1">+1</button>'        + '</div></div>';    });    html += '</div>';    html += '<div class="actions" style="margin-top:14px"><button class="btn sec" id="vAddP">+ Joueur</button><button class="btn sec red" id="vReset">Reset</button></div>';    app.innerHTML = html;    app.querySelectorAll(".v-n").forEach(inp=> inp.addEventListener("change",(e)=>{ d.ps[Number(e.target.dataset.i)]=e.target.value; save("victoires",d); }) );    app.querySelectorAll("[data-plus]").forEach(b=> b.addEventListener("click",()=>{ const i=Number(b.getAttribute("data-plus")); d.w[i]=(d.w[i]||0)+1; save("victoires",d); render(); ding(); }) );    app.querySelectorAll("[data-minus]").forEach(b=> b.addEventListener("click",()=>{ const i=Number(b.getAttribute("data-minus")); d.w[i]=Math.max(0,(d.w[i]||0)-1); save("victoires",d); render(); }) );    $("#vAddP").addEventListener("click", ()=>{ d.ps.push("J"+(d.ps.length+1)); d.w.push(0); save("victoires",d); render(); });    $("#vReset").addEventListener("click", ()=>{ if(confirm("Reset ?")){ save("victoires",{ps:["J1","J2"], w:[0,0]}); render(); }});  }  function rMolkky(){    const d = load("molkky",{ps:[{n:"J1",s:0,m:0},{n:"J2",s:0,m:0}], cur:0});    if(!Array.isArray(d.ps) || d.ps.length<1) d.ps=[{n:"J1",s:0,m:0},{n:"J2",s:0,m:0}];    if(typeof d.cur!=="number") d.cur=0;    const cur = d.ps[d.cur] || d.ps[0];    let html = '<div class="panel drawn" style="display:flex;gap:8px;align-items:center"><div style="font-weight:1000;font-size:18px">Mölkky</div>'+qbtn("molkky")+'</div>';    html += '<div class="actions"><button class="btn sec" id="mAddP">+ Joueur</button><button class="btn sec red" id="mReset">Reset</button></div><br>';    d.ps.forEach((pl,i)=>{      let state="";      if(pl.m>=3) state="💀 Éliminé";      else if(pl.s===50) state="🏆 Gagné !";      else if(pl.s>50) state="⬇ 25";      html += '<div class="m-player drawn '+(i===d.cur?'active':'')+'" data-p="'+i+'">'        + '<div style="display:flex;justify-content:space-between"><span style="font-weight:1000">'+esc(pl.n)+'</span><span style="font-weight:1000;font-size:18px">'+(pl.s||0)+' / 50</span></div>'        + '<div style="font-size:11px;color:var(--muted)">Ratés: '+(pl.m||0)+' '+state+'</div></div>';    });    html += '<div class="panel drawn"><div style="text-align:center;font-weight:1000;margin-bottom:10px">Tour de '+esc(cur.n)+'</div>'      + '<div class="molkky-grid">'+[1,2,3,4,5,6,7,8,9,10,11,12].map(n=>'<div class="pin-btn" data-hit="'+n+'">'+n+'</div>').join("")+'</div>'      + '<div class="actions"><button class="btn sec red" id="mMiss">RATÉ (X)</button></div></div>';    app.innerHTML = html;    app.querySelectorAll(".m-player").forEach(el=> el.addEventListener("click", ()=>{ d.cur=Number(el.getAttribute("data-p")); save("molkky",d); render(); }) );    function nextPlayer(){      let next=d.cur+1; if(next>=d.ps.length) next=0;      const start=next;      while(d.ps[next].m>=3 || d.ps[next].s===50){        next++; if(next>=d.ps.length) next=0;        if(next===start) break;      }      d.cur=next;    }    function hit(val){      const pl=d.ps[d.cur];      if(pl.m>=3 || pl.s===50) return;      if(val===0){ pl.m=(pl.m||0)+1; }      else{ pl.m=0; pl.s=(pl.s||0)+val; if(pl.s>50) pl.s=25; }      nextPlayer();      save("molkky",d); render();    }    $("#mAddP").addEventListener("click", ()=>{ d.ps.push({n:"J"+(d.ps.length+1),s:0,m:0}); save("molkky",d); render(); });    $("#mReset").addEventListener("click", ()=>{ if(confirm("Nouvelle partie ?")){ save("molkky",{ps:[{n:"J1",s:0,m:0},{n:"J2",s:0,m:0}],cur:0}); render(); }});    $("#mMiss").addEventListener("click", ()=> hit(0));    app.querySelectorAll("[data-hit]").forEach(b=> b.addEventListener("click", ()=> hit(Number(b.getAttribute("data-hit")))) );  }  let diceCount = 1;  function rDice(){    app.innerHTML = '<div class="panel drawn" style="text-align:center">'      + '<div style="font-weight:1000;font-size:18px">Dé (d6)</div>'      + '<div class="kicker">Lancer rapide — choisis le nombre de dés.</div>'      + '<div class="actions" style="justify-content:center">'      +   [1,2,3,4,5,6].map(n=>'<button class="btn'+(n===diceCount?'':' sec')+'" data-count="'+n+'">'+n+'</button>').join("")      + '</div>'      + '<div id="dGrid" style="display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin:20px 0">'      +   Array.from({length:diceCount}).map((_,i)=>'<div class="die drawn" id="dDie'+i+'">?</div>').join("")      + '</div>'      + '<div id="dTotal" style="font-weight:1000;font-size:16px;color:var(--muted);min-height:20px"></div>'      + '<div class="actions"><button class="btn" id="dRoll">LANCER</button></div>'      + '</div>';    app.querySelectorAll("[data-count]").forEach(b=> b.addEventListener("click", ()=>{ diceCount=Number(b.getAttribute("data-count")); render(); }) );    $("#dRoll").addEventListener("click", ()=>{      let i=0;      const dice = Array.from({length:diceCount}, (_,k)=> $("#dDie"+k));      const t=setInterval(()=>{        dice.forEach(el=> el.textContent = String(1+Math.floor(Math.random()*6)));        if(++i>10){          clearInterval(t);          const vals = dice.map(el=> Number(el.textContent));          $("#dTotal").textContent = diceCount>1 ? ("Total : "+vals.reduce((a,b)=>a+b,0)) : "";          ding();        }      }, 50);    });  }  let tInt=null, hgInt=null, hgPhase=0;  let tS={t:60,r:60,run:false};  function stopTimer(){    if(tInt){ clearInterval(tInt); tInt=null; }    if(hgInt){ clearInterval(hgInt); hgInt=null; }    tS.run=false;  }  function formatTime(total){    total = Math.max(0, total);    const h=Math.floor(total/3600), m=Math.floor((total%3600)/60), s=total%60;    const mm=String(m).padStart(2,"0"), ss=String(s).padStart(2,"0");    return h>0 ? (h+":"+mm+":"+ss) : (mm+":"+ss);  }  function adjustTime(unit, dir){    let h=Math.floor(tS.t/3600), rem=tS.t%3600, m=Math.floor(rem/60), s=rem%60;    if(unit==="h") h=Math.max(0,Math.min(23,h+dir));    if(unit==="m") m=Math.max(0,Math.min(59,m+dir));    if(unit==="s") s=Math.max(0,Math.min(59,s+dir));    stopTimer();    tS.t = h*3600+m*60+s;    tS.r = tS.t;    render();  }  const HG_COLS=18, HG_ROWS=30, HG_CELL=7;  const HG_WIDE=[2,15], HG_NARROW=[8,9];  function hgRowBounds(i, n, reverse){    const f = n<=1 ? 0 : i/(n-1);    const a = reverse ? HG_NARROW : HG_WIDE;    const b = reverse ? HG_WIDE : HG_NARROW;    return { left: Math.round(a[0] + (b[0]-a[0])*f), right: Math.round(a[1] + (b[1]-a[1])*f) };  }  function drawHourglass(){    const cv = $("#hgCanvas");    if(!cv) return;    const ctx = cv.getContext("2d");    ctx.clearRect(0,0,cv.width,cv.height);    const px = (col,row,color)=>{ ctx.fillStyle=color; ctx.fillRect(col*HG_CELL,row*HG_CELL,HG_CELL,HG_CELL); };    const INK="#1a1a2e", WOOD="#8d6e63", SAND="#eba83a", GLASS="#f2f0ea";    const frac = tS.t>0 ? Math.max(0,Math.min(1, tS.r/tS.t)) : 0;    for(let c=0;c<HG_COLS;c++){ px(c,0,WOOD); px(c,1,WOOD); px(c,HG_ROWS-2,WOOD); px(c,HG_ROWS-1,WOOD); }    const topN=12, botN=12, topStart=2, neckStart=14, botStart=16;    const fillTop = Math.round(topN * frac);    const fillBot = Math.round(botN * (1-frac));    for(let i=0;i<topN;i++){      const row = topStart+i;      const {left,right} = hgRowBounds(i, topN, false);      px(left,row,INK); px(right,row,INK);      const isSand = i >= (topN - fillTop);      for(let c=left+1;c<right;c++) px(c,row, isSand ? SAND : GLASS);    }    for(let row=neckStart; row<neckStart+2; row++){      px(HG_NARROW[0],row,INK); px(HG_NARROW[1],row,INK);      for(let c=HG_NARROW[0]+1;c<HG_NARROW[1];c++) px(c,row,GLASS);    }    if(tS.run && frac>0 && frac<1){      const gRow = neckStart + (hgPhase%2);      px(HG_NARROW[0]+1, gRow, SAND);    }    for(let i=0;i<botN;i++){      const row = botStart+i;      const {left,right} = hgRowBounds(i, botN, true);      px(left,row,INK); px(right,row,INK);      const isSand = i >= (botN - fillBot);      for(let c=left+1;c<right;c++) px(c,row, isSand ? SAND : GLASS);    }  }  function beginRun(){    tS.run=true;    tInt=setInterval(()=>{      tS.r--;      if(tS.r<=0){ tS.r=0; stopTimer(); drawHourglass(); ringAlarm(); updateTimerText(); return; }      updateTimerText();    }, 1000);    hgInt=setInterval(()=>{ hgPhase++; drawHourglass(); }, 180);    updateTimerText();  }  function updateTimerText(){    const el=$("#tTime"); if(el) el.textContent = formatTime(tS.r);    const btn=$("#tStart"); if(btn) btn.textContent = tS.run ? "PAUSE" : "LANCER";  }  function rTimer(){    const H=Math.floor(tS.t/3600), Mrem=tS.t%3600, M=Math.floor(Mrem/60), S=Mrem%60;    app.innerHTML = '<div class="panel drawn" style="text-align:center">'      + '<div style="font-weight:1000;font-size:18px">Minuteur</div>'      + '<div id="hgWrap"><canvas id="hgCanvas" width="'+(HG_COLS*HG_CELL)+'" height="'+(HG_ROWS*HG_CELL)+'"></canvas></div>'      + '<div id="tTime" style="font-weight:1000;font-size:40px">'+formatTime(tS.r)+'</div>'      + '<div class="actions"><button class="btn" id="tStart">'+(tS.run?'PAUSE':'LANCER')+'</button><button class="btn sec" id="tReset">RESET</button></div>'      + '<div class="actions">'+[30,60,90,120,180,300].map(s=>'<button class="btn sec" data-p="'+s+'">'+(s<60? s+'s' : (s/60)+'m')+'</button>').join("")+'</div>'      + '</div>'      + '<div class="panel drawn" style="margin-top:14px">'      + '<div class="kicker" style="text-align:center">Régler soi-même</div>'      + '<div style="display:flex;justify-content:center;gap:22px;margin-top:6px">'      +   ['h','m','s'].map(u=>{            const label = u==="h"?"H":(u==="m"?"MIN":"SEC");            const val = u==="h"?H:(u==="m"?M:S);            return '<div class="t-unit">'              + '<button class="qbtn" data-unit="'+u+'" data-dir="1">+</button>'              + '<div class="t-val">'+String(val).padStart(2,"0")+'</div>'              + '<div style="font-size:10px;color:var(--muted);font-weight:900">'+label+'</div>'              + '<button class="qbtn" data-unit="'+u+'" data-dir="-1">−</button>'              + '</div>';          }).join("")      + '</div>'      + '</div>';    drawHourglass();    $("#tStart").addEventListener("click", ()=>{      if(tS.run){ stopTimer(); updateTimerText(); return; }      if(tS.t<=0) return;      const fresh = tS.r>=tS.t || tS.r<=0;      if(fresh){        const cv=$("#hgCanvas");        let done=false;        const finish=()=>{          if(done) return; done=true;          cv.classList.remove("hg-flip");          tS.r=tS.t; drawHourglass();          beginRun();        };        cv.classList.add("hg-flip");        cv.addEventListener("animationend", finish, {once:true});        setTimeout(finish, 500);      }else{        beginRun();      }    });    $("#tReset").addEventListener("click", ()=>{ stopTimer(); tS.r=tS.t; render(); });    app.querySelectorAll("[data-p]").forEach(b=> b.addEventListener("click", ()=>{ const s=Number(b.getAttribute("data-p")); stopTimer(); tS.t=s; tS.r=s; render(); }) );    app.querySelectorAll("[data-unit]").forEach(b=> b.addEventListener("click", ()=>{ adjustTime(b.getAttribute("data-unit"), Number(b.getAttribute("data-dir"))); }) );  }  const BAC_ALL = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("");  const BAC_HARD = ["K","W","X","Y","Z"];  const BAC_DURATIONS = [15,30,45,60,90,120,180,300];  function bacPool(d){ return BAC_ALL.filter(l=> !(d.excludeHard && BAC_HARD.includes(l))); }  let bacInt=null;  let bacTS={t:60,r:60,run:false};  function stopBacTimer(){ if(bacInt){ clearInterval(bacInt); bacInt=null; } bacTS.run=false; }  function updateBacTimerText(){    const el=$("#bacTime"); if(el) el.textContent = formatTime(bacTS.r);    const btn=$("#bacStart"); if(btn) btn.textContent = bacTS.run ? "PAUSE" : "LANCER";  }  function beginBacRun(){    bacTS.run=true;    bacInt=setInterval(()=>{      bacTS.r--;      if(bacTS.r<=0){ bacTS.r=0; stopBacTimer(); ringAlarm(); updateBacTimerText(); return; }      updateBacTimerText();    }, 1000);    updateBacTimerText();  }  function rBac(){    const d = load("bac", {excludeHard:true, duration:60, used:[], current:null});    if(!Array.isArray(d.used)) d.used=[];    if(typeof d.duration!=="number" || !BAC_DURATIONS.includes(d.duration)) d.duration=60;    if(!bacTS.run && bacTS.t!==d.duration){ bacTS.t=d.duration; bacTS.r=d.duration; }    const pool = bacPool(d);    const grid = BAC_ALL.map(l=>{      const excluded = d.excludeHard && BAC_HARD.includes(l);      const used = !excluded && d.used.includes(l);      const current = d.current===l;      let cls = "bac-letter" + (current?" current":(excluded?" excluded":(used?" used":"")));      return '<div class="'+cls+'">'+l+'</div>';    }).join("");    app.innerHTML = `      <div class="panel drawn" style="text-align:center">        <div style="display:flex;gap:8px;align-items:center;justify-content:center">          <div style="font-weight:1000;font-size:18px">Jeu du Bac</div>          ${qbtn("bac")}        </div>        <div class="kicker">Tire une lettre, lance le minuteur, trouve un mot par catégorie avant la fin.</div>        <div class="bac-big drawn" id="bacLetter">${d.current || "?"}</div>        <div class="actions" style="justify-content:center">          <button class="btn" id="bacDraw">🔀 TIRER UNE LETTRE</button>        </div>        <label style="display:flex;align-items:center;gap:6px;justify-content:center;margin-top:12px;font-size:11px;white-space:nowrap">          <input type="checkbox" id="bacHard" ${d.excludeHard?"checked":""}>          Désactiver les lettres compliquées (K, W, X, Y, Z)        </label>        <div class="bac-grid">${grid}</div>        <div class="actions">          <button class="btn sec" id="bacUsedReset">Vider les lettres tirées</button>        </div>      </div>      <div class="panel drawn" style="margin-top:14px;text-align:center">        <div style="font-weight:1000;font-size:18px">Minuteur du tour</div>        <div id="bacTime" style="font-weight:1000;font-size:40px;margin:10px 0">${formatTime(bacTS.r)}</div>        <div class="actions" style="justify-content:center">          <button class="btn" id="bacStart">${bacTS.run?"PAUSE":"LANCER"}</button>          <button class="btn sec" id="bacReset">RESET</button>        </div>        <div class="bac-dur-grid">          ${BAC_DURATIONS.map(s=>'<button class="btn sec" data-dur="'+s+'" style="'+(s===d.duration?'border-color:var(--red);color:var(--red)':'')+'">'+(s<60? s+'s' : (s/60)+'m')+'</button>').join("")}        </div>      </div>    `;    $("#bacDraw").addEventListener("click", ()=>{      const p = bacPool(d);      if(p.length===0) return;      let avail = p.filter(l=> !d.used.includes(l));      if(avail.length===0) avail = p.slice();      const finalLetter = avail[Math.floor(Math.random()*avail.length)];      const el = $("#bacLetter");      let i=0;      const t=setInterval(()=>{        el.textContent = p[Math.floor(Math.random()*p.length)];        if(++i>10){          clearInterval(t);          if(p.every(l=> d.used.includes(l))) d.used=[];          if(!d.used.includes(finalLetter)) d.used.push(finalLetter);          d.current = finalLetter;          save("bac", d);          ding();          render();        }      }, 50);    });    $("#bacHard").addEventListener("change", (e)=>{ d.excludeHard = e.target.checked; save("bac", d); render(); });    $("#bacUsedReset").addEventListener("click", ()=>{ d.used=[]; save("bac", d); render(); });    $("#bacStart").addEventListener("click", ()=>{      if(bacTS.run){ stopBacTimer(); updateBacTimerText(); return; }      if(bacTS.t<=0) return;      if(bacTS.r>=bacTS.t || bacTS.r<=0) bacTS.r = bacTS.t;      beginBacRun();    });    $("#bacReset").addEventListener("click", ()=>{ stopBacTimer(); bacTS.r=bacTS.t; updateBacTimerText(); });    app.querySelectorAll("[data-dur]").forEach(b=> b.addEventListener("click", ()=>{      const s=Number(b.getAttribute("data-dur"));      d.duration=s; save("bac", d);      stopBacTimer(); bacTS.t=s; bacTS.r=s;      render();    }));  }  function rCustom(){    const cfg = load("custom_cfg",{title:"Tableau custom", players:4, rounds:5});    app.innerHTML = `      <div class="panel drawn">        <div style="font-weight:1000;font-size:18px">Tableau custom</div>        <div class="kicker">Choisis joueurs + manches → on génère une feuille.</div>        <div class="actions" style="margin-top:10px">          <div style="flex:1;min-width:160px"><div style="font-size:12px;color:var(--muted);margin-bottom:6px">Titre</div><input id="ctTitle" value="${esc(cfg.title)}"></div>          <div style="flex:1;min-width:120px"><div style="font-size:12px;color:var(--muted);margin-bottom:6px">Joueurs</div><input id="ctPlayers" type="number" min="1" max="12" value="${cfg.players}"></div>          <div style="flex:1;min-width:120px"><div style="font-size:12px;color:var(--muted);margin-bottom:6px">Manches</div><input id="ctRounds" type="number" min="1" max="30" value="${cfg.rounds}"></div>        </div>        <div class="actions">          <button class="btn" id="ctGo">GÉNÉRER</button>          <button class="btn sec red" id="ctReset">Reset feuille</button>        </div>      </div>    `;    function saveCfg(){      cfg.title=$("#ctTitle").value||"Tableau custom";      cfg.players=Math.max(1,Math.min(12,Number($("#ctPlayers").value)||4));      cfg.rounds=Math.max(1,Math.min(30,Number($("#ctRounds").value)||5));      save("custom_cfg",cfg);    }    $("#ctTitle").addEventListener("input", saveCfg);    $("#ctPlayers").addEventListener("input", saveCfg);    $("#ctRounds").addEventListener("input", saveCfg);    $("#ctGo").addEventListener("click", ()=>{      saveCfg();      const ps=Array.from({length:cfg.players},(_,i)=>"J"+(i+1));      const r=Array.from({length:cfg.rounds},()=>({k:"", s:new Array(cfg.players).fill(0)}));      save("custom_sheet",{ps:ps, r:r, meta:{date:"", title:cfg.title}});      nav("#custom_sheet");    });    $("#ctReset").addEventListener("click", ()=>{ if(confirm("Reset ?")){ save("custom_sheet",{ps:["J1","J2"], r:[], meta:{date:"", title:"Tableau custom"}}); alert("OK."); }});  }  function rCustomSheet(){    const d = load("custom_sheet",{ps:["J1","J2"], r:[], meta:{date:"", title:"Tableau custom"}});    renderSheet("custom_sheet", (d.meta && d.meta.title) ? d.meta.title : "Tableau custom", {defaultPlayers:d.ps, addRoundLabel:"Manche"});  }  function render(){    const h = location.hash || "#home";    if(h==="#home"){ backBtn.style.visibility="hidden"; homeBtn.disabled=true; }    else{ backBtn.style.visibility="visible"; homeBtn.disabled=false; }    if(h!=="#timer") stopTimer();    if(h!=="#bac") stopBacTimer();    showBanner(false);    switch(h){      case "#home": rHome(); break;      case "#belote": rBelote(); break;      case "#yams": rYams(); break;      case "#tarot": rTarot(); break;      case "#rami": rRami(); break;      case "#uno": rUno(); break;      case "#scrabble": rScrabble(); break;      case "#free": rFree(); break;      case "#421": r421(); break;      case "#skyjo": rSkyjo(); break;      case "#petanque": rPetanque(); break;      case "#bac": rBac(); break;      case "#victoires": rVictoires(); break;      case "#molkky": rMolkky(); break;      case "#dice": rDice(); break;      case "#timer": rTimer(); break;      case "#custom": rCustom(); break;      case "#custom_sheet": rCustomSheet(); break;      default: rHome();    }  }  setWakeUI(false); setFSUI(false);  boot();})();</script></body></html>
