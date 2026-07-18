@@ -91,6 +91,7 @@
   <noscript>
     <div style="padding:16px;font-family:system-ui;background:#fff;border:2px solid #000;margin:12px;border-radius:10px">
       JavaScript est nécessaire pour faire fonctionner Table Tools, veuillez activer JavaScript ou créez une exception pour pouvoir utiliser cet outil.
+      <br>JavaScript is required to run Table Tools — please enable JavaScript or add an exception to use this tool.
     </div>
   </noscript>
   <svg width="0" height="0" style="position:absolute">
@@ -130,8 +131,8 @@
       <div id="banner" class="banner drawn">
         <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
           <div style="flex:1;min-width:220px">
-            <div><b>Mode table :</b> anti‑veille / plein écran a été perdu.</div>
-            <div style="font-size:12px;color:var(--muted)">Appuyez sur ☀ / ⛶ (ou touchez l'écran).</div>
+            <div><b id="bannerMode">Mode table :</b> <span id="bannerLost">anti‑veille / plein écran a été perdu.</span></div>
+            <div style="font-size:12px;color:var(--muted)" id="bannerTap">Appuyez sur ☀ / ⛶ (ou touchez l'écran).</div>
           </div>
           <button class="btn sec" id="bannerFix">RÉACTIVER</button>
         </div>
@@ -177,65 +178,261 @@
   const load=(k,d)=>{try{ return JSON.parse(localStorage.getItem("tt15_"+k)) || d; }catch(e){ return d; }};
   const save=(k,v)=>{ try{ localStorage.setItem("tt15_"+k, JSON.stringify(v)); }catch(e){} };
   const esc=(s)=>String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#039;");
+  const SYS_LANG = ((navigator.language || navigator.userLanguage || "fr") + "").toLowerCase();
+  const LANG = SYS_LANG.startsWith("fr") ? "fr" : "en";
+  document.documentElement.lang = LANG;
+  const I18N = {
+    nav_back:{fr:"Retour",en:"Back"},
+    nav_wake:{fr:"Anti-veille",en:"Keep awake"},
+    nav_wake_label:{fr:"ANTI<br>VEILLE",en:"KEEP<br>AWAKE"},
+    nav_fs:{fr:"Plein écran",en:"Fullscreen"},
+    nav_fs_label:{fr:"PLEIN<br>ÉCRAN",en:"FULL<br>SCREEN"},
+    nav_home:{fr:"Accueil",en:"Home"},
+    nav_close:{fr:"Fermer",en:"Close"},
+    nav_rules:{fr:"Règles du jeu",en:"Game rules"},
+    noscript_msg:{fr:"JavaScript est nécessaire pour faire fonctionner Table Tools, veuillez activer JavaScript ou créez une exception pour pouvoir utiliser cet outil.",en:"JavaScript is required to run Table Tools — please enable JavaScript or add an exception to use this tool."},
+    banner_mode:{fr:"Mode table :",en:"Table mode:"},
+    banner_lost:{fr:"anti‑veille / plein écran a été perdu.",en:"keep-awake / fullscreen was lost."},
+    banner_tap:{fr:"Appuyez sur ☀ / ⛶ (ou touchez l'écran).",en:"Tap ☀ / ⛶ (or touch the screen)."},
+    banner_btn:{fr:"RÉACTIVER",en:"RE-ENABLE"},
+    home_games:{fr:"Jeux de score",en:"Score games"},
+    home_tools:{fr:"Outils",en:"Tools"},
+    g_belote_t:{fr:"Belote",en:"Belote"}, g_belote_s:{fr:"Nous / Eux",en:"Us / Them"},
+    g_yams_t:{fr:"Yams",en:"Yams"}, g_yams_s:{fr:"Feuille + bonus auto",en:"Sheet + auto bonus"},
+    g_tarot_t:{fr:"Tarot",en:"Tarot"}, g_tarot_s:{fr:"Contrat + scores",en:"Contract + scores"},
+    g_rami_t:{fr:"Rami",en:"Rummy"}, g_rami_s:{fr:"Cartes en main = malus",en:"Cards in hand = penalty"},
+    g_uno_t:{fr:"Uno",en:"Uno"}, g_uno_s:{fr:"Le + haut gagne, fin à 500",en:"Highest wins, ends at 500"},
+    g_scrabble_t:{fr:"Scrabble",en:"Scrabble"}, g_scrabble_s:{fr:"Tours + total",en:"Turns + total"},
+    g_bac_t:{fr:"Jeu du Bac",en:"Categories"}, g_bac_s:{fr:"Lettre + minuteur",en:"Letter + timer"},
+    g_421_t:{fr:"421",en:"421"}, g_421_s:{fr:"3 dés + carnet",en:"3 dice + scoresheet"},
+    g_molkky_t:{fr:"Mölkky",en:"Mölkky"}, g_molkky_s:{fr:"50 points pile",en:"Exactly 50 points"},
+    g_skyjo_t:{fr:"Skyjo",en:"Skyjo"}, g_skyjo_s:{fr:"Le + bas gagne, fin à 100",en:"Lowest wins, ends at 100"},
+    g_petanque_t:{fr:"Pétanque",en:"Pétanque"}, g_petanque_s:{fr:"Nous / Eux, jusqu'à 13",en:"Us / Them, up to 13"},
+    g_victoires_t:{fr:"Victoires",en:"Wins"}, g_victoires_s:{fr:"Dames, échecs, P4...",en:"Checkers, chess, Connect 4..."},
+    g_custom_t:{fr:"Tableau custom",en:"Custom sheet"}, g_custom_s:{fr:"Joueurs + manches",en:"Players + rounds"},
+    g_free_t:{fr:"Score libre",en:"Free score"}, g_free_s:{fr:"Tableau générique",en:"Generic sheet"},
+    t_dice_t:{fr:"Dé (d6)",en:"Dice (d6)"}, t_dice_s:{fr:"lancer rapide",en:"quick roll"},
+    t_timer_t:{fr:"Sablier",en:"Timer"}, t_timer_s:{fr:"presets",en:"presets"},
+    rules_heading:{fr:"RÈGLES",en:"RULES"},
+    scoring_heading:{fr:"COMPTAGE DES POINTS",en:"SCORING"},
+    sheet_rounds_header:{fr:"MANCHES",en:"ROUNDS"},
+    sheet_total_label:{fr:"TOTAL",en:"TOTAL"},
+    sheet_add_round:{fr:"Manche",en:"Round"},
+    sheet_add_player:{fr:"+ Joueur",en:"+ Player"},
+    sheet_undo:{fr:"Annuler",en:"Undo"},
+    sheet_reset:{fr:"Reset",en:"Reset"},
+    sheet_default_subtitle:{fr:"Manches cumulées, total automatique.",en:"Cumulative rounds, automatic total."},
+    sheet_round_row:{fr:"Manche",en:"Round"},
+    confirm_new_sheet:{fr:"Nouveau ?",en:"Start over?"},
+    sheet_win_banner:{fr:"remporte la partie avec",en:"wins the game with"},
+    tarot_contract_label:{fr:"Contrat",en:"Contract"},
+    tarot_deal_label:{fr:"Donne",en:"Deal"},
+    tarot_deals_header:{fr:"DONNES",en:"DEALS"},
+    tarot_subtitle:{fr:"Contrat (optionnel) + scores, total auto.",en:"Contract (optional) + scores, auto total."},
+    rami_subtitle:{fr:"Cartes restées en main = points de malus. Le total le plus bas gagne.",en:"Cards left in hand = penalty points. Lowest total wins."},
+    uno_subtitle:{fr:"Points des cartes adverses. Le total le plus haut gagne, fin à 500 pts.",en:"Points from opponents' cards. Highest total wins, ends at 500 pts."},
+    scrabble_turn_label:{fr:"Tour",en:"Turn"},
+    scrabble_turns_header:{fr:"TOURS",en:"TURNS"},
+    scrabble_subtitle:{fr:"Tour par tour, total auto.",en:"Turn by turn, auto total."},
+    belote_us:{fr:"NOUS",en:"US"}, belote_them:{fr:"EUX",en:"THEM"},
+    belote_us_ph:{fr:"Nous",en:"Us"}, belote_them_ph:{fr:"Eux",en:"Them"},
+    belote_add:{fr:"Ajouter",en:"Add"},
+    yams_kicker:{fr:"Bonus auto (>=63) + total auto.",en:"Auto bonus (>=63) + auto total."},
+    yams_cat_uppertotal:{fr:"Total sup",en:"Upper total"},
+    yams_cat_bonus:{fr:"Bonus (+35)",en:"Bonus (+35)"},
+    yams_cat_three:{fr:"Brelan",en:"Three of a kind"},
+    yams_cat_four:{fr:"Carré",en:"Four of a kind"},
+    yams_cat_full:{fr:"Full",en:"Full house"},
+    yams_cat_small:{fr:"Petite suite",en:"Small straight"},
+    yams_cat_large:{fr:"Grande suite",en:"Large straight"},
+    yams_cat_yams:{fr:"YAMS",en:"YAMS"},
+    yams_cat_chance:{fr:"Chance",en:"Chance"},
+    yams_cat_totalfinal:{fr:"TOTAL",en:"TOTAL"},
+    g421_check_hint:{fr:"Cochez les dés à relancer",en:"Check the dice to reroll"},
+    g421_reroll_btn:{fr:"Relancer les dés cochés",en:"Reroll checked dice"},
+    g421_next_btn:{fr:"Joueur suivant →",en:"Next player →"},
+    g421_exhausted:{fr:"Lancers épuisés (3/3) — au tour du joueur suivant.",en:"Rolls used up (3/3) — next player's turn."},
+    g421_roll_btn:{fr:"Lancer 3 dés",en:"Roll 3 dice"},
+    skyjo_kicker:{fr:"Le score le plus bas gagne. Fin de partie dès qu'un joueur atteint 100 pts.",en:"Lowest score wins. The game ends as soon as a player reaches 100 pts."},
+    skyjo_gameover:{fr:"Partie terminée —",en:"Game over —"},
+    skyjo_wins_with:{fr:"gagne avec",en:"wins with"},
+    confirm_new_game:{fr:"Nouvelle partie ?",en:"New game?"},
+    petanque_kicker:{fr:"Première équipe à 13 points gagne la partie.",en:"First team to 13 points wins the game."},
+    petanque_won:{fr:"a gagné la partie !",en:"won the game!"},
+    petanque_end_kicker:{fr:"Points de la mène (un seul camp marque à la fois, 1 à 6 pts).",en:"Points for the end (only one side scores at a time, 1 to 6 pts)."},
+    petanque_add_end:{fr:"+ Mène",en:"+ End"},
+    victoires_title:{fr:"Compteur de victoires",en:"Win counter"},
+    victoires_kicker:{fr:"Pour les jeux sans score chiffré (dames, échecs, puissance 4...). Une victoire = un point.",en:"For games without numeric scores (checkers, chess, Connect 4...). One win = one point."},
+    molkky_eliminated:{fr:"💀 Éliminé",en:"💀 Eliminated"},
+    molkky_won:{fr:"🏆 Gagné !",en:"🏆 Won!"},
+    molkky_misses_label:{fr:"Ratés:",en:"Misses:"},
+    molkky_miss_btn:{fr:"RATÉ (X)",en:"MISS (X)"},
+    dice_kicker:{fr:"Lancer rapide — choisissez le nombre de dés.",en:"Quick roll — choose the number of dice."},
+    dice_roll_btn:{fr:"LANCER",en:"ROLL"},
+    dice_total_label:{fr:"Total :",en:"Total:"},
+    timer_pause:{fr:"PAUSE",en:"PAUSE"},
+    timer_start:{fr:"LANCER",en:"START"},
+    timer_reset_btn:{fr:"RESET",en:"RESET"},
+    timer_manual_kicker:{fr:"Régler soi-même",en:"Set manually"},
+    timer_h:{fr:"H",en:"H"}, timer_min:{fr:"MIN",en:"MIN"}, timer_sec:{fr:"SEC",en:"SEC"},
+    bac_kicker:{fr:"Tirez une lettre, lancez le minuteur, trouvez un mot par catégorie avant la fin.",en:"Draw a letter, start the timer, find a word for each category before time runs out."},
+    bac_draw_btn:{fr:"🔀 TIRER UNE LETTRE",en:"🔀 DRAW A LETTER"},
+    bac_hard_label:{fr:"Désactiver les lettres compliquées (Q, W, X, Y, Z)",en:"Disable tricky letters (Q, W, X, Y, Z)"},
+    bac_clear_btn:{fr:"Vider les lettres tirées",en:"Clear drawn letters"},
+    bac_announce:{fr:"Annonce la lettre...",en:"Announce the letter..."},
+    bac_starts_after:{fr:"Le minuteur démarre juste après.",en:"The timer starts right after."},
+    bac_round_timer:{fr:"Minuteur du tour",en:"Round timer"},
+    bac_set_time_kicker:{fr:"Régler le temps (max 10 min)",en:"Set the time (max 10 min)"},
+    custom_kicker:{fr:"Choisissez joueurs + manches → on génère une feuille.",en:"Choose players + rounds → we'll generate a sheet."},
+    custom_title_label:{fr:"Titre",en:"Title"},
+    custom_players_label:{fr:"Joueurs",en:"Players"},
+    custom_rounds_label:{fr:"Manches",en:"Rounds"},
+    custom_generate_btn:{fr:"GÉNÉRER",en:"GENERATE"},
+    custom_reset_sheet_btn:{fr:"Reset feuille",en:"Reset sheet"},
+    custom_default_title:{fr:"Tableau custom",en:"Custom sheet"},
+    confirm_reset:{fr:"Reset ?",en:"Reset?"},
+    generic_ok:{fr:"OK.",en:"OK."}
+  };
+  function t(key){ const e=I18N[key]; if(!e) return key; return e[LANG]||e.fr||key; }
+  function turnOf(name){ return LANG==="fr" ? ("Tour de "+name) : (name+"'s turn"); }
+  function applyStaticI18N(){
+    backBtn.title = t('nav_back');
+    wakeIcon.title = t('nav_wake'); wakeIcon.innerHTML = t('nav_wake_label');
+    wakeBtn.title = t('nav_wake');
+    fsIcon.title = t('nav_fs'); fsIcon.innerHTML = t('nav_fs_label');
+    fsBtn.title = t('nav_fs');
+    homeBtn.title = t('nav_home');
+    const rc = $("#rulesClose"); if(rc) rc.title = t('nav_close');
+    const bm = $("#bannerMode"); if(bm) bm.textContent = t('banner_mode');
+    const bl = $("#bannerLost"); if(bl) bl.textContent = t('banner_lost');
+    const bt = $("#bannerTap"); if(bt) bt.textContent = t('banner_tap');
+    if(bannerFix) bannerFix.textContent = t('banner_btn');
+  }
   const RULES = {
     belote:{
-      r:"32 cartes, 4 joueurs en 2 équipes (Nous/Eux). Le donneur retourne une carte : chacun annonce \"je prends\" ou \"je passe\" pour choisir l'atout (2 tours d'enchères, puis retournée face cachée si personne ne prend). L'équipe preneuse doit ramasser plus de la moitié des points de la donne.",
-      c:"162 points par donne (152 dans les plis + 10 pour le Dix de Der, dernier pli). À l'atout : Valet=20, 9=14, As=11, 10=10, Roi=4, Dame=3, 8/7=0. Aux autres couleurs : As=11, 10=10, Roi=4, Dame=3, Valet=2, 9/8/7=0. Belote-Rebelote (Roi+Dame d'atout dans la même main) = +20 pts. Si l'équipe preneuse n'atteint pas la majorité, elle est \"dedans\" : l'adversaire marque les 162 pts, elle marque 0."
+      r:{
+        fr:"32 cartes, 4 joueurs en 2 équipes (Nous/Eux). Le donneur retourne une carte : chacun annonce \"je prends\" ou \"je passe\" pour choisir l'atout (2 tours d'enchères, puis retournée face cachée si personne ne prend). L'équipe preneuse doit ramasser plus de la moitié des points de la donne.",
+        en:"32 cards, 4 players in 2 teams (Us/Them). The dealer flips a card: each player says \"I take\" or \"I pass\" to choose trumps (2 rounds of bidding, then the card is turned face down if no one takes it). The taking team must collect more than half the points in that hand."
+      },
+      c:{
+        fr:"162 points par donne (152 dans les plis + 10 pour le Dix de Der, dernier pli). À l'atout : Valet=20, 9=14, As=11, 10=10, Roi=4, Dame=3, 8/7=0. Aux autres couleurs : As=11, 10=10, Roi=4, Dame=3, Valet=2, 9/8/7=0. Belote-Rebelote (Roi+Dame d'atout dans la même main) = +20 pts. Si l'équipe preneuse n'atteint pas la majorité, elle est \"dedans\" : l'adversaire marque les 162 pts, elle marque 0.",
+        en:"162 points per hand (152 in tricks + 10 for the last trick, the \"Dix de Der\"). Trump suit: Jack=20, 9=14, Ace=11, 10=10, King=4, Queen=3, 8/7=0. Other suits: Ace=11, 10=10, King=4, Queen=3, Jack=2, 9/8/7=0. Belote-Rebelote (King+Queen of trumps in the same hand) = +20 pts. If the taking team doesn't reach the majority, they're \"in the hole\": the opponents score all 162 pts, they score 0."
+      }
     },
     yams:{
-      r:"5 dés, jusqu'à 3 lancers par tour (on garde de côté les dés qu'on veut entre les lancers). À chaque tour, on doit remplir une case de sa grille avec le résultat obtenu — impossible de passer une case sans la remplir (au pire à 0).",
-      c:"Section haute (1 à 6) : on additionne uniquement les dés de cette valeur ; bonus de +35 si le total de la section atteint 63 ou plus. Section basse : Brelan/Carré = somme des 5 dés, Full = 25, Petite suite = 30, Grande suite = 40, Yams (5 dés identiques) = 50 (+100 par Yams supplémentaire dans la partie), Chance = somme des 5 dés peu importe la combinaison."
+      r:{
+        fr:"5 dés, jusqu'à 3 lancers par tour (on garde de côté les dés qu'on veut entre les lancers). À chaque tour, on doit remplir une case de sa grille avec le résultat obtenu — impossible de passer une case sans la remplir (au pire à 0).",
+        en:"5 dice, up to 3 rolls per turn (you can set aside any dice you want to keep between rolls). Each turn you must fill in one box on your sheet with the result — you can't skip a box without filling it (even if it's a 0)."
+      },
+      c:{
+        fr:"Section haute (1 à 6) : on additionne uniquement les dés de cette valeur ; bonus de +35 si le total de la section atteint 63 ou plus. Section basse : Brelan/Carré = somme des 5 dés, Full = 25, Petite suite = 30, Grande suite = 40, Yams (5 dés identiques) = 50 (+100 par Yams supplémentaire dans la partie), Chance = somme des 5 dés peu importe la combinaison.",
+        en:"Upper section (1 to 6): add up only the dice showing that value; +35 bonus if the section total reaches 63 or more. Lower section: Three/Four of a kind = sum of all 5 dice, Full house = 25, Small straight = 30, Large straight = 40, Yahtzee (5 matching dice) = 50 (+100 for each extra Yahtzee in the game), Chance = sum of all 5 dice regardless of combination."
+      }
     },
     tarot:{
-      r:"78 cartes (dont les 21 atouts + l'Excuse), 4 joueurs. Enchères à 4 niveaux (Petite, Garde, Garde Sans, Garde Contre) : le plus offrant devient preneur et joue seul contre les 3 autres. En Petite/Garde, le Chien (6 cartes écartées) revient au preneur ; en Garde Sans/Contre, il reste caché.",
-      c:"Le contrat se juge sur le nombre de \"bouts\" (Excuse, Petit, 21 d'atout) gardés par le preneur dans ses plis : 0 bout → il faut 56 pts sur 91, 1 bout → 51 pts, 2 bouts → 41 pts, 3 bouts → 36 pts. L'écart entre points réalisés et objectif est multiplié par le coefficient du contrat (Petite×1, Garde×2, Garde Sans×4, Garde Contre×6) pour donner le score final."
+      r:{
+        fr:"78 cartes (dont les 21 atouts + l'Excuse), 4 joueurs. Enchères à 4 niveaux (Petite, Garde, Garde Sans, Garde Contre) : le plus offrant devient preneur et joue seul contre les 3 autres. En Petite/Garde, le Chien (6 cartes écartées) revient au preneur ; en Garde Sans/Contre, il reste caché.",
+        en:"78 cards (including the 21 trumps + the Excuse), 4 players. Bidding has 4 levels (Small, Guard, Guard Without, Guard Against): the highest bidder becomes the taker and plays alone against the other 3. In Small/Guard, the \"dog\" (6 set-aside cards) goes to the taker; in Guard Without/Against, it stays hidden."
+      },
+      c:{
+        fr:"Le contrat se juge sur le nombre de \"bouts\" (Excuse, Petit, 21 d'atout) gardés par le preneur dans ses plis : 0 bout → il faut 56 pts sur 91, 1 bout → 51 pts, 2 bouts → 41 pts, 3 bouts → 36 pts. L'écart entre points réalisés et objectif est multiplié par le coefficient du contrat (Petite×1, Garde×2, Garde Sans×4, Garde Contre×6) pour donner le score final.",
+        en:"The contract is judged on the number of \"oudlers\" (Excuse, Petit, 21 of trumps) the taker keeps in their tricks: 0 oudlers → needs 56 pts out of 91, 1 oudler → 51 pts, 2 oudlers → 41 pts, 3 oudlers → 36 pts. The gap between points scored and the target is multiplied by the contract's coefficient (Small×1, Guard×2, Guard Without×4, Guard Against×6) to give the final score."
+      }
     },
     rami:{
-      r:"2 jeux de 52 cartes + jokers, 2 à 6 joueurs. À son tour, on pioche une carte (talon ou défausse) puis on en défausse une, en essayant de poser des combinaisons (brelans/carrés de même valeur, ou suites de 3+ cartes de même couleur) pour vider sa main.",
-      c:"Quand un joueur vide sa main, la manche s'arrête : les autres comptent les points des cartes qui leur restent en main (pénalité). Valeurs courantes : cartes numérotées = leur valeur, figures = 10, As = 1 ou 11 selon la variante, Joker = 15 à 25. Le gagnant de la manche marque 0. À la fin de la partie, le total le plus bas gagne."
+      r:{
+        fr:"2 jeux de 52 cartes + jokers, 2 à 6 joueurs. À son tour, on pioche une carte (talon ou défausse) puis on en défausse une, en essayant de poser des combinaisons (brelans/carrés de même valeur, ou suites de 3+ cartes de même couleur) pour vider sa main.",
+        en:"2 decks of 52 cards + jokers, 2 to 6 players. On your turn, draw a card (from the stock or discard pile) then discard one, trying to lay down combinations (three/four of a kind, or runs of 3+ cards in the same suit) to empty your hand."
+      },
+      c:{
+        fr:"Quand un joueur vide sa main, la manche s'arrête : les autres comptent les points des cartes qui leur restent en main (pénalité). Valeurs courantes : cartes numérotées = leur valeur, figures = 10, As = 1 ou 11 selon la variante, Joker = 15 à 25. Le gagnant de la manche marque 0. À la fin de la partie, le total le plus bas gagne.",
+        en:"When a player empties their hand, the round ends: everyone else counts the points of the cards left in their hand (a penalty). Common values: number cards = their value, face cards = 10, Ace = 1 or 11 depending on the variant, Joker = 15 to 25. The round winner scores 0. At the end of the game, the lowest total wins."
+      }
     },
     uno:{
-      r:"7 cartes par joueur au départ. À son tour, on pose une carte de même couleur, même valeur, ou une carte spéciale (+2, Inversé, Passe, Joker, Joker +4) sur la couleur/valeur en cours. On doit annoncer \"UNO\" quand il ne reste qu'une carte en main.",
-      c:"Dès qu'un joueur pose sa dernière carte, il marque tous les points restés dans les mains des autres : cartes chiffrées = leur valeur, +2/Inversé/Passe = 20 pts, Joker/Joker+4 = 50 pts. Ces points s'ajoutent à son total cumulé sur plusieurs manches. Le premier joueur à atteindre 500 points remporte la partie."
+      r:{
+        fr:"7 cartes par joueur au départ. À son tour, on pose une carte de même couleur, même valeur, ou une carte spéciale (+2, Inversé, Passe, Joker, Joker +4) sur la couleur/valeur en cours. On doit annoncer \"UNO\" quand il ne reste qu'une carte en main.",
+        en:"7 cards per player to start. On your turn, play a card matching the current color or value, or a special card (+2, Reverse, Skip, Wild, Wild +4). You must call \"UNO\" when you have just one card left."
+      },
+      c:{
+        fr:"Dès qu'un joueur pose sa dernière carte, il marque tous les points restés dans les mains des autres : cartes chiffrées = leur valeur, +2/Inversé/Passe = 20 pts, Joker/Joker+4 = 50 pts. Ces points s'ajoutent à son total cumulé sur plusieurs manches. Le premier joueur à atteindre 500 points remporte la partie.",
+        en:"As soon as a player plays their last card, they score all the points left in everyone else's hands: number cards = their value, +2/Reverse/Skip = 20 pts, Wild/Wild+4 = 50 pts. These points add to their running total across rounds. The first player to reach 500 points wins the game."
+      }
     },
     scrabble:{
-      r:"Chaque joueur pioche 7 lettres et forme des mots sur la grille en les reliant à ceux déjà posés façon mots croisés, en utilisant les cases bonus (lettre compte double/triple, mot compte double/triple).",
-      c:"Chaque lettre a une valeur fixe (1 à 10 pts selon sa rareté). On additionne les valeurs des lettres du mot posé, puis on applique les multiplicateurs des cases utilisées (le bonus \"mot\" s'applique après les bonus \"lettre\"). Poser ses 7 lettres d'un coup (un \"scrabble\") rapporte +50 pts bonus sur le tour."
+      r:{
+        fr:"Chaque joueur pioche 7 lettres et forme des mots sur la grille en les reliant à ceux déjà posés façon mots croisés, en utilisant les cases bonus (lettre compte double/triple, mot compte double/triple).",
+        en:"Each player draws 7 letters and forms words on the board by connecting them to words already played, crossword-style, using the bonus squares (double/triple letter, double/triple word)."
+      },
+      c:{
+        fr:"Chaque lettre a une valeur fixe (1 à 10 pts selon sa rareté). On additionne les valeurs des lettres du mot posé, puis on applique les multiplicateurs des cases utilisées (le bonus \"mot\" s'applique après les bonus \"lettre\"). Poser ses 7 lettres d'un coup (un \"scrabble\") rapporte +50 pts bonus sur le tour.",
+        en:"Each letter has a fixed value (1 to 10 pts depending on rarity). Add up the values of the letters in the word played, then apply the multipliers of the squares used (the \"word\" bonus applies after the \"letter\" bonuses). Playing all 7 letters at once (a \"bingo\") earns a +50 pt bonus for that turn."
+      }
     },
     "421":{
-      r:"3 dés. Chaque joueur lance jusqu'à 3 fois par tour, en gardant de côté les dés qu'il veut garder entre les lancers, pour former la meilleure combinaison possible. Traditionnellement joué pour désigner qui règle la tournée.",
-      c:"Le \"421\" (4-2-1) est la combinaison reine. Viennent ensuite les brelans (trois dés identiques, le plus élevé gagne), puis les suites, puis simplement la somme des dés. Le perdant de chaque manche pose un jeton ou un gage ; celui qui a le plus de jetons à la fin de la partie paie sa tournée."
+      r:{
+        fr:"3 dés. Chaque joueur lance jusqu'à 3 fois par tour, en gardant de côté les dés qu'il veut garder entre les lancers, pour former la meilleure combinaison possible. Traditionnellement joué pour désigner qui règle la tournée.",
+        en:"3 dice. Each player rolls up to 3 times per turn, setting aside any dice they want to keep between rolls, to form the best possible combination. Traditionally played to decide who buys the next round."
+      },
+      c:{
+        fr:"Le \"421\" (4-2-1) est la combinaison reine. Viennent ensuite les brelans (trois dés identiques, le plus élevé gagne), puis les suites, puis simplement la somme des dés. Le perdant de chaque manche pose un jeton ou un gage ; celui qui a le plus de jetons à la fin de la partie paie sa tournée.",
+        en:"\"421\" (4-2-1) is the top combination. Next come three-of-a-kinds (highest wins), then straights, then simply the sum of the dice. The loser of each round puts down a token or forfeit; whoever has the most tokens at the end pays for the round."
+      }
     },
     molkky:{
-      r:"Jeu de lancer finlandais. Douze quilles numérotées de 1 à 12 sont plantées debout, groupées serrées. Chaque joueur, à son tour, lance le \"molkky\" (bâton) pour faire tomber une ou plusieurs quilles, à une distance raisonnable.",
-      c:"Si une seule quille tombe, on marque le chiffre inscrit dessus. Si plusieurs quilles tombent au même lancer, on marque simplement le nombre de quilles tombées (peu importe leurs numéros). Le premier à atteindre exactement 50 points gagne ; s'il dépasse 50, son score retombe à 25. Trois lancers ratés d'affilée éliminent un joueur."
+      r:{
+        fr:"Jeu de lancer finlandais. Douze quilles numérotées de 1 à 12 sont plantées debout, groupées serrées. Chaque joueur, à son tour, lance le \"molkky\" (bâton) pour faire tomber une ou plusieurs quilles, à une distance raisonnable.",
+        en:"A Finnish throwing game. Twelve pins numbered 1 to 12 are set up standing close together. Each player, on their turn, throws the \"mölkky\" (a wooden stick) to knock down one or more pins, from a reasonable distance."
+      },
+      c:{
+        fr:"Si une seule quille tombe, on marque le chiffre inscrit dessus. Si plusieurs quilles tombent au même lancer, on marque simplement le nombre de quilles tombées (peu importe leurs numéros). Le premier à atteindre exactement 50 points gagne ; s'il dépasse 50, son score retombe à 25. Trois lancers ratés d'affilée éliminent un joueur.",
+        en:"If only one pin falls, you score the number written on it. If several pins fall on the same throw, you simply score the number of pins knocked down (regardless of their numbers). The first to reach exactly 50 points wins; if they go over 50, their score drops back to 25. Three missed throws in a row eliminate a player."
+      }
     },
     skyjo:{
-      r:"Chaque joueur reçoit une grille de 12 cartes face cachée et en retourne 2 au départ. À son tour, on pioche une carte (pioche ou défausse) : soit on l'échange contre une carte de sa grille (qui se révèle), soit on la défausse et on révèle une carte de sa grille à la place.",
-      c:"Chaque carte vaut sa valeur imprimée, de -2 à 12. Une colonne de 3 cartes identiques révélées est retirée du jeu et ne compte plus (0 pt). Dès qu'un joueur révèle sa dernière carte, la manche se termine aussitôt et tous les autres révèlent et totalisent leur grille. Le total le plus bas à la fin de la partie gagne ; la partie s'arrête dès qu'un joueur atteint 100 pts cumulés."
+      r:{
+        fr:"Chaque joueur reçoit une grille de 12 cartes face cachée et en retourne 2 au départ. À son tour, on pioche une carte (pioche ou défausse) : soit on l'échange contre une carte de sa grille (qui se révèle), soit on la défausse et on révèle une carte de sa grille à la place.",
+        en:"Each player gets a grid of 12 face-down cards and flips 2 of them at the start. On your turn, draw a card (from the deck or discard pile): either swap it for a card in your grid (which is then revealed), or discard it and reveal a card in your grid instead."
+      },
+      c:{
+        fr:"Chaque carte vaut sa valeur imprimée, de -2 à 12. Une colonne de 3 cartes identiques révélées est retirée du jeu et ne compte plus (0 pt). Dès qu'un joueur révèle sa dernière carte, la manche se termine aussitôt et tous les autres révèlent et totalisent leur grille. Le total le plus bas à la fin de la partie gagne ; la partie s'arrête dès qu'un joueur atteint 100 pts cumulés.",
+        en:"Each card is worth its printed value, from -2 to 12. A column of 3 matching revealed cards is removed from play and no longer counts (0 pts). As soon as a player reveals their last card, the round ends immediately and everyone else reveals and totals their grid. The lowest total at the end of the game wins; the game stops as soon as a player reaches 100 cumulative points."
+      }
     },
     petanque:{
-      r:"Deux équipes s'affrontent. Chaque joueur lance ses boules le plus près possible du cochonnet (petite boule cible), en essayant soit de s'en approcher (\"pointer\"), soit de repousser une boule adverse (\"tirer\").",
-      c:"À la fin de chaque mène, seule l'équipe la plus proche du cochonnet marque des points : elle en gagne autant que de boules à elle plus proches du cochonnet que la meilleure boule adverse (donc 1 à 6 points selon les cas). La première équipe à atteindre 13 points remporte la partie."
+      r:{
+        fr:"Deux équipes s'affrontent. Chaque joueur lance ses boules le plus près possible du cochonnet (petite boule cible), en essayant soit de s'en approcher (\"pointer\"), soit de repousser une boule adverse (\"tirer\").",
+        en:"Two teams compete. Each player throws their boules as close as possible to the jack (the small target ball), trying either to get close to it (\"pointing\") or to knock away an opponent's boule (\"shooting\")."
+      },
+      c:{
+        fr:"À la fin de chaque mène, seule l'équipe la plus proche du cochonnet marque des points : elle en gagne autant que de boules à elle plus proches du cochonnet que la meilleure boule adverse (donc 1 à 6 points selon les cas). La première équipe à atteindre 13 points remporte la partie.",
+        en:"At the end of each end, only the team closest to the jack scores points: they score one point for each of their boules that is closer to the jack than the opponent's best boule (so 1 to 6 points depending on the situation). The first team to reach 13 points wins the game."
+      }
     },
     bac:{
-      r:"Chaque joueur a une feuille avec les mêmes catégories (prénom, animal, ville, pays, métier, fruit/légume, objet...). Une lettre est tirée au sort : dans le temps imparti, chacun doit trouver un mot commençant par cette lettre pour chaque catégorie. On s'arrête à la fin du minuteur, ou dès qu'un joueur a tout rempli et crie \"Stop !\".",
-      c:"Pour chaque catégorie : mot valide trouvé par un seul joueur = 10 points, mot valide trouvé par plusieurs joueurs = 5 points chacun, catégorie vide ou mot invalide = 0 point. On additionne les points de toutes les catégories à chaque tour ; le premier à atteindre le score visé (souvent 100 pts) remporte la partie."
+      r:{
+        fr:"Chaque joueur a une feuille avec les mêmes catégories (prénom, animal, ville, pays, métier, fruit/légume, objet...). Une lettre est tirée au sort : dans le temps imparti, chacun doit trouver un mot commençant par cette lettre pour chaque catégorie. On s'arrête à la fin du minuteur, ou dès qu'un joueur a tout rempli et crie \"Stop !\".",
+        en:"Each player has a sheet with the same categories (first name, animal, city, country, job, fruit/vegetable, object...). A letter is drawn at random: within the time given, everyone must find a word starting with that letter for each category. Play stops when the timer ends, or as soon as one player has filled everything in and shouts \"Stop!\""
+      },
+      c:{
+        fr:"Pour chaque catégorie : mot valide trouvé par un seul joueur = 10 points, mot valide trouvé par plusieurs joueurs = 5 points chacun, catégorie vide ou mot invalide = 0 point. On additionne les points de toutes les catégories à chaque tour ; le premier à atteindre le score visé (souvent 100 pts) remporte la partie.",
+        en:"For each category: a valid word found by only one player = 10 points, a valid word found by several players = 5 points each, an empty category or invalid word = 0 points. Add up the points from all categories each round; the first to reach the target score (often 100 pts) wins the game."
+      }
     }
   };
-  function qbtn(key){ return '<button class="qbtn" data-rules="'+key+'" title="Règles du jeu">?</button>'; }
+  function qbtn(key){ return '<button class="qbtn" data-rules="'+key+'" title="'+t('nav_rules')+'">?</button>'; }
   const rulesModal = $("#rulesModal");
   function openRules(key){
     const g = RULES[key];
     if(!g || !rulesModal) return;
     $("#rulesTitle").textContent = ruleTitleFor(key);
-    $("#rulesBody").innerHTML = '<div style="font-weight:1000;margin-bottom:4px">RÈGLES</div><div style="margin-bottom:14px;line-height:1.4">'+esc(g.r)+'</div>'
-      + '<div style="font-weight:1000;margin-bottom:4px">COMPTAGE DES POINTS</div><div style="line-height:1.4">'+esc(g.c)+'</div>';
+    $("#rulesBody").innerHTML = '<div style="font-weight:1000;margin-bottom:4px">'+t('rules_heading')+'</div><div style="margin-bottom:14px;line-height:1.4">'+esc(g.r[LANG]||g.r.fr)+'</div>'
+      + '<div style="font-weight:1000;margin-bottom:4px">'+t('scoring_heading')+'</div><div style="line-height:1.4">'+esc(g.c[LANG]||g.c.fr)+'</div>';
     rulesModal.classList.add("show");
   }
   function closeRules(){ if(rulesModal) rulesModal.classList.remove("show"); }
   function ruleTitleFor(key){
-    const names = {belote:"Belote", yams:"Yams", tarot:"Tarot", rami:"Rami", uno:"Uno", scrabble:"Scrabble", "421":"421", molkky:"Mölkky", skyjo:"Skyjo", petanque:"Pétanque", bac:"Jeu du Bac"};
+    const names = {belote:t('g_belote_t'), yams:t('g_yams_t'), tarot:t('g_tarot_t'), rami:t('g_rami_t'), uno:t('g_uno_t'), scrabble:t('g_scrabble_t'), "421":t('g_421_t'), molkky:t('g_molkky_t'), skyjo:t('g_skyjo_t'), petanque:t('g_petanque_t'), bac:t('g_bac_t')};
     return names[key] || key;
   }
   app.addEventListener("click", (e)=>{
@@ -295,8 +492,23 @@
       if(wantFS && !document.fullscreenElement) showBanner(true);
     }, 5000);
   }
+  function safeReplaceState(state, hash){
+    try{ history.replaceState(state, "", hash); }
+    catch(e){ if(location.hash !== hash) location.hash = hash; }
+  }
+  function safePushState(state, hash){
+    try{ history.pushState(state, "", hash); }
+    catch(e){ if(location.hash !== hash) location.hash = hash; }
+  }
   async function boot(){
     if(!location.hash) location.hash="#home";
+    if(location.hash === "#home"){
+      safeReplaceState({screen:"home"}, "#home");
+    }else{
+      const deep = location.hash;
+      safeReplaceState({screen:"home"}, "#home");
+      safePushState({screen:deep}, deep);
+    }
     render();
     scheduleKeepAlive();
     await tryWakeLock();
@@ -332,10 +544,32 @@
     showBanner(false);
   });
   bannerFix.addEventListener("click", async ()=>{ await releaseWakeLock(); await tryWakeLock(); await tryFullscreen(); showBanner(false); });
-  function nav(hash){ location.hash = hash; render(); }
+  let homeBackPresses = 0;
+  function nav(hash){
+    if(hash === "#home"){
+      if(location.hash !== "#home") history.back();
+    }else{
+      homeBackPresses = 0;
+      safePushState({screen:hash}, hash);
+      render();
+    }
+  }
   backBtn.addEventListener("click", ()=> nav("#home"));
   homeBtn.addEventListener("click", ()=> nav("#home"));
-  window.addEventListener("hashchange", render);
+  window.addEventListener("popstate", ()=>{
+    if(location.hash === "#home" || !location.hash){
+      homeBackPresses++;
+      render();
+      if(homeBackPresses < 3){
+        safePushState({screen:"home"}, "#home");
+      }else{
+        try{ window.close(); }catch(e){}
+      }
+    }else{
+      homeBackPresses = 0;
+      render();
+    }
+  });
   const Aud = window.AudioContext || window.webkitAudioContext;
   let sharedAudioCtx = null;
   function unlockAudioCtx(){
@@ -420,27 +654,27 @@
   function rHome(){
     backBtn.style.visibility="hidden"; homeBtn.disabled=true;
     app.innerHTML = `
-      <h2>Jeux de score</h2>
+      <h2>${t('home_games')}</h2>
       <div class="grid">
-        <div class="card drawn" data-go="#belote"><div class="ico">🃏</div><div class="tit">Belote</div><div class="sub">Nous / Eux</div></div>
-        <div class="card drawn" data-go="#yams"><div class="ico">🎲</div><div class="tit">Yams</div><div class="sub">Feuille + bonus auto</div></div>
-        <div class="card drawn" data-go="#tarot"><div class="ico">🔮</div><div class="tit">Tarot</div><div class="sub">Contrat + scores</div></div>
-        <div class="card drawn" data-go="#rami"><div class="ico">🂡</div><div class="tit">Rami</div><div class="sub">Cartes en main = malus</div></div>
-        <div class="card drawn" data-go="#uno"><div class="ico">🔴</div><div class="tit">Uno</div><div class="sub">Le + haut gagne, fin à 500</div></div>
-        <div class="card drawn" data-go="#scrabble"><div class="ico">🅰️</div><div class="tit">Scrabble</div><div class="sub">Tours + total</div></div>
-        <div class="card drawn" data-go="#bac"><div class="ico">🔤</div><div class="tit">Jeu du Bac</div><div class="sub">Lettre + minuteur</div></div>
-        <div class="card drawn" data-go="#421"><div class="ico">🎲</div><div class="tit">421</div><div class="sub">3 dés + carnet</div></div>
-        <div class="card drawn" data-go="#molkky"><div class="ico">🪵</div><div class="tit">Mölkky</div><div class="sub">50 points pile</div></div>
-        <div class="card drawn" data-go="#skyjo"><div class="ico">🔢</div><div class="tit">Skyjo</div><div class="sub">Le + bas gagne, fin à 100</div></div>
-        <div class="card drawn" data-go="#petanque"><div class="ico">🎯</div><div class="tit">Pétanque</div><div class="sub">Nous / Eux, jusqu'à 13</div></div>
-        <div class="card drawn" data-go="#victoires"><div class="ico">🏆</div><div class="tit">Victoires</div><div class="sub">Dames, échecs, P4...</div></div>
-        <div class="card drawn" data-go="#custom"><div class="ico">📋</div><div class="tit">Tableau custom</div><div class="sub">Joueurs + manches</div></div>
-        <div class="card drawn" data-go="#free"><div class="ico">📝</div><div class="tit">Score libre</div><div class="sub">Tableau générique</div></div>
+        <div class="card drawn" data-go="#belote"><div class="ico">🃏</div><div class="tit">${t('g_belote_t')}</div><div class="sub">${t('g_belote_s')}</div></div>
+        <div class="card drawn" data-go="#yams"><div class="ico">🎲</div><div class="tit">${t('g_yams_t')}</div><div class="sub">${t('g_yams_s')}</div></div>
+        <div class="card drawn" data-go="#tarot"><div class="ico">🔮</div><div class="tit">${t('g_tarot_t')}</div><div class="sub">${t('g_tarot_s')}</div></div>
+        <div class="card drawn" data-go="#rami"><div class="ico">🂡</div><div class="tit">${t('g_rami_t')}</div><div class="sub">${t('g_rami_s')}</div></div>
+        <div class="card drawn" data-go="#uno"><div class="ico">🔴</div><div class="tit">${t('g_uno_t')}</div><div class="sub">${t('g_uno_s')}</div></div>
+        <div class="card drawn" data-go="#scrabble"><div class="ico">🅰️</div><div class="tit">${t('g_scrabble_t')}</div><div class="sub">${t('g_scrabble_s')}</div></div>
+        <div class="card drawn" data-go="#bac"><div class="ico">🔤</div><div class="tit">${t('g_bac_t')}</div><div class="sub">${t('g_bac_s')}</div></div>
+        <div class="card drawn" data-go="#421"><div class="ico">🎲</div><div class="tit">${t('g_421_t')}</div><div class="sub">${t('g_421_s')}</div></div>
+        <div class="card drawn" data-go="#molkky"><div class="ico">🪵</div><div class="tit">${t('g_molkky_t')}</div><div class="sub">${t('g_molkky_s')}</div></div>
+        <div class="card drawn" data-go="#skyjo"><div class="ico">🔢</div><div class="tit">${t('g_skyjo_t')}</div><div class="sub">${t('g_skyjo_s')}</div></div>
+        <div class="card drawn" data-go="#petanque"><div class="ico">🎯</div><div class="tit">${t('g_petanque_t')}</div><div class="sub">${t('g_petanque_s')}</div></div>
+        <div class="card drawn" data-go="#victoires"><div class="ico">🏆</div><div class="tit">${t('g_victoires_t')}</div><div class="sub">${t('g_victoires_s')}</div></div>
+        <div class="card drawn" data-go="#custom"><div class="ico">📋</div><div class="tit">${t('g_custom_t')}</div><div class="sub">${t('g_custom_s')}</div></div>
+        <div class="card drawn" data-go="#free"><div class="ico">📝</div><div class="tit">${t('g_free_t')}</div><div class="sub">${t('g_free_s')}</div></div>
       </div>
-      <h2 style="margin-top:18px">Outils</h2>
+      <h2 style="margin-top:18px">${t('home_tools')}</h2>
       <div class="grid">
-        <div class="card drawn" data-go="#dice"><div class="ico">🎲</div><div class="tit">Dé (d6)</div><div class="sub">lancer rapide</div></div>
-        <div class="card drawn" data-go="#timer"><div class="ico">⏳</div><div class="tit">Sablier</div><div class="sub">presets</div></div>
+        <div class="card drawn" data-go="#dice"><div class="ico">🎲</div><div class="tit">${t('t_dice_t')}</div><div class="sub">${t('t_dice_s')}</div></div>
+        <div class="card drawn" data-go="#timer"><div class="ico">⏳</div><div class="tit">${t('t_timer_t')}</div><div class="sub">${t('t_timer_s')}</div></div>
       </div>
     `;
     app.querySelectorAll("[data-go]").forEach(el=> el.addEventListener("click", ()=> nav(el.getAttribute("data-go"))) );
@@ -448,7 +682,7 @@
   function renderSheet(key, title, opts){
     opts = opts || {};
     const showContract = !!opts.contract;
-    const contractLabel = opts.contractLabel || "CONTRAT";
+    const contractLabel = opts.contractLabel || t('tarot_contract_label');
     const d = load(key, {ps: opts.defaultPlayers || ["J1","J2"], r:[], meta:{date:""}});
     if(!Array.isArray(d.ps) || d.ps.length<1) d.ps = opts.defaultPlayers || ["J1","J2"];
     if(!Array.isArray(d.r)) d.r = [];
@@ -461,20 +695,20 @@
       if(opts.endAt) ended = opts.leader==="low" ? totals.some(t=>t<=opts.endAt) : totals.some(t=>t>=opts.endAt);
     }
     const head = d.ps.map((p,i)=>'<th><input class="'+key+'-n" data-i="'+i+'" value="'+esc(p)+'">'+(ended && i===leaderIdx?' 🏆':'')+'</th>').join("");
-    const leftHead = showContract ? '<th class="drawn" style="width:140px">'+esc(contractLabel)+'</th>' : '<th class="drawn" style="width:140px">'+esc(opts.leftHeader || "MANCHES")+'</th>';
+    const leftHead = showContract ? '<th class="drawn" style="width:140px">'+esc(contractLabel)+'</th>' : '<th class="drawn" style="width:140px">'+esc(opts.leftHeader || t('sheet_rounds_header'))+'</th>';
     const body = d.r.map((row,ri)=>{
       const leftCell = showContract
         ? '<td class="drawn"><input class="'+key+'-c" data-r="'+ri+'" value="'+esc(row.k||"")+'" placeholder="'+esc(contractLabel)+'"></td>'
-        : '<td class="drawn label">Manche '+(ri+1)+'</td>';
+        : '<td class="drawn label">'+t('sheet_round_row')+' '+(ri+1)+'</td>';
       const cells = d.ps.map((_,ci)=>{
         const v = (row.s||[])[ci] ?? "";
         return '<td class="drawn"><input type="number" class="'+key+'-v" data-r="'+ri+'" data-c="'+ci+'" value="'+esc(v)+'"></td>';
       }).join("");
       return "<tr>"+leftCell+cells+"</tr>";
     }).join("");
-    const foot = '<tr style="font-weight:1000;background:#eee"><td class="drawn label">'+esc(opts.totalLabel||"TOTAL")+'</td>'
+    const foot = '<tr style="font-weight:1000;background:#eee"><td class="drawn label">'+esc(opts.totalLabel||t('sheet_total_label'))+'</td>'
       + totals.map((t,i)=>'<td class="drawn" style="'+(i===leaderIdx?'color:var(--red)':'')+'">'+t+'</td>').join("")+"</tr>";
-    const endBanner = ended ? '<div style="text-align:center;margin-top:8px;font-weight:900;color:var(--red)">🏆 '+esc(d.ps[leaderIdx]||"?")+' remporte la partie avec '+totals[leaderIdx]+' pts !</div>' : '';
+    const endBanner = ended ? '<div style="text-align:center;margin-top:8px;font-weight:900;color:var(--red)">🏆 '+esc(d.ps[leaderIdx]||"?")+' '+t('sheet_win_banner')+' '+totals[leaderIdx]+' pts!</div>' : '';
     app.innerHTML = `
       <div class="panel drawn">
         <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;justify-content:space-between">
@@ -484,7 +718,7 @@
           </div>
           <div style="min-width:160px"><input id="${key}_date" placeholder="Date" value="${esc(d.meta.date||"")}"></div>
         </div>
-        <div class="kicker">${esc(opts.subtitle || "Manches cumulées, total automatique.")}</div>
+        <div class="kicker">${esc(opts.subtitle || t('sheet_default_subtitle'))}</div>
         ${endBanner}
       </div>
       <div style="overflow-x:auto;margin-top:12px">
@@ -494,12 +728,12 @@
         </table>
       </div>
       <div class="actions">
-        <button class="btn" id="${key}_addR">+ ${esc(opts.addRoundLabel||"Manche")}</button>
-        <button class="btn sec" id="${key}_addP">+ Joueur</button>
+        <button class="btn" id="${key}_addR">+ ${esc(opts.addRoundLabel||t('sheet_add_round'))}</button>
+        <button class="btn sec" id="${key}_addP">${t('sheet_add_player')}</button>
       </div>
       <div class="actions">
-        <button class="btn sec" id="${key}_undo">Annuler</button>
-        <button class="btn sec red" id="${key}_reset">Reset</button>
+        <button class="btn sec" id="${key}_undo">${t('sheet_undo')}</button>
+        <button class="btn sec red" id="${key}_reset">${t('sheet_reset')}</button>
       </div>
     `;
     $("#"+key+"_date").addEventListener("input", (e)=>{ d.meta.date = e.target.value; save(key,d); });
@@ -514,7 +748,7 @@
     });
     $("#"+key+"_undo").addEventListener("click", ()=>{ d.r.pop(); save(key,d); render(); });
     $("#"+key+"_reset").addEventListener("click", ()=>{
-      if(confirm("Nouveau ?")){
+      if(confirm(t('confirm_new_sheet'))){
         save(key, {ps: opts.defaultPlayers || ["J1","J2"], r:[], meta:{date:""}});
         render();
       }
@@ -535,9 +769,9 @@
   }
   const Y_CATS = [
     {l:"Total 1",k:"1"},{l:"Total 2",k:"2"},{l:"Total 3",k:"3"},{l:"Total 4",k:"4"},{l:"Total 5",k:"5"},{l:"Total 6",k:"6"},
-    {l:"Total sup",auto:"u",bg:1},{l:"Bonus (+35)",auto:"bo",bg:1},
-    {l:"Brelan",k:"br"},{l:"Carré",k:"ca"},{l:"Full",k:"fu"},{l:"Petite suite",k:"ps"},{l:"Grande suite",k:"gs"},{l:"YAMS",k:"ya"},{l:"Chance",k:"ch"},
-    {l:"TOTAL",auto:"tot",bg:1,big:1}
+    {l:t('yams_cat_uppertotal'),auto:"u",bg:1},{l:t('yams_cat_bonus'),auto:"bo",bg:1},
+    {l:t('yams_cat_three'),k:"br"},{l:t('yams_cat_four'),k:"ca"},{l:t('yams_cat_full'),k:"fu"},{l:t('yams_cat_small'),k:"ps"},{l:t('yams_cat_large'),k:"gs"},{l:t('yams_cat_yams'),k:"ya"},{l:t('yams_cat_chance'),k:"ch"},
+    {l:t('yams_cat_totalfinal'),auto:"tot",bg:1,big:1}
   ];
   function rYams(){
     const d = load("yams", {ps:["J1","J2"], s:{}});
@@ -551,8 +785,8 @@
       ["br","ca","fu","ps","gs","ya","ch"].forEach(k=> l += Number(s[k]||0));
       return {u:u, bo:bo, tot:u+bo+l};
     };
-    let html = '<div class="panel drawn"><div style="display:flex;gap:8px;align-items:center"><div style="font-weight:1000;font-size:18px">Yams</div>'+qbtn("yams")+'</div><div class="kicker">Bonus auto (>=63) + total auto.</div></div>';
-    html += '<div style="overflow-x:auto;margin-top:12px"><table class="paper-table drawn"><thead><tr><th class="drawn">YAMS</th>';
+    let html = '<div class="panel drawn"><div style="display:flex;gap:8px;align-items:center"><div style="font-weight:1000;font-size:18px">'+t('g_yams_t')+'</div>'+qbtn("yams")+'</div><div class="kicker">'+t('yams_kicker')+'</div></div>';
+    html += '<div style="overflow-x:auto;margin-top:12px"><table class="paper-table drawn"><thead><tr><th class="drawn">'+t('g_yams_t')+'</th>';
     d.ps.forEach((p,i)=>{ html += '<th><input class="y-n" data-i="'+i+'" value="'+esc(p)+'"></th>'; });
     html += '</tr></thead><tbody>';
     Y_CATS.forEach(cat=>{
@@ -569,7 +803,7 @@
       html += '</tr>';
     });
     html += '</tbody></table></div>';
-    html += '<div class="actions"><button class="btn" id="yAdd">+ Joueur</button><button class="btn sec red" id="yReset">Reset</button></div>';
+    html += '<div class="actions"><button class="btn" id="yAdd">'+t('sheet_add_player')+'</button><button class="btn sec red" id="yReset">'+t('sheet_reset')+'</button></div>';
     app.innerHTML = html;
     app.querySelectorAll(".y-n").forEach(inp=> inp.addEventListener("change",(e)=>{ d.ps[Number(e.target.dataset.i)] = e.target.value; save("yams",d); }) );
     app.querySelectorAll(".y-v").forEach(inp=> inp.addEventListener("input",(e)=>{
@@ -583,7 +817,7 @@
       if(el){ el.focus(); }
     }) );
     $("#yAdd").addEventListener("click", ()=>{ d.ps.push("J"+(d.ps.length+1)); save("yams",d); render(); });
-    $("#yReset").addEventListener("click", ()=>{ if(confirm("Reset ?")){ save("yams",{ps:["J1","J2"], s:{}}); render(); }});
+    $("#yReset").addEventListener("click", ()=>{ if(confirm(t('confirm_reset'))){ save("yams",{ps:["J1","J2"], s:{}}); render(); }});
   }
   function rBelote(){
     const d = load("belote", {r:[]});
@@ -593,33 +827,33 @@
     const list = d.r.slice().reverse().map(r=>"<div>"+(Number(r.u)||0)+" - "+(Number(r.t)||0)+"</div>").join("");
     app.innerHTML = `
       <div class="panel drawn" style="display:flex;gap:8px;align-items:center">
-        <div style="font-weight:1000;font-size:18px">Belote</div>
+        <div style="font-weight:1000;font-size:18px">${t('g_belote_t')}</div>
         ${qbtn("belote")}
       </div>
       <div class="belote-split drawn" style="margin-top:12px">
         <div class="belote-col">
-          <div class="b-head">NOUS</div>
+          <div class="b-head">${t('belote_us')}</div>
           <div class="b-tot">${totU}</div>
           <div class="b-list">${list}</div>
         </div>
         <div class="belote-col">
-          <div class="b-head">EUX</div>
+          <div class="b-head">${t('belote_them')}</div>
           <div class="b-tot">${totT}</div>
           <div class="b-list" style="background:#f9f9f9"></div>
         </div>
       </div>
       <div class="panel drawn" style="margin-top:14px">
         <div class="grid" style="grid-template-columns:1fr 1fr">
-          <div><input type="number" id="bU" placeholder="Nous"></div>
-          <div><input type="number" id="bT" placeholder="Eux"></div>
+          <div><input type="number" id="bU" placeholder="${t('belote_us_ph')}"></div>
+          <div><input type="number" id="bT" placeholder="${t('belote_them_ph')}"></div>
         </div>
         <div class="actions">
           <button class="btn sec" id="b162">162</button>
-          <button class="btn" id="bAdd">Ajouter</button>
+          <button class="btn" id="bAdd">${t('belote_add')}</button>
         </div>
         <div class="actions">
-          <button class="btn sec" id="bUndo">Annuler</button>
-          <button class="btn sec red" id="bReset">Reset</button>
+          <button class="btn sec" id="bUndo">${t('sheet_undo')}</button>
+          <button class="btn sec red" id="bReset">${t('sheet_reset')}</button>
         </div>
       </div>
     `;
@@ -634,13 +868,13 @@
       d.r.push({u:u,t:t}); save("belote",d); render();
     });
     $("#bUndo").addEventListener("click", ()=>{ d.r.pop(); save("belote",d); render(); });
-    $("#bReset").addEventListener("click", ()=>{ if(confirm("Reset ?")){ save("belote",{r:[]}); render(); }});
+    $("#bReset").addEventListener("click", ()=>{ if(confirm(t('confirm_reset'))){ save("belote",{r:[]}); render(); }});
   }
-  function rTarot(){ renderSheet("tarot","Tarot",{defaultPlayers:["J1","J2","J3","J4"], contract:true, contractLabel:"Contrat", addRoundLabel:"Donne", leftHeader:"DONNES", subtitle:"Contrat (optionnel) + scores, total auto.", rulesKey:"tarot"}); }
-  function rRami(){ renderSheet("rami","Rami",{defaultPlayers:["J1","J2"], addRoundLabel:"Manche", subtitle:"Cartes restées en main = points de malus. Le total le plus bas gagne.", leader:"low", rulesKey:"rami"}); }
-  function rUno(){ renderSheet("uno","Uno",{defaultPlayers:["J1","J2"], addRoundLabel:"Manche", subtitle:"Points des cartes adverses. Le total le plus haut gagne, fin à 500 pts.", leader:"high", endAt:500, rulesKey:"uno"}); }
-  function rScrabble(){ renderSheet("scrabble","Scrabble",{defaultPlayers:["J1","J2"], leftHeader:"TOURS", addRoundLabel:"Tour", subtitle:"Tour par tour, total auto.", rulesKey:"scrabble"}); }
-  function rFree(){ renderSheet("free","Score libre",{defaultPlayers:["J1","J2"], addRoundLabel:"Manche"}); }
+  function rTarot(){ renderSheet("tarot",t('g_tarot_t'),{defaultPlayers:["J1","J2","J3","J4"], contract:true, contractLabel:t('tarot_contract_label'), addRoundLabel:t('tarot_deal_label'), leftHeader:t('tarot_deals_header'), subtitle:t('tarot_subtitle'), rulesKey:"tarot"}); }
+  function rRami(){ renderSheet("rami",t('g_rami_t'),{defaultPlayers:["J1","J2"], addRoundLabel:t('sheet_add_round'), subtitle:t('rami_subtitle'), leader:"low", rulesKey:"rami"}); }
+  function rUno(){ renderSheet("uno",t('g_uno_t'),{defaultPlayers:["J1","J2"], addRoundLabel:t('sheet_add_round'), subtitle:t('uno_subtitle'), leader:"high", endAt:500, rulesKey:"uno"}); }
+  function rScrabble(){ renderSheet("scrabble",t('g_scrabble_t'),{defaultPlayers:["J1","J2"], leftHeader:t('scrabble_turns_header'), addRoundLabel:t('scrabble_turn_label'), subtitle:t('scrabble_subtitle'), rulesKey:"scrabble"}); }
+  function rFree(){ renderSheet("free",t('g_free_t'),{defaultPlayers:["J1","J2"], addRoundLabel:t('sheet_add_round')}); }
   function r421(){
     const d = load("g421",{ps:["J1","J2"], r:[], dice:[4,2,1], throws:0, cur:0});
     if(!Array.isArray(d.ps) || d.ps.length<1) d.ps=["J1","J2"];
@@ -656,29 +890,29 @@
         const v = (row.s||[])[ci] ?? "";
         return '<td class="drawn"><input type="number" class="g421-v" data-r="'+ri+'" data-c="'+ci+'" value="'+esc(v)+'"></td>';
       }).join("");
-      return '<tr><td class="drawn label">Manche '+(ri+1)+'</td>'+cells+'</tr>';
+      return '<tr><td class="drawn label">'+t('sheet_round_row')+' '+(ri+1)+'</td>'+cells+'</tr>';
     }).join("");
     const mid = d.throws>0 && d.throws<3;
     const done = d.throws>=3;
     const curName = esc(d.ps[d.cur] || "?");
     const rollZone = d.throws===0
-      ? '<div class="actions"><button class="btn" id="gRoll">Lancer 3 dés</button></div>'
+      ? '<div class="actions"><button class="btn" id="gRoll">'+t('g421_roll_btn')+'</button></div>'
       : '<div class="d3-check">'
         + [0,1,2].map(i=>'<div style="width:74px;text-align:center"><input type="checkbox" class="g421-chk" data-die="'+i+'" style="width:22px;height:22px"></div>').join("")
         + '</div>'
-        + '<div style="font-size:12px;color:var(--muted);margin-top:4px">Cochez les dés à relancer</div>'
+        + '<div style="font-size:12px;color:var(--muted);margin-top:4px">'+t('g421_check_hint')+'</div>'
         + '<div class="actions">'
-        +   (mid ? '<button class="btn" id="gReroll" disabled>Relancer les dés cochés</button>' : '')
-        +   '<button class="btn sec" id="gNext">Joueur suivant →</button>'
+        +   (mid ? '<button class="btn" id="gReroll" disabled>'+t('g421_reroll_btn')+'</button>' : '')
+        +   '<button class="btn sec" id="gNext">'+t('g421_next_btn')+'</button>'
         + '</div>'
-        + (done ? '<div style="text-align:center;font-weight:900;color:var(--red);margin-top:6px">Lancers épuisés (3/3) — au tour du joueur suivant.</div>' : '');
+        + (done ? '<div style="text-align:center;font-weight:900;color:var(--red);margin-top:6px">'+t('g421_exhausted')+'</div>' : '');
     app.innerHTML = `
       <div class="panel drawn">
         <div style="display:flex;gap:8px;align-items:center">
-          <div style="font-weight:1000;font-size:18px">421</div>
+          <div style="font-weight:1000;font-size:18px">${t('g_421_t')}</div>
           ${qbtn("421")}
         </div>
-        <div class="kicker">Tour de <b>${curName}</b> — lancer ${d.throws}/3.</div>
+        <div class="kicker">${LANG==="fr" ? ("Tour de <b>"+curName+"</b> — lancer "+d.throws+"/3.") : ("<b>"+curName+"</b>'s turn — roll "+d.throws+"/3.")}</div>
         <div class="d3">
           <div class="die drawn" id="g421Die0">${d.dice[0]}</div>
           <div class="die drawn" id="g421Die1">${d.dice[1]}</div>
@@ -686,18 +920,18 @@
         </div>
         ${rollZone}
         <div class="actions">
-          <button class="btn sec" id="gAddR">+ Manche</button>
-          <button class="btn sec" id="gAddP">+ Joueur</button>
+          <button class="btn sec" id="gAddR">+ ${t('sheet_add_round')}</button>
+          <button class="btn sec" id="gAddP">${t('sheet_add_player')}</button>
         </div>
         <div class="actions">
-          <button class="btn sec" id="gUndo">Annuler</button>
-          <button class="btn sec red" id="gReset">Reset</button>
+          <button class="btn sec" id="gUndo">${t('sheet_undo')}</button>
+          <button class="btn sec red" id="gReset">${t('sheet_reset')}</button>
         </div>
       </div>
       <div style="overflow-x:auto;margin-top:12px">
         <table class="paper-table drawn">
-          <thead><tr><th class="drawn" style="width:140px">MANCHES</th>${head}</tr></thead>
-          <tbody>${body}<tr style="font-weight:1000;background:#eee"><td class="drawn label">TOTAL</td>${totals.map(t=>'<td class="drawn">'+t+'</td>').join("")}</tr></tbody>
+          <thead><tr><th class="drawn" style="width:140px">${t('sheet_rounds_header')}</th>${head}</tr></thead>
+          <tbody>${body}<tr style="font-weight:1000;background:#eee"><td class="drawn label">${t('sheet_total_label')}</td>${totals.map(tv=>'<td class="drawn">'+tv+'</td>').join("")}</tr></tbody>
         </table>
       </div>
     `;
@@ -754,7 +988,7 @@
     $("#gAddR").addEventListener("click", ()=>{ d.r.push({s:new Array(d.ps.length).fill(0)}); save("g421",d); render(); });
     $("#gAddP").addEventListener("click", ()=>{ d.ps.push("J"+(d.ps.length+1)); d.r.forEach(r=>{ if(!Array.isArray(r.s)) r.s=[]; r.s.push(0); }); save("g421",d); render(); });
     $("#gUndo").addEventListener("click", ()=>{ d.r.pop(); save("g421",d); render(); });
-    $("#gReset").addEventListener("click", ()=>{ if(confirm("Reset ?")){ save("g421",{ps:["J1","J2"], r:[], dice:[4,2,1], throws:0, cur:0}); render(); }});
+    $("#gReset").addEventListener("click", ()=>{ if(confirm(t('confirm_reset'))){ save("g421",{ps:["J1","J2"], r:[], dice:[4,2,1], throws:0, cur:0}); render(); }});
     app.querySelectorAll(".g421-n").forEach(inp=> inp.addEventListener("change",(e)=>{ d.ps[Number(e.target.dataset.i)]=e.target.value; save("g421",d); }) );
     app.querySelectorAll(".g421-v").forEach(inp=> inp.addEventListener("input",(e)=>{
       const r=Number(e.target.dataset.r), c=Number(e.target.dataset.c);
@@ -779,30 +1013,30 @@
         const v = (row.s||[])[ci] ?? "";
         return '<td class="drawn"><input type="number" class="sk-v" data-r="'+ri+'" data-c="'+ci+'" value="'+esc(v)+'"></td>';
       }).join("");
-      return '<tr><td class="drawn label">Manche '+(ri+1)+'</td>'+cells+'</tr>';
+      return '<tr><td class="drawn label">'+t('sheet_round_row')+' '+(ri+1)+'</td>'+cells+'</tr>';
     }).join("");
-    const foot = '<tr style="font-weight:1000;background:#eee"><td class="drawn label">TOTAL</td>'
-      + totals.map(t=>'<td class="drawn" style="'+(t===minTot?'color:var(--red)':'')+'">'+t+'</td>').join("") + '</tr>';
+    const foot = '<tr style="font-weight:1000;background:#eee"><td class="drawn label">'+t('sheet_total_label')+'</td>'
+      + totals.map(tv=>'<td class="drawn" style="'+(tv===minTot?'color:var(--red)':'')+'">'+tv+'</td>').join("") + '</tr>';
     app.innerHTML = `
       <div class="panel drawn">
         <div style="display:flex;gap:8px;align-items:center">
-          <div style="font-weight:1000;font-size:18px">Skyjo</div>
+          <div style="font-weight:1000;font-size:18px">${t('g_skyjo_t')}</div>
           ${qbtn("skyjo")}
         </div>
-        <div class="kicker">Le score le plus bas gagne. Fin de partie dès qu'un joueur atteint 100 pts.</div>
-        ${ended ? '<div style="text-align:center;margin-top:8px;font-weight:900;color:var(--red)">🏁 Partie terminée — '+esc(d.ps[winnerIdx]||"?")+' gagne avec '+minTot+' pts !</div>' : ''}
+        <div class="kicker">${t('skyjo_kicker')}</div>
+        ${ended ? '<div style="text-align:center;margin-top:8px;font-weight:900;color:var(--red)">🏁 '+t('skyjo_gameover')+' '+esc(d.ps[winnerIdx]||"?")+' '+t('skyjo_wins_with')+' '+minTot+' pts!</div>' : ''}
         <div class="actions">
-          <button class="btn" id="skAddR">+ Manche</button>
-          <button class="btn sec" id="skAddP">+ Joueur</button>
+          <button class="btn" id="skAddR">+ ${t('sheet_add_round')}</button>
+          <button class="btn sec" id="skAddP">${t('sheet_add_player')}</button>
         </div>
         <div class="actions">
-          <button class="btn sec" id="skUndo">Annuler</button>
-          <button class="btn sec red" id="skReset">Reset</button>
+          <button class="btn sec" id="skUndo">${t('sheet_undo')}</button>
+          <button class="btn sec red" id="skReset">${t('sheet_reset')}</button>
         </div>
       </div>
       <div style="overflow-x:auto;margin-top:12px">
         <table class="paper-table drawn">
-          <thead><tr><th class="drawn" style="width:140px">MANCHES</th>${head}</tr></thead>
+          <thead><tr><th class="drawn" style="width:140px">${t('sheet_rounds_header')}</th>${head}</tr></thead>
           <tbody>${body}${foot}</tbody>
         </table>
       </div>
@@ -810,7 +1044,7 @@
     $("#skAddR").addEventListener("click", ()=>{ d.r.push({s:new Array(d.ps.length).fill(0)}); save("skyjo",d); render(); });
     $("#skAddP").addEventListener("click", ()=>{ d.ps.push("J"+(d.ps.length+1)); d.r.forEach(r=>{ if(!Array.isArray(r.s)) r.s=[]; r.s.push(0); }); save("skyjo",d); render(); });
     $("#skUndo").addEventListener("click", ()=>{ d.r.pop(); save("skyjo",d); render(); });
-    $("#skReset").addEventListener("click", ()=>{ if(confirm("Nouvelle partie ?")){ save("skyjo",{ps:["J1","J2"], r:[]}); render(); }});
+    $("#skReset").addEventListener("click", ()=>{ if(confirm(t('confirm_new_game'))){ save("skyjo",{ps:["J1","J2"], r:[]}); render(); }});
     app.querySelectorAll(".sk-n").forEach(inp=> inp.addEventListener("change",(e)=>{ d.ps[Number(e.target.dataset.i)]=e.target.value; save("skyjo",d); render(); }) );
     app.querySelectorAll(".sk-v").forEach(inp=> inp.addEventListener("input",(e)=>{
       const r=Number(e.target.dataset.r), c=Number(e.target.dataset.c);
@@ -829,40 +1063,40 @@
     const listU = d.r.slice().reverse().map(r=>"<div>+"+(Number(r.u)||0)+"</div>").join("");
     const listT = d.r.slice().reverse().map(r=>"<div>+"+(Number(r.t)||0)+"</div>").join("");
     const ended = totU>=13 || totT>=13;
-    const winner = totU>=13 ? "NOUS" : (totT>=13 ? "EUX" : null);
+    const winner = totU>=13 ? t('belote_us') : (totT>=13 ? t('belote_them') : null);
     app.innerHTML = `
       <div class="panel drawn">
         <div style="display:flex;gap:8px;align-items:center">
-          <div style="font-weight:1000;font-size:18px">Pétanque</div>
+          <div style="font-weight:1000;font-size:18px">${t('g_petanque_t')}</div>
           ${qbtn("petanque")}
         </div>
-        <div class="kicker">Première équipe à 13 points gagne la partie.</div>
-        ${ended ? '<div style="text-align:center;margin-top:8px;font-weight:900;color:var(--red)">🏆 '+winner+' a gagné la partie !</div>' : ''}
+        <div class="kicker">${t('petanque_kicker')}</div>
+        ${ended ? '<div style="text-align:center;margin-top:8px;font-weight:900;color:var(--red)">🏆 '+winner+' '+t('petanque_won')+'</div>' : ''}
       </div>
       <div class="belote-split drawn" style="margin-top:12px">
         <div class="belote-col">
-          <div class="b-head">NOUS</div>
+          <div class="b-head">${t('belote_us')}</div>
           <div class="b-tot">${totU}</div>
           <div class="b-list">${listU}</div>
         </div>
         <div class="belote-col">
-          <div class="b-head">EUX</div>
+          <div class="b-head">${t('belote_them')}</div>
           <div class="b-tot">${totT}</div>
           <div class="b-list" style="background:#f9f9f9">${listT}</div>
         </div>
       </div>
       <div class="panel drawn" style="margin-top:14px">
-        <div class="kicker">Points de la mène (un seul camp marque à la fois, 1 à 6 pts).</div>
+        <div class="kicker">${t('petanque_end_kicker')}</div>
         <div class="grid" style="grid-template-columns:1fr 1fr">
-          <div><input type="number" id="pU" placeholder="Nous" min="0" max="6"></div>
-          <div><input type="number" id="pT" placeholder="Eux" min="0" max="6"></div>
+          <div><input type="number" id="pU" placeholder="${t('belote_us_ph')}" min="0" max="6"></div>
+          <div><input type="number" id="pT" placeholder="${t('belote_them_ph')}" min="0" max="6"></div>
         </div>
         <div class="actions">
-          <button class="btn" id="pAdd">+ Mène</button>
+          <button class="btn" id="pAdd">${t('petanque_add_end')}</button>
         </div>
         <div class="actions">
-          <button class="btn sec" id="pUndo">Annuler</button>
-          <button class="btn sec red" id="pReset">Reset</button>
+          <button class="btn sec" id="pUndo">${t('sheet_undo')}</button>
+          <button class="btn sec red" id="pReset">${t('sheet_reset')}</button>
         </div>
       </div>
     `;
@@ -872,14 +1106,14 @@
       d.r.push({u:u,t:t}); save("petanque",d); render();
     });
     $("#pUndo").addEventListener("click", ()=>{ d.r.pop(); save("petanque",d); render(); });
-    $("#pReset").addEventListener("click", ()=>{ if(confirm("Reset ?")){ save("petanque",{r:[]}); render(); }});
+    $("#pReset").addEventListener("click", ()=>{ if(confirm(t('confirm_reset'))){ save("petanque",{r:[]}); render(); }});
   }
   function rVictoires(){
     const d = load("victoires", {ps:["J1","J2"], w:[0,0]});
     if(!Array.isArray(d.ps) || d.ps.length<1) d.ps=["J1","J2"];
     if(!Array.isArray(d.w)) d.w=[];
     while(d.w.length < d.ps.length) d.w.push(0);
-    let html = '<div class="panel drawn"><div style="font-weight:1000;font-size:18px">Compteur de victoires</div><div class="kicker">Pour les jeux sans score chiffré (dames, échecs, puissance 4...). Une victoire = un point.</div></div>';
+    let html = '<div class="panel drawn"><div style="font-weight:1000;font-size:18px">'+t('victoires_title')+'</div><div class="kicker">'+t('victoires_kicker')+'</div></div>';
     html += '<div class="grid" style="margin-top:12px;grid-template-columns:repeat(auto-fit,minmax(140px,1fr))">';
     d.ps.forEach((p,i)=>{
       html += '<div class="panel drawn" style="text-align:center">'
@@ -891,33 +1125,33 @@
         + '</div></div>';
     });
     html += '</div>';
-    html += '<div class="actions" style="margin-top:14px"><button class="btn sec" id="vAddP">+ Joueur</button><button class="btn sec red" id="vReset">Reset</button></div>';
+    html += '<div class="actions" style="margin-top:14px"><button class="btn sec" id="vAddP">'+t('sheet_add_player')+'</button><button class="btn sec red" id="vReset">'+t('sheet_reset')+'</button></div>';
     app.innerHTML = html;
     app.querySelectorAll(".v-n").forEach(inp=> inp.addEventListener("change",(e)=>{ d.ps[Number(e.target.dataset.i)]=e.target.value; save("victoires",d); }) );
     app.querySelectorAll("[data-plus]").forEach(b=> b.addEventListener("click",()=>{ const i=Number(b.getAttribute("data-plus")); d.w[i]=(d.w[i]||0)+1; save("victoires",d); render(); ding(); }) );
     app.querySelectorAll("[data-minus]").forEach(b=> b.addEventListener("click",()=>{ const i=Number(b.getAttribute("data-minus")); d.w[i]=Math.max(0,(d.w[i]||0)-1); save("victoires",d); render(); }) );
     $("#vAddP").addEventListener("click", ()=>{ d.ps.push("J"+(d.ps.length+1)); d.w.push(0); save("victoires",d); render(); });
-    $("#vReset").addEventListener("click", ()=>{ if(confirm("Reset ?")){ save("victoires",{ps:["J1","J2"], w:[0,0]}); render(); }});
+    $("#vReset").addEventListener("click", ()=>{ if(confirm(t('confirm_reset'))){ save("victoires",{ps:["J1","J2"], w:[0,0]}); render(); }});
   }
   function rMolkky(){
     const d = load("molkky",{ps:[{n:"J1",s:0,m:0},{n:"J2",s:0,m:0}], cur:0});
     if(!Array.isArray(d.ps) || d.ps.length<1) d.ps=[{n:"J1",s:0,m:0},{n:"J2",s:0,m:0}];
     if(typeof d.cur!=="number") d.cur=0;
     const cur = d.ps[d.cur] || d.ps[0];
-    let html = '<div class="panel drawn" style="display:flex;gap:8px;align-items:center"><div style="font-weight:1000;font-size:18px">Mölkky</div>'+qbtn("molkky")+'</div>';
-    html += '<div class="actions"><button class="btn sec" id="mAddP">+ Joueur</button><button class="btn sec red" id="mReset">Reset</button></div><br>';
+    let html = '<div class="panel drawn" style="display:flex;gap:8px;align-items:center"><div style="font-weight:1000;font-size:18px">'+t('g_molkky_t')+'</div>'+qbtn("molkky")+'</div>';
+    html += '<div class="actions"><button class="btn sec" id="mAddP">'+t('sheet_add_player')+'</button><button class="btn sec red" id="mReset">'+t('sheet_reset')+'</button></div><br>';
     d.ps.forEach((pl,i)=>{
       let state="";
-      if(pl.m>=3) state="💀 Éliminé";
-      else if(pl.s===50) state="🏆 Gagné !";
+      if(pl.m>=3) state=t('molkky_eliminated');
+      else if(pl.s===50) state=t('molkky_won');
       else if(pl.s>50) state="⬇ 25";
       html += '<div class="m-player drawn '+(i===d.cur?'active':'')+'" data-p="'+i+'">'
         + '<div style="display:flex;justify-content:space-between"><span style="font-weight:1000">'+esc(pl.n)+'</span><span style="font-weight:1000;font-size:18px">'+(pl.s||0)+' / 50</span></div>'
-        + '<div style="font-size:11px;color:var(--muted)">Ratés: '+(pl.m||0)+' '+state+'</div></div>';
+        + '<div style="font-size:11px;color:var(--muted)">'+t('molkky_misses_label')+' '+(pl.m||0)+' '+state+'</div></div>';
     });
-    html += '<div class="panel drawn"><div style="text-align:center;font-weight:1000;margin-bottom:10px">Tour de '+esc(cur.n)+'</div>'
+    html += '<div class="panel drawn"><div style="text-align:center;font-weight:1000;margin-bottom:10px">'+turnOf(esc(cur.n))+'</div>'
       + '<div class="molkky-grid">'+[1,2,3,4,5,6,7,8,9,10,11,12].map(n=>'<div class="pin-btn" data-hit="'+n+'">'+n+'</div>').join("")+'</div>'
-      + '<div class="actions"><button class="btn sec red" id="mMiss">RATÉ (X)</button></div></div>';
+      + '<div class="actions"><button class="btn sec red" id="mMiss">'+t('molkky_miss_btn')+'</button></div></div>';
     app.innerHTML = html;
     app.querySelectorAll(".m-player").forEach(el=> el.addEventListener("click", ()=>{ d.cur=Number(el.getAttribute("data-p")); save("molkky",d); render(); }) );
     function nextPlayer(){
@@ -938,15 +1172,15 @@
       save("molkky",d); render();
     }
     $("#mAddP").addEventListener("click", ()=>{ d.ps.push({n:"J"+(d.ps.length+1),s:0,m:0}); save("molkky",d); render(); });
-    $("#mReset").addEventListener("click", ()=>{ if(confirm("Nouvelle partie ?")){ save("molkky",{ps:[{n:"J1",s:0,m:0},{n:"J2",s:0,m:0}],cur:0}); render(); }});
+    $("#mReset").addEventListener("click", ()=>{ if(confirm(t('confirm_new_game'))){ save("molkky",{ps:[{n:"J1",s:0,m:0},{n:"J2",s:0,m:0}],cur:0}); render(); }});
     $("#mMiss").addEventListener("click", ()=> hit(0));
     app.querySelectorAll("[data-hit]").forEach(b=> b.addEventListener("click", ()=> hit(Number(b.getAttribute("data-hit")))) );
   }
   let diceCount = 1;
   function rDice(){
     app.innerHTML = '<div class="panel drawn" style="text-align:center">'
-      + '<div style="font-weight:1000;font-size:18px">Dé (d6)</div>'
-      + '<div class="kicker">Lancer rapide — choisissez le nombre de dés.</div>'
+      + '<div style="font-weight:1000;font-size:18px">'+t('t_dice_t')+'</div>'
+      + '<div class="kicker">'+t('dice_kicker')+'</div>'
       + '<div class="actions" style="justify-content:center">'
       +   [1,2,3,4,5,6].map(n=>'<button class="btn'+(n===diceCount?'':' sec')+'" data-count="'+n+'">'+n+'</button>').join("")
       + '</div>'
@@ -954,7 +1188,7 @@
       +   Array.from({length:diceCount}).map((_,i)=>'<div class="die drawn" id="dDie'+i+'">?</div>').join("")
       + '</div>'
       + '<div id="dTotal" style="font-weight:1000;font-size:16px;color:var(--muted);min-height:20px"></div>'
-      + '<div class="actions"><button class="btn" id="dRoll">LANCER</button></div>'
+      + '<div class="actions"><button class="btn" id="dRoll">'+t('dice_roll_btn')+'</button></div>'
       + '</div>';
     app.querySelectorAll("[data-count]").forEach(b=> b.addEventListener("click", ()=>{ diceCount=Number(b.getAttribute("data-count")); render(); }) );
     $("#dRoll").addEventListener("click", ()=>{
@@ -970,7 +1204,7 @@
         if(i<11) requestAnimationFrame(frame);
         else{
           const vals = dice.map(el=> Number(el.textContent));
-          $("#dTotal").textContent = diceCount>1 ? ("Total : "+vals.reduce((a,b)=>a+b,0)) : "";
+          $("#dTotal").textContent = diceCount>1 ? (t('dice_total_label')+" "+vals.reduce((a,b)=>a+b,0)) : "";
         }
       }
       requestAnimationFrame(frame);
@@ -1055,22 +1289,22 @@
   }
   function updateTimerText(){
     const el=$("#tTime"); if(el) el.textContent = formatTime(tS.r);
-    const btn=$("#tStart"); if(btn) btn.textContent = tS.run ? "PAUSE" : "LANCER";
+    const btn=$("#tStart"); if(btn) btn.textContent = tS.run ? t('timer_pause') : t('timer_start');
   }
   function rTimer(){
     const H=Math.floor(tS.t/3600), Mrem=tS.t%3600, M=Math.floor(Mrem/60), S=Mrem%60;
     app.innerHTML = '<div class="panel drawn" style="text-align:center">'
-      + '<div style="font-weight:1000;font-size:18px">Minuteur</div>'
+      + '<div style="font-weight:1000;font-size:18px">'+t('t_timer_t')+'</div>'
       + '<div id="hgWrap"><canvas id="hgCanvas" width="'+(HG_COLS*HG_CELL)+'" height="'+(HG_ROWS*HG_CELL)+'"></canvas></div>'
       + '<div id="tTime" style="font-weight:1000;font-size:40px">'+formatTime(tS.r)+'</div>'
-      + '<div class="actions"><button class="btn" id="tStart">'+(tS.run?'PAUSE':'LANCER')+'</button><button class="btn sec" id="tReset">RESET</button></div>'
+      + '<div class="actions"><button class="btn" id="tStart">'+(tS.run?t('timer_pause'):t('timer_start'))+'</button><button class="btn sec" id="tReset">'+t('timer_reset_btn')+'</button></div>'
       + '<div class="actions">'+[30,60,90,120,180,300].map(s=>'<button class="btn sec" data-p="'+s+'">'+(s<60? s+'s' : (s/60)+'m')+'</button>').join("")+'</div>'
       + '</div>'
       + '<div class="panel drawn" style="margin-top:14px">'
-      + '<div class="kicker" style="text-align:center">Régler soi-même</div>'
+      + '<div class="kicker" style="text-align:center">'+t('timer_manual_kicker')+'</div>'
       + '<div style="display:flex;justify-content:center;gap:22px;margin-top:6px">'
       +   ['h','m','s'].map(u=>{
-            const label = u==="h"?"H":(u==="m"?"MIN":"SEC");
+            const label = u==="h"?t('timer_h'):(u==="m"?t('timer_min'):t('timer_sec'));
             const val = u==="h"?H:(u==="m"?M:S);
             return '<div class="t-unit">'
               + '<button class="qbtn" data-unit="'+u+'" data-dir="1">+</button>'
@@ -1118,7 +1352,7 @@
   function stopBacPre(){ if(bacPreInt){ clearInterval(bacPreInt); bacPreInt=null; } bacPreVal=0; }
   function updateBacTimerText(){
     const el=$("#bacTime"); if(el) el.textContent = formatTime(bacTS.r);
-    const btn=$("#bacStart"); if(btn) btn.textContent = bacTS.run ? "PAUSE" : "LANCER";
+    const btn=$("#bacStart"); if(btn) btn.textContent = bacTS.run ? t('timer_pause') : t('timer_start');
   }
   function beginBacRun(){
     bacTS.run=true;
@@ -1173,29 +1407,29 @@
     const durM = Math.floor(d.duration/60), durS = d.duration%60;
     const timerZone = bacPreVal>0
       ? `
-        <div style="font-weight:1000;font-size:18px">Annonce la lettre...</div>
+        <div style="font-weight:1000;font-size:18px">${t('bac_announce')}</div>
         <div style="font-weight:1000;font-size:56px;margin:10px 0;color:var(--red)">${bacPreVal}</div>
-        <div class="kicker">Le minuteur démarre juste après.</div>
+        <div class="kicker">${t('bac_starts_after')}</div>
       `
       : `
-        <div style="font-weight:1000;font-size:18px">Minuteur du tour</div>
+        <div style="font-weight:1000;font-size:18px">${t('bac_round_timer')}</div>
         <div id="bacTime" style="font-weight:1000;font-size:40px;margin:10px 0">${formatTime(bacTS.r)}</div>
         <div class="actions" style="justify-content:center">
-          <button class="btn" id="bacStart">${bacTS.run?"PAUSE":"LANCER"}</button>
-          <button class="btn sec" id="bacReset">RESET</button>
+          <button class="btn" id="bacStart">${bacTS.run?t('timer_pause'):t('timer_start')}</button>
+          <button class="btn sec" id="bacReset">${t('timer_reset_btn')}</button>
         </div>
-        <div class="kicker" style="margin-top:10px">Régler le temps (max 10 min)</div>
+        <div class="kicker" style="margin-top:10px">${t('bac_set_time_kicker')}</div>
         <div style="display:flex;justify-content:center;gap:22px;margin-top:6px">
           <div class="t-unit">
             <button class="qbtn" data-bacunit="m" data-bacdir="1">+</button>
             <div class="t-val">${String(durM).padStart(2,"0")}</div>
-            <div style="font-size:10px;color:var(--muted);font-weight:900">MIN</div>
+            <div style="font-size:10px;color:var(--muted);font-weight:900">${t('timer_min')}</div>
             <button class="qbtn" data-bacunit="m" data-bacdir="-1">−</button>
           </div>
           <div class="t-unit">
             <button class="qbtn" data-bacunit="s" data-bacdir="1">+</button>
             <div class="t-val">${String(durS).padStart(2,"0")}</div>
-            <div style="font-size:10px;color:var(--muted);font-weight:900">SEC</div>
+            <div style="font-size:10px;color:var(--muted);font-weight:900">${t('timer_sec')}</div>
             <button class="qbtn" data-bacunit="s" data-bacdir="-1">−</button>
           </div>
         </div>
@@ -1203,23 +1437,23 @@
     app.innerHTML = `
       <div class="panel drawn" style="text-align:center">
         <div style="display:flex;gap:8px;align-items:center;justify-content:center">
-          <div style="font-weight:1000;font-size:18px">Jeu du Bac</div>
+          <div style="font-weight:1000;font-size:18px">${t('g_bac_t')}</div>
           ${qbtn("bac")}
         </div>
-        <div class="kicker">Tirez une lettre, lancez le minuteur, trouvez un mot par catégorie avant la fin.</div>
+        <div class="kicker">${t('bac_kicker')}</div>
         <div class="bac-big drawn" id="bacLetter">${d.current || "?"}</div>
         <div class="actions" style="justify-content:center">
-          <button class="btn" id="bacDraw">🔀 TIRER UNE LETTRE</button>
+          <button class="btn" id="bacDraw">${t('bac_draw_btn')}</button>
         </div>
         <div style="text-align:center;margin-top:12px">
           <label style="display:inline-flex;align-items:center;gap:6px;font-size:11px">
             <input type="checkbox" id="bacHard" ${d.excludeHard?"checked":""}>
-            <span>Désactiver les lettres compliquées (Q, W, X, Y, Z)</span>
+            <span>${t('bac_hard_label')}</span>
           </label>
         </div>
         <div class="bac-grid">${grid}</div>
         <div class="actions">
-          <button class="btn sec" id="bacUsedReset">Vider les lettres tirées</button>
+          <button class="btn sec" id="bacUsedReset">${t('bac_clear_btn')}</button>
         </div>
       </div>
       <div class="panel drawn" style="margin-top:14px;text-align:center">
@@ -1268,24 +1502,24 @@
     }
   }
   function rCustom(){
-    const cfg = load("custom_cfg",{title:"Tableau custom", players:4, rounds:5});
+    const cfg = load("custom_cfg",{title:t('custom_default_title'), players:4, rounds:5});
     app.innerHTML = `
       <div class="panel drawn">
-        <div style="font-weight:1000;font-size:18px">Tableau custom</div>
-        <div class="kicker">Choisissez joueurs + manches → on génère une feuille.</div>
+        <div style="font-weight:1000;font-size:18px">${t('g_custom_t')}</div>
+        <div class="kicker">${t('custom_kicker')}</div>
         <div class="actions" style="margin-top:10px">
-          <div style="flex:1;min-width:160px"><div style="font-size:12px;color:var(--muted);margin-bottom:6px">Titre</div><input id="ctTitle" value="${esc(cfg.title)}"></div>
-          <div style="flex:1;min-width:120px"><div style="font-size:12px;color:var(--muted);margin-bottom:6px">Joueurs</div><input id="ctPlayers" type="number" min="1" max="12" value="${cfg.players}"></div>
-          <div style="flex:1;min-width:120px"><div style="font-size:12px;color:var(--muted);margin-bottom:6px">Manches</div><input id="ctRounds" type="number" min="1" max="30" value="${cfg.rounds}"></div>
+          <div style="flex:1;min-width:160px"><div style="font-size:12px;color:var(--muted);margin-bottom:6px">${t('custom_title_label')}</div><input id="ctTitle" value="${esc(cfg.title)}"></div>
+          <div style="flex:1;min-width:120px"><div style="font-size:12px;color:var(--muted);margin-bottom:6px">${t('custom_players_label')}</div><input id="ctPlayers" type="number" min="1" max="12" value="${cfg.players}"></div>
+          <div style="flex:1;min-width:120px"><div style="font-size:12px;color:var(--muted);margin-bottom:6px">${t('custom_rounds_label')}</div><input id="ctRounds" type="number" min="1" max="30" value="${cfg.rounds}"></div>
         </div>
         <div class="actions">
-          <button class="btn" id="ctGo">GÉNÉRER</button>
-          <button class="btn sec red" id="ctReset">Reset feuille</button>
+          <button class="btn" id="ctGo">${t('custom_generate_btn')}</button>
+          <button class="btn sec red" id="ctReset">${t('custom_reset_sheet_btn')}</button>
         </div>
       </div>
     `;
     function saveCfg(){
-      cfg.title=$("#ctTitle").value||"Tableau custom";
+      cfg.title=$("#ctTitle").value||t('custom_default_title');
       cfg.players=Math.max(1,Math.min(12,Number($("#ctPlayers").value)||4));
       cfg.rounds=Math.max(1,Math.min(30,Number($("#ctRounds").value)||5));
       save("custom_cfg",cfg);
@@ -1300,11 +1534,11 @@
       save("custom_sheet",{ps:ps, r:r, meta:{date:"", title:cfg.title}});
       nav("#custom_sheet");
     });
-    $("#ctReset").addEventListener("click", ()=>{ if(confirm("Reset ?")){ save("custom_sheet",{ps:["J1","J2"], r:[], meta:{date:"", title:"Tableau custom"}}); alert("OK."); }});
+    $("#ctReset").addEventListener("click", ()=>{ if(confirm(t('confirm_reset'))){ save("custom_sheet",{ps:["J1","J2"], r:[], meta:{date:"", title:t('custom_default_title')}}); alert(t('generic_ok')); }});
   }
   function rCustomSheet(){
-    const d = load("custom_sheet",{ps:["J1","J2"], r:[], meta:{date:"", title:"Tableau custom"}});
-    renderSheet("custom_sheet", (d.meta && d.meta.title) ? d.meta.title : "Tableau custom", {defaultPlayers:d.ps, addRoundLabel:"Manche"});
+    const d = load("custom_sheet",{ps:["J1","J2"], r:[], meta:{date:"", title:t('custom_default_title')}});
+    renderSheet("custom_sheet", (d.meta && d.meta.title) ? d.meta.title : t('custom_default_title'), {defaultPlayers:d.ps, addRoundLabel:t('sheet_add_round')});
   }
   function render(){
     const h = location.hash || "#home";
@@ -1335,6 +1569,7 @@
       default: rHome();
     }
   }
+  applyStaticI18N();
   setWakeUI(false); setFSUI(false);
   boot();
   if("serviceWorker" in navigator){
