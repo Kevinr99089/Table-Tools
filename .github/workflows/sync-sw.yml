@@ -1,0 +1,38 @@
+name: Sync Service Worker version
+
+on:
+  push:
+    paths:
+      - 'docs/**'
+
+permissions:
+  contents: write
+
+jobs:
+  sync-version:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Compute content hash
+        id: version
+        run: |
+          HASH=$(cat docs/index.html docs/manifest.json | sha256sum | cut -c1-10)
+          echo "hash=$HASH" >> "$GITHUB_OUTPUT"
+
+      - name: Update CACHE_NAME in docs/sw.js
+        run: |
+          sed -i "s|const CACHE_NAME = '.*';|const CACHE_NAME = 'tt-shell-${{ steps.version.outputs.hash }}';|" docs/sw.js
+
+      - name: Commit and push if changed
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add docs/sw.js
+          if ! git diff --cached --quiet; then
+            git commit -m "chore: sync SW cache version (${{ steps.version.outputs.hash }})"
+            git push
+          else
+            echo "No changes to commit"
+          fi
