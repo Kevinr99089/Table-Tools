@@ -1,4 +1,4 @@
-const CACHE_NAME = 'tt-shell-fba2715696';
+const CACHE_NAME = 'tt-shell-121b854901';
 const SHELL_FILES = ['./index.html', './manifest.json', './icon-192.png', './icon-512.png'];
 
 self.addEventListener('install', (event) => {
