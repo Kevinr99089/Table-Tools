@@ -80,7 +80,7 @@
     @keyframes hgFlip{ from{transform:rotate(0deg)} to{transform:rotate(180deg)} }
     .hg-flip{animation:hgFlip .45s ease-in-out}
     .t-unit{display:flex;flex-direction:column;align-items:center;gap:6px}
-    .t-val{font-weight:1000;font-size:20px;min-width:40px}
+    .t-val{font-weight:1000;font-size:20px;min-width:40px;width:44px;text-align:center;background:transparent}
     .qbtn{width:30px;height:30px;flex-shrink:0;border-radius:50%;border:2.5px solid var(--ink);background:#fff;color:var(--ink);
       font-family:var(--font);font-weight:1000;font-size:15px;line-height:1;cursor:pointer;box-shadow:2px 2px 0 var(--ink);padding:0}
     .qbtn:active{transform:translate(1px,1px);box-shadow:1px 1px 0 var(--ink)}
@@ -1348,15 +1348,20 @@
     }, 1000);
     updateBacTimerText();
   }
-  function adjustBacDuration(d, unit, dir){
-    let m = Math.floor(d.duration/60), s = d.duration%60;
-    if(unit==="m") m = Math.max(0, Math.min(10, m+dir));
-    if(unit==="s") s = Math.max(0, Math.min(59, s+dir));
+  function setBacDuration(d, m, s){
+    m = Math.max(0, Math.min(10, isNaN(m)?0:Math.trunc(m)));
+    s = Math.max(0, Math.min(59, isNaN(s)?0:Math.trunc(s)));
     if(m>=10){ m=10; s=0; }
     d.duration = m*60+s;
     save("bac", d);
     stopBacTimer(); stopBacPre();
     bacTS.t=d.duration; bacTS.r=d.duration;
+  }
+  function adjustBacDuration(d, unit, dir){
+    let m = Math.floor(d.duration/60), s = d.duration%60;
+    if(unit==="m") m += dir;
+    if(unit==="s") s += dir;
+    setBacDuration(d, m, s);
     render();
   }
   function startBacCountdown(d){
@@ -1407,13 +1412,13 @@
         <div style="display:flex;justify-content:center;gap:22px;margin-top:6px">
           <div class="t-unit">
             <button class="qbtn" data-bacunit="m" data-bacdir="1">+</button>
-            <div class="t-val">${String(durM).padStart(2,"0")}</div>
+            <input class="t-val" id="bacMinInput" type="tel" inputmode="numeric" pattern="[0-9]*" maxlength="2" value="${String(durM).padStart(2,"0")}">
             <div style="font-size:10px;color:var(--muted);font-weight:900">${t('timer_min')}</div>
             <button class="qbtn" data-bacunit="m" data-bacdir="-1">−</button>
           </div>
           <div class="t-unit">
             <button class="qbtn" data-bacunit="s" data-bacdir="1">+</button>
-            <div class="t-val">${String(durS).padStart(2,"0")}</div>
+            <input class="t-val" id="bacSecInput" type="tel" inputmode="numeric" pattern="[0-9]*" maxlength="2" value="${String(durS).padStart(2,"0")}">
             <div style="font-size:10px;color:var(--muted);font-weight:900">${t('timer_sec')}</div>
             <button class="qbtn" data-bacunit="s" data-bacdir="-1">−</button>
           </div>
@@ -1472,7 +1477,7 @@
       requestAnimationFrame(frame);
     });
     $("#bacHard").addEventListener("change", (e)=>{ d.excludeHard = e.target.checked; save("bac", d); render(); });
-    $("#bacUsedReset").addEventListener("click", ()=>{ d.used=[]; save("bac", d); render(); });
+    $("#bacUsedReset").addEventListener("click", ()=>{ d.used=[]; d.current=null; save("bac", d); render(); });
     if(bacPreVal<=0){
       $("#bacStart").addEventListener("click", ()=>{
         if(bacTS.run){ stopBacTimer(); updateBacTimerText(); return; }
@@ -1484,6 +1489,27 @@
       app.querySelectorAll("[data-bacunit]").forEach(b=> b.addEventListener("click", ()=>{
         adjustBacDuration(d, b.getAttribute("data-bacunit"), Number(b.getAttribute("data-bacdir")));
       }));
+      const bacMinInput = $("#bacMinInput"), bacSecInput = $("#bacSecInput");
+      function finalizeBacInputs(){
+        let m = parseInt(bacMinInput.value,10); if(isNaN(m)) m=0;
+        let s = parseInt(bacSecInput.value,10); if(isNaN(s)) s=0;
+        setBacDuration(d, m, s);
+        render();
+      }
+      bacMinInput.addEventListener("focus", ()=> bacMinInput.select());
+      bacMinInput.addEventListener("input", ()=>{
+        let v = bacMinInput.value.replace(/[^0-9]/g,"");
+        v = (v.length>0 && v[0]!=="1") ? v.slice(0,1) : v.slice(0,2);
+        bacMinInput.value = v;
+      });
+      bacMinInput.addEventListener("blur", finalizeBacInputs);
+      bacMinInput.addEventListener("keydown", e=>{ if(e.key==="Enter") bacMinInput.blur(); });
+      bacSecInput.addEventListener("focus", ()=> bacSecInput.select());
+      bacSecInput.addEventListener("input", ()=>{
+        bacSecInput.value = bacSecInput.value.replace(/[^0-9]/g,"").slice(0,2);
+      });
+      bacSecInput.addEventListener("blur", finalizeBacInputs);
+      bacSecInput.addEventListener("keydown", e=>{ if(e.key==="Enter") bacSecInput.blur(); });
     }
   }
   function rCustom(){
