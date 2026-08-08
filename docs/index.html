@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&display=swap" rel="stylesheet">
-  <meta name="theme-color" content="#1e1e28">
+  <meta name="theme-color" content="#f6f1e2">
   <meta name="mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
@@ -16,77 +16,124 @@
   <link rel="apple-touch-icon" href="icon-192.png">
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAzMiAzMiI+PHJlY3QgeD0iNCIgeT0iMyIgd2lkdGg9IjE4IiBoZWlnaHQ9IjI2IiByeD0iMyIgZmlsbD0iI2ZjZmJmOCIgc3Ryb2tlPSIjMWExYTJlIiBzdHJva2Utd2lkdGg9IjIuNSIvPjxjaXJjbGUgY3g9IjQiIGN5PSI4IiByPSIxLjYiIGZpbGw9IiMxYTFhMmUiLz48Y2lyY2xlIGN4PSI0IiBjeT0iMTUiIHI9IjEuNiIgZmlsbD0iIzFhMWEyZSIvPjxjaXJjbGUgY3g9IjQiIGN5PSIyMiIgcj0iMS42IiBmaWxsPSIjMWExYTJlIi8+PGxpbmUgeDE9IjkiIHkxPSIxMCIgeDI9IjE4IiB5Mj0iMTAiIHN0cm9rZT0iIzY2NiIgc3Ryb2tlLXdpZHRoPSIyIi8+PGxpbmUgeDE9IjkiIHkxPSIxNiIgeDI9IjE4IiB5Mj0iMTYiIHN0cm9rZT0iIzY2NiIgc3Ryb2tlLXdpZHRoPSIyIi8+PHBhdGggZD0iTTE2IDI3IEwyNyAxMCBMMzAgMTIgTDIwIDI5IFoiIGZpbGw9IiNjMDM5MmIiIHN0cm9rZT0iIzFhMWEyZSIgc3Ryb2tlLXdpZHRoPSIxLjUiIHN0cm9rZS1saW5lam9pbj0icm91bmQiLz48L3N2Zz4=" />
   <style>
-    :root{--bg:#fcfbf8;--ink:#1a1a2e;--muted:#666;--red:#c0392b;--wood:#8d6e63;--ok:#2e7d32;--font:"Fredoka",system-ui,sans-serif;}
+    :root{
+      --paper:#f6f1e2;--paper-deep:#ece0c2;--card:#fffdf7;--ink:#242231;--muted:#726b58;
+      --red:#c1392b;--red-soft:#e2685c;--gold:#d9a441;--ok:#3f7d4f;--wood:#8a6a4f;--line:#ddceaa;
+      --font:"Fredoka",system-ui,sans-serif;
+    }
     *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;user-select:none}
-    body{margin:0;color:var(--ink);font-family:var(--font);background:var(--bg);
-      background-image:linear-gradient(#e0e0e0 1px,transparent 1px),linear-gradient(90deg,#e0e0e0 1px,transparent 1px);
-      background-size:20px 20px;background-blend-mode:multiply;padding-bottom:90px;}
+    html{-webkit-text-size-adjust:100%}
+    body{margin:0;color:var(--ink);font-family:var(--font);font-weight:400;background-color:var(--paper);
+      background-image:linear-gradient(90deg,transparent 30px,rgba(193,57,43,.32) 30px,rgba(193,57,43,.32) 31.5px,transparent 31.5px),
+        linear-gradient(var(--line) 1px,transparent 1px);
+      background-size:100% 100%,100% 30px;padding-bottom:90px;}
     .drawn{filter:url('#wiggle')}
-    header{position:sticky;top:0;z-index:50;background:var(--bg);border-bottom:2px solid var(--ink);padding:10px;display:flex;align-items:center;gap:10px;box-shadow:0 4px 10px rgba(0,0,0,.1)}
-    header button{background:transparent;border:2px solid var(--ink);border-radius:50%;width:40px;height:40px;font-size:18px;cursor:pointer;display:grid;place-items:center}
-    #wakeIcon,#fsIcon{opacity:.15;font-size:10px;line-height:1.1;text-align:right;transition:.2s}
-    #wakeIcon.on{opacity:1;color:var(--ok);font-weight:900}
-    #fsIcon.on{opacity:1;color:var(--wood);font-weight:900}
-    main{max-width:860px;margin:0 auto;padding:15px}
-    h2{margin:10px 0 8px}
-    .grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:15px}
+    header{position:sticky;top:0;z-index:50;background:var(--paper);border-bottom:2.5px solid var(--ink);padding:9px 12px;display:flex;align-items:center;gap:8px;box-shadow:0 5px 10px -6px rgba(36,34,49,.35)}
+    .hbtn{background:var(--card);border:2.2px solid var(--ink);border-radius:50%;width:38px;height:38px;font-size:16px;cursor:pointer;display:grid;place-items:center;flex-shrink:0;position:relative;box-shadow:2px 2px 0 var(--ink)}
+    .hbtn:active{transform:translate(2px,2px);box-shadow:none}
+    .hbtn.alert::after{content:"";position:absolute;top:-1px;right:-1px;width:9px;height:9px;border-radius:50%;background:var(--red);border:1.5px solid var(--paper)}
+    .logo-wrap{display:flex;align-items:center;gap:8px;min-width:0}
+    .logo-text{font-weight:700;font-size:19px;transform:rotate(-1.5deg);white-space:nowrap;
+      text-decoration:underline wavy var(--red-soft) 2px;text-underline-offset:5px}
+    main{max-width:860px;margin:0 auto;padding:16px 15px}
+    .cat-title{font-weight:700;font-size:22px;margin:10px 0 2px;
+      text-decoration:underline wavy var(--red-soft) 2px;text-underline-offset:6px;display:inline-block}
+    .cat-kicker{margin:0 0 12px;font-size:12px}
+    .kicker{color:var(--muted);font-style:italic;text-align:center;font-size:12px}
+    .grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
     @media(min-width:600px){.grid{grid-template-columns:repeat(3,minmax(0,1fr));}}
-    .card{background:#fff;border:2px solid var(--ink);border-radius:6px;padding:15px;display:flex;flex-direction:column;align-items:center;gap:6px;box-shadow:3px 3px 0 rgba(0,0,0,.1);cursor:pointer}
-    .card:active{transform:scale(.98)}
-    .card .ico{font-size:32px}
-    .card .tit{font-weight:900;font-size:16px}
-    .card .sub{font-size:11px;color:var(--muted);font-style:italic;text-align:center}
-    .panel{background:#fff;border:2px solid var(--ink);border-radius:10px;padding:14px;box-shadow:2px 2px 0 rgba(0,0,0,.12)}
-    .kicker{font-size:12px;color:var(--muted);font-style:italic;text-align:center}
+    .card{position:relative;background:var(--card);border:2.4px solid var(--ink);border-radius:8px;padding:16px 12px 14px;
+      display:flex;flex-direction:column;align-items:center;gap:5px;box-shadow:3px 3px 0 rgba(36,34,49,.16);cursor:pointer;text-align:center}
+    .card::before{content:"";position:absolute;top:-7px;left:50%;transform:translateX(-50%) rotate(-4deg);width:13px;height:13px;
+      border-radius:50%;background:radial-gradient(circle at 35% 32%,#ff8072,var(--red));box-shadow:0 2px 3px rgba(0,0,0,.35)}
+    .card:nth-child(3n+1){transform:rotate(-.7deg)}
+    .card:nth-child(3n+2){transform:rotate(.5deg)}
+    .card:nth-child(3n){transform:rotate(-.3deg)}
+    .card:active{transform:scale(.97)}
+    .card .ico{font-size:30px}
+    .card .tit{font-weight:700;font-size:15px}
+    .card .sub{font-size:11px;color:var(--muted);font-style:italic}
+    .card.feature{flex-direction:row;text-align:left;justify-content:flex-start;padding:18px;gap:14px;transform:rotate(-.4deg)}
+    .card.feature .ico{font-size:42px}
+    .card.feature .tit{font-size:19px}
+    .panel{background:var(--card);border:2.4px solid var(--ink);border-radius:10px;padding:14px;box-shadow:2px 2px 0 rgba(36,34,49,.16)}
     .actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:12px}
-    .btn{flex:1;min-width:140px;padding:12px;background:#fff;border:2px solid var(--ink);border-radius:10px;font-family:var(--font);font-weight:900;cursor:pointer;box-shadow:2px 2px 0 var(--ink)}
+    .btn{flex:1;min-width:140px;padding:12px;background:var(--card);border:2.4px solid var(--ink);border-radius:9px;
+      font-family:var(--font);font-weight:700;font-size:14px;cursor:pointer;box-shadow:2.5px 2.5px 0 var(--ink)}
     .btn:active{transform:translate(2px,2px);box-shadow:none}
-    .btn.sec{border-style:dashed;opacity:.9;box-shadow:none}
+    .btn.sec{border-style:dashed;box-shadow:none;opacity:.92}
     .btn.red{color:var(--red);border-color:var(--red)}
-    input{background:transparent;border:none;border-bottom:1px dashed #999;font-family:var(--font);font-size:16px;width:100%;text-align:center;color:var(--ink);user-select:text;border-radius:0}
-    input:focus{outline:none;border-bottom:2px solid var(--ink);background:#f0f0f0}
-    .paper-table{width:100%;border-collapse:collapse;background:#fff;margin:12px 0}
-    .paper-table th{border:2px solid var(--ink);background:#eee;padding:6px;font-size:12px;text-transform:uppercase}
-    .paper-table td{border:2px solid var(--ink);padding:6px;text-align:center;height:36px}
-    .paper-table td.label{text-align:left;font-weight:900;background:#fafafa;width:140px;font-size:13px}
-    .belote-split{display:flex;border:3px solid var(--ink);height:300px;background:#fff;filter:url('#wiggle')}
+    .btn.confirming{background:var(--red);color:#fff;border-color:var(--red);border-style:solid;opacity:1;animation:confirmPulse .6s ease-in-out infinite alternate}
+    @keyframes confirmPulse{from{opacity:1}to{opacity:.65}}
+    input{background:transparent;border:none;border-bottom:1.5px dashed #b6a883;font-family:var(--font);font-size:16px;
+      width:100%;text-align:center;color:var(--ink);user-select:text;border-radius:0;padding:2px 0}
+    input:focus{outline:none;border-bottom:2px solid var(--ink);background:rgba(217,164,65,.12)}
+    .paper-table{width:100%;border-collapse:collapse;background:var(--card);margin:12px 0}
+    .paper-table th{border:2px solid var(--ink);background:var(--paper-deep);padding:6px;font-size:11px;text-transform:uppercase;font-weight:700}
+    .paper-table td{border:2px solid var(--ink);padding:6px;text-align:center;height:36px;font-weight:700}
+    .paper-table td.label{text-align:left;font-weight:700;background:rgba(236,224,194,.5);width:130px;font-size:12.5px}
+    .belote-split{display:flex;border:3px solid var(--ink);height:290px;background:var(--card)}
     .belote-col{flex:1;display:flex;flex-direction:column;border-right:2px solid var(--ink)}
     .belote-col:last-child{border:none}
-    .b-head{background:#eee;padding:10px;text-align:center;font-weight:900;border-bottom:2px solid var(--ink)}
-    .b-tot{font-size:40px;text-align:center;padding:10px;font-weight:1000;border-bottom:2px dashed #ccc}
+    .b-head{background:var(--paper-deep);padding:10px;text-align:center;font-weight:700;border-bottom:2px solid var(--ink);letter-spacing:1px}
+    .b-tot{font-size:38px;text-align:center;padding:10px;font-weight:700;border-bottom:2px dashed var(--line)}
     .b-list{flex:1;overflow-y:auto;font-size:14px;text-align:center;line-height:1.8}
     .d3{display:flex;gap:12px;justify-content:center;align-items:center;margin:14px 0 6px}
     .d3-check{display:flex;gap:12px;justify-content:center;align-items:center;margin:4px 0}
-    .die{width:74px;height:74px;border:3px solid var(--ink);border-radius:14px;display:grid;place-items:center;font-size:34px;font-weight:1000;background:#fff;box-shadow:3px 3px 0 rgba(0,0,0,.12)}
+    .die{width:72px;height:72px;border:3px solid var(--ink);border-radius:12px;display:grid;place-items:center;font-size:32px;
+      font-weight:700;background:var(--card);box-shadow:3px 3px 0 rgba(36,34,49,.18)}
     .molkky-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:14px 0}
-    .pin-btn{aspect-ratio:1;border:2px solid var(--wood);border-radius:50%;background:#fff;color:var(--wood);font-weight:1000;font-size:20px;display:grid;place-items:center;cursor:pointer}
+    .pin-btn{aspect-ratio:1;border:2.2px solid var(--wood);border-radius:50%;background:var(--card);color:var(--wood);
+      font-weight:700;font-size:19px;display:grid;place-items:center;cursor:pointer}
     .pin-btn:active{background:var(--wood);color:#fff}
-    .m-player{padding:10px;border:2px solid var(--ink);margin-bottom:10px;border-radius:10px;background:#fff}
-    #alarmFlash{position:fixed;inset:0;z-index:500;pointer-events:none;opacity:0;background:#ffcf3f}
+    .m-player{padding:10px;border:2.2px solid var(--ink);margin-bottom:10px;border-radius:9px;background:var(--card)}
+    .m-player.active{border:3px solid var(--gold);background:#fbf1da}
+    #alarmFlash{position:fixed;inset:0;z-index:500;pointer-events:none;opacity:0;background:var(--gold)}
     #alarmFlash.flashing{animation:alarmFlashKf .5s ease-in-out infinite}
     @keyframes alarmFlashKf{0%,100%{opacity:0}50%{opacity:.55}}
-    .m-player.active{border:4px solid var(--wood);background:#fff8e1}
-    .bac-big{width:130px;height:130px;border:3px solid var(--ink);border-radius:16px;display:grid;place-items:center;font-size:64px;font-weight:1000;background:#fff;box-shadow:4px 4px 0 rgba(0,0,0,.15);margin:14px auto}
-    .bac-grid{display:grid;grid-template-columns:repeat(26,1fr);gap:2px;margin:14px 0}
-    .bac-letter{aspect-ratio:auto;height:24px;border:1px solid var(--ink);border-radius:4px;display:grid;place-items:center;font-weight:1000;font-size:10px;background:#fff;padding:0}
+    .bac-big{width:126px;height:126px;border:3px solid var(--ink);border-radius:14px;display:grid;place-items:center;font-size:60px;
+      font-family:var(--font);font-weight:700;background:var(--card);box-shadow:4px 4px 0 rgba(36,34,49,.2);margin:14px auto}
+    .bac-grid{display:grid;grid-template-columns:repeat(26,1fr);gap:3px;margin:14px 0}
+    .bac-letter{height:25px;border:1px solid var(--ink);border-radius:4px;display:grid;place-items:center;font-family:var(--font);font-weight:600;
+      font-size:11px;background:var(--card);padding:0}
     .bac-letter.used{opacity:.35;text-decoration:line-through}
     .bac-letter.excluded{opacity:.2;border-style:dashed}
     .bac-letter.current{background:var(--red);color:#fff;border-color:var(--red)}
-    .banner{position:sticky;top:64px;z-index:49;background:#fff;border:2px dashed var(--ink);padding:10px;border-radius:12px;box-shadow:2px 2px 0 rgba(0,0,0,.12);margin:10px 0;display:none}
-    .banner.show{display:block}
-    .banner b{color:var(--red)}
+    .banner{position:sticky;top:56px;z-index:49;background:var(--card);border:1.8px dashed var(--red-soft);
+      padding:5px 6px 5px 12px;border-radius:16px;box-shadow:1.5px 1.5px 0 rgba(36,34,49,.14);margin:8px 0;
+      display:none;align-items:center;justify-content:space-between;gap:8px}
+    .banner.show{display:flex}
+    .banner span{font-size:11px;color:var(--muted)}
+    .banner button{flex-shrink:0;width:24px;height:24px;border-radius:50%;border:1.8px solid var(--red);background:var(--card);
+      color:var(--red);font-weight:700;font-size:13px;cursor:pointer;display:grid;place-items:center;padding:0}
+    .banner button:active{transform:scale(.9)}
     #hgWrap{display:flex;justify-content:center;margin:12px 0}
-    #hgCanvas{border:3px solid var(--ink);border-radius:4px;background:#fff;box-shadow:3px 3px 0 rgba(0,0,0,.12);image-rendering:pixelated}
+    #hgCanvas{border:3px solid var(--ink);border-radius:4px;background:var(--card);box-shadow:3px 3px 0 rgba(36,34,49,.18);image-rendering:pixelated}
     @keyframes hgFlip{ from{transform:rotate(0deg)} to{transform:rotate(180deg)} }
     .hg-flip{animation:hgFlip .45s ease-in-out}
     .t-unit{display:flex;flex-direction:column;align-items:center;gap:6px}
-    .t-val{font-weight:1000;font-size:20px;min-width:40px;width:44px;text-align:center;background:transparent}
-    .qbtn{width:30px;height:30px;flex-shrink:0;border-radius:50%;border:2.5px solid var(--ink);background:#fff;color:var(--ink);
-      font-family:var(--font);font-weight:1000;font-size:15px;line-height:1;cursor:pointer;box-shadow:2px 2px 0 var(--ink);padding:0}
+    .t-val{font-weight:700;font-size:19px;min-width:40px;width:44px;text-align:center;background:transparent;border:none;font-family:var(--font);color:var(--ink)}
+    .qbtn{width:30px;height:30px;flex-shrink:0;border-radius:50%;border:2.3px solid var(--ink);background:var(--card);color:var(--ink);
+      font-family:var(--font);font-weight:700;font-size:15px;line-height:1;cursor:pointer;box-shadow:2px 2px 0 var(--ink);padding:0}
     .qbtn:active{transform:translate(1px,1px);box-shadow:1px 1px 0 var(--ink)}
-    .modal-overlay{position:fixed;inset:0;z-index:6000;background:rgba(26,26,46,.55);display:none;align-items:flex-start;justify-content:center;padding:16px;overflow-y:auto}
+    .modal-overlay{position:fixed;inset:0;z-index:6000;background:rgba(36,34,49,.55);display:none;align-items:flex-start;justify-content:center;padding:16px;overflow-y:auto}
     .modal-overlay.show{display:flex}
-    .modal-box{background:var(--bg);border:3px solid var(--ink);border-radius:14px;max-width:480px;width:100%;margin-top:40px;padding:18px;box-shadow:5px 5px 0 var(--ink);font-size:14px}
+    .modal-box{background:var(--paper);border:3px solid var(--ink);border-radius:13px;max-width:480px;width:100%;margin-top:36px;padding:18px;box-shadow:5px 5px 0 var(--ink);font-size:14px}
+    .switch{width:32px;height:32px;border:2.3px solid var(--ink);border-radius:7px;display:grid;place-items:center;background:var(--card);
+      font-weight:700;cursor:pointer;box-shadow:2px 2px 0 var(--ink);flex-shrink:0}
+    .switch.on{background:var(--ok);color:#fff;border-color:var(--ok)}
+    .switch:active{transform:translate(2px,2px);box-shadow:none}
+    .settings-section{margin-bottom:16px;padding-bottom:14px;border-bottom:2px dashed var(--line)}
+    .settings-section:last-child{border-bottom:none;margin-bottom:0;padding-bottom:0}
+    .settings-row{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:10px}
+    .settings-row:last-child{margin-bottom:0}
+    .settings-label{font-weight:700;font-size:14px}
+    .settings-desc{font-size:11px;color:var(--muted);font-style:italic;margin-top:2px}
+    .sound-pills{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
+    .sound-pills .btn{flex:none;min-width:0;padding:8px 12px;font-size:13px}
+    input[type=range]{-webkit-appearance:none;width:100%;height:6px;border-radius:4px;background:var(--paper-deep);border:1.5px solid var(--ink);margin-top:8px}
+    input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:20px;height:20px;border-radius:50%;background:var(--red);border:2px solid var(--ink);cursor:pointer}
+    input[type=range]::-moz-range-thumb{width:20px;height:20px;border-radius:50%;background:var(--red);border:2px solid var(--ink);cursor:pointer}
     video{position:absolute;top:0;left:0;width:1px;height:1px;opacity:.01;pointer-events:none}
   </style>
 </head>
@@ -102,43 +149,35 @@
       <feTurbulence type="fractalNoise" baseFrequency="0.01" numOctaves="3" result="noise" />
       <feDisplacementMap in="SourceGraphic" in2="noise" scale="2" />
     </filter>
-    <clipPath id="clipTop"><path d="M10,10 L90,10 L50,80 Z" /></clipPath>
-    <clipPath id="clipBot"><path d="M50,80 L90,150 L10,150 Z" /></clipPath>
   </svg>
   <video id="hackVid" playsinline loop muted>
     <source src="data:video/mp4;base64,AAAAHGZ0eXBNUjRCAAAARU1SNIgAAABhYXJrdWR0YQAAAAxjb3ZlYXJrdWR0YQlmcm9tAAAAGHNvaWFhcnR3cmvDq2xpYnF1aWNrY2hhdAAAAAxtZGF0AAAAAAAAAAAAAA==" type="video/mp4">
   </video>
   <div id="appWrap">
     <header>
-      <button id="backBtn" title="Retour">←</button>
-      <svg viewBox="0 0 32 32" width="30" height="30" class="drawn" style="flex-shrink:0">
-        <rect x="5" y="3" width="17" height="25" rx="2" fill="#fff" stroke="var(--ink)" stroke-width="2"/>
-        <circle cx="5" cy="7" r="1.4" fill="var(--ink)"/>
-        <circle cx="5" cy="13" r="1.4" fill="var(--ink)"/>
-        <circle cx="5" cy="19" r="1.4" fill="var(--ink)"/>
-        <circle cx="5" cy="25" r="1.4" fill="var(--ink)"/>
-        <line x1="9" y1="9" x2="18" y2="9" stroke="var(--muted)" stroke-width="1.5"/>
-        <line x1="9" y1="14" x2="18" y2="14" stroke="var(--muted)" stroke-width="1.5"/>
-        <line x1="9" y1="19" x2="15" y2="19" stroke="var(--muted)" stroke-width="1.5"/>
-        <path d="M17 26 L27 10 L30 12 L20 28 Z" fill="var(--red)" stroke="var(--ink)" stroke-width="1.3" stroke-linejoin="round"/>
-      </svg>
-      <div style="font-weight:1000;font-size:18px">TableTools</div>
+      <button id="backBtn" class="hbtn drawn" title="Retour">←</button>
+      <div class="logo-wrap">
+        <svg viewBox="0 0 32 32" width="30" height="30" class="drawn" style="flex-shrink:0">
+          <rect x="5" y="3" width="17" height="25" rx="2" fill="var(--card)" stroke="var(--ink)" stroke-width="2"/>
+          <circle cx="5" cy="7" r="1.4" fill="var(--ink)"/>
+          <circle cx="5" cy="13" r="1.4" fill="var(--ink)"/>
+          <circle cx="5" cy="19" r="1.4" fill="var(--ink)"/>
+          <circle cx="5" cy="25" r="1.4" fill="var(--ink)"/>
+          <line x1="9" y1="9" x2="18" y2="9" stroke="var(--muted)" stroke-width="1.5"/>
+          <line x1="9" y1="14" x2="18" y2="14" stroke="var(--muted)" stroke-width="1.5"/>
+          <line x1="9" y1="19" x2="15" y2="19" stroke="var(--muted)" stroke-width="1.5"/>
+          <path d="M17 26 L27 10 L30 12 L20 28 Z" fill="var(--red)" stroke="var(--ink)" stroke-width="1.3" stroke-linejoin="round"/>
+        </svg>
+        <span class="logo-text">TableTools</span>
+      </div>
       <div style="flex:1"></div>
-      <div id="wakeIcon" title="Anti-veille">ANTI<br>VEILLE</div>
-      <button id="wakeBtn" title="Anti-veille">☀</button>
-      <div id="fsIcon" title="Plein écran">PLEIN<br>ÉCRAN</div>
-      <button id="fsBtn" title="Plein écran">⛶</button>
-      <button id="homeBtn" title="Accueil">⌂</button>
+      <button id="settingsBtn" class="hbtn drawn" title="Réglages">⚙</button>
+      <button id="homeBtn" class="hbtn drawn" title="Accueil">⌂</button>
     </header>
     <main>
       <div id="banner" class="banner drawn">
-        <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;">
-          <div style="flex:1;min-width:220px">
-            <div><b id="bannerMode">Mode table :</b> <span id="bannerLost">anti‑veille / plein écran a été perdu.</span></div>
-            <div style="font-size:12px;color:var(--muted)" id="bannerTap">Appuyez sur ☀ / ⛶ (ou touchez l'écran).</div>
-          </div>
-          <button class="btn sec" id="bannerFix">RÉACTIVER</button>
-        </div>
+        <span id="bannerLost">anti‑veille / plein écran désactivé</span>
+        <button id="bannerFix" title="Réactiver">↻</button>
       </div>
       <div id="app"></div>
     </main>
@@ -147,37 +186,67 @@
   <div id="rulesModal" class="modal-overlay">
     <div class="modal-box drawn">
       <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:10px">
-        <div id="rulesTitle" style="font-weight:1000;font-size:20px"></div>
+        <div id="rulesTitle" style="font-weight:700;font-size:20px"></div>
         <button id="rulesClose" class="qbtn" title="Fermer">✕</button>
       </div>
       <div id="rulesBody"></div>
+    </div>
+  </div>
+  <div id="settingsModal" class="modal-overlay">
+    <div class="modal-box drawn">
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:14px">
+        <div id="settingsTitle" style="font-weight:700;font-size:22px"></div>
+        <button id="settingsClose" class="qbtn" title="Fermer">✕</button>
+      </div>
+      <div id="settingsBody"></div>
     </div>
   </div>
 <script>
 (function(){
   const $ = (s)=>document.querySelector(s);
   const app = $("#app");
-  const appWrap = $("#appWrap");
   const vid = $("#hackVid");
-  const wakeIcon = $("#wakeIcon");
-  const wakeBtn  = $("#wakeBtn");
-  const fsIcon   = $("#fsIcon");
-  const fsBtn    = $("#fsBtn");
   const banner   = $("#banner");
   const bannerFix= $("#bannerFix");
   const backBtn  = $("#backBtn");
   const homeBtn  = $("#homeBtn");
+  const settingsBtn = $("#settingsBtn");
   const alarmFlashEl = $("#alarmFlash");
   const PREF_WAKE = "tt15_pref_wake";
   const PREF_FS   = "tt15_pref_fs";
+  const PREF_SOUND = "tt15_pref_sound";
+  const PREF_VOLUME = "tt15_pref_volume";
+  const PREF_FLASH = "tt15_pref_flash";
+  const PREF_VIBRATE = "tt15_pref_vibrate";
+  const PREF_CUSTOM_DATA = "tt15_pref_customsound_data";
+  const PREF_CUSTOM_NAME = "tt15_pref_customsound_name";
   const loadPref=(k,d)=>{try{const v=localStorage.getItem(k);return v===null?d:(v==="1");}catch(e){return d;}};
   const savePref=(k,v)=>{try{localStorage.setItem(k,v?"1":"0");}catch(e){}};
+  const loadStr=(k,d)=>{try{const v=localStorage.getItem(k);return v===null?d:v;}catch(e){return d;}};
+  const saveStr=(k,v)=>{try{ if(v===null||v===undefined) localStorage.removeItem(k); else localStorage.setItem(k,v); }catch(e){ return false; } return true;};
   let wantWake = loadPref(PREF_WAKE, true);
-  let wantFS   = loadPref(PREF_FS, false);
+  let wantFS   = loadPref(PREF_FS, true);
   let wakeLock = null;
   let keepAliveTimer = null;
-  function setWakeUI(on){ wakeIcon.classList.toggle("on", !!on); }
-  function setFSUI(on){ fsIcon.classList.toggle("on", !!on); }
+  let wakeActive = false, fsActive = false;
+  let settings = {
+    sound: loadStr(PREF_SOUND, "cloche"),
+    volume: Number(loadStr(PREF_VOLUME, "80")) || 80,
+    flash: loadPref(PREF_FLASH, true),
+    vibrate: loadPref(PREF_VIBRATE, true),
+    customData: loadStr(PREF_CUSTOM_DATA, null),
+    customName: loadStr(PREF_CUSTOM_NAME, null)
+  };
+  function updateGearBadge(){
+    const degraded = (wantWake && !wakeActive) || (wantFS && !fsActive);
+    if(settingsBtn) settingsBtn.classList.toggle("alert", !!degraded);
+  }
+  function refreshSettingsBody(){
+    const m = $("#settingsModal");
+    if(m && m.classList.contains("show")) renderSettingsBody();
+  }
+  function setWakeUI(on){ wakeActive = !!on; updateGearBadge(); refreshSettingsBody(); }
+  function setFSUI(on){ fsActive = !!on; updateGearBadge(); refreshSettingsBody(); }
   const load=(k,d)=>{try{ return JSON.parse(localStorage.getItem("tt15_"+k)) || d; }catch(e){ return d; }};
   const save=(k,v)=>{ try{ localStorage.setItem("tt15_"+k, JSON.stringify(v)); }catch(e){} };
   const esc=(s)=>String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#039;");
@@ -186,20 +255,21 @@
   document.documentElement.lang = LANG;
   const I18N = {
     nav_back:{fr:"Retour",en:"Back"},
-    nav_wake:{fr:"Anti-veille",en:"Keep awake"},
-    nav_wake_label:{fr:"ANTI<br>VEILLE",en:"KEEP<br>AWAKE"},
-    nav_fs:{fr:"Plein écran",en:"Fullscreen"},
-    nav_fs_label:{fr:"PLEIN<br>ÉCRAN",en:"FULL<br>SCREEN"},
+    nav_settings:{fr:"Réglages",en:"Settings"},
     nav_home:{fr:"Accueil",en:"Home"},
     nav_close:{fr:"Fermer",en:"Close"},
     nav_rules:{fr:"Règles du jeu",en:"Game rules"},
-    noscript_msg:{fr:"JavaScript est nécessaire pour faire fonctionner Table Tools, veuillez activer JavaScript ou créez une exception pour pouvoir utiliser cet outil.",en:"JavaScript is required to run Table Tools — please enable JavaScript or add an exception to use this tool."},
-    banner_mode:{fr:"Mode table :",en:"Table mode:"},
-    banner_lost:{fr:"anti‑veille / plein écran a été perdu.",en:"keep-awake / fullscreen was lost."},
-    banner_tap:{fr:"Appuyez sur ☀ / ⛶ (ou touchez l'écran).",en:"Tap ☀ / ⛶ (or touch the screen)."},
-    banner_btn:{fr:"RÉACTIVER",en:"RE-ENABLE"},
-    home_games:{fr:"Jeux de score",en:"Score games"},
-    home_tools:{fr:"Outils",en:"Tools"},
+    banner_lost:{fr:"anti-veille / plein écran désactivé",en:"keep-awake / fullscreen is off"},
+    banner_btn:{fr:"Réactiver",en:"Re-enable"},
+    confirm_tap_again:{fr:"Sûr ?",en:"Sure?"},
+    sheet_remove_player:{fr:"− Joueur",en:"− Player"},
+    cat_score_t:{fr:"Jeux à score",en:"Score games"},
+    cat_score_s:{fr:"Cartes, dés, tuiles : on compte, on tient les comptes.",en:"Cards, dice, tiles: keeping the tally."},
+    cat_bac_t:{fr:"Le jeu du Bac",en:"Categories game"},
+    cat_free_t:{fr:"Feuilles libres",en:"Free sheets"},
+    cat_free_s:{fr:"Pour les jeux sans grille toute faite.",en:"For games without a ready-made sheet."},
+    cat_tools_t:{fr:"Outils",en:"Tools"},
+    cat_tools_s:{fr:"Un dé, un sablier, sous la main.",en:"A die, a timer, close at hand."},
     g_belote_t:{fr:"Belote",en:"Belote"}, g_belote_s:{fr:"Nous / Eux",en:"Us / Them"},
     g_yams_t:{fr:"Yams",en:"Yams"}, g_yams_s:{fr:"Feuille + bonus auto",en:"Sheet + auto bonus"},
     g_tarot_t:{fr:"Tarot",en:"Tarot"}, g_tarot_s:{fr:"Contrat + scores",en:"Contract + scores"},
@@ -207,10 +277,8 @@
     g_uno_t:{fr:"Uno",en:"Uno"}, g_uno_s:{fr:"Le + haut gagne, fin à 500",en:"Highest wins, ends at 500"},
     g_scrabble_t:{fr:"Scrabble",en:"Scrabble"}, g_scrabble_s:{fr:"Tours + total",en:"Turns + total"},
     g_bac_t:{fr:"Jeu du Bac",en:"Categories"}, g_bac_s:{fr:"Lettre + minuteur",en:"Letter + timer"},
-    g_421_t:{fr:"421",en:"421"}, g_421_s:{fr:"3 dés + carnet",en:"3 dice + scoresheet"},
     g_molkky_t:{fr:"Mölkky",en:"Mölkky"}, g_molkky_s:{fr:"50 points pile",en:"Exactly 50 points"},
     g_skyjo_t:{fr:"Skyjo",en:"Skyjo"}, g_skyjo_s:{fr:"Le + bas gagne, fin à 100",en:"Lowest wins, ends at 100"},
-    g_petanque_t:{fr:"Pétanque",en:"Pétanque"}, g_petanque_s:{fr:"Nous / Eux, jusqu'à 13",en:"Us / Them, up to 13"},
     g_victoires_t:{fr:"Victoires",en:"Wins"}, g_victoires_s:{fr:"Dames, échecs, P4...",en:"Checkers, chess, Connect 4..."},
     g_custom_t:{fr:"Tableau custom",en:"Custom sheet"}, g_custom_s:{fr:"Joueurs + manches",en:"Players + rounds"},
     g_free_t:{fr:"Score libre",en:"Free score"}, g_free_s:{fr:"Tableau générique",en:"Generic sheet"},
@@ -226,7 +294,6 @@
     sheet_reset:{fr:"Reset",en:"Reset"},
     sheet_default_subtitle:{fr:"Manches cumulées, total automatique.",en:"Cumulative rounds, automatic total."},
     sheet_round_row:{fr:"Manche",en:"Round"},
-    confirm_new_sheet:{fr:"Nouveau ?",en:"Start over?"},
     sheet_win_banner:{fr:"remporte la partie avec",en:"wins the game with"},
     tarot_contract_label:{fr:"Contrat",en:"Contract"},
     tarot_deal_label:{fr:"Donne",en:"Deal"},
@@ -240,7 +307,7 @@
     belote_us:{fr:"NOUS",en:"US"}, belote_them:{fr:"EUX",en:"THEM"},
     belote_us_ph:{fr:"Nous",en:"Us"}, belote_them_ph:{fr:"Eux",en:"Them"},
     belote_add:{fr:"Ajouter",en:"Add"},
-    yams_kicker:{fr:"Bonus auto (>=63) + total auto.",en:"Auto bonus (>=63) + auto total."},
+    yams_kicker:{fr:"Bonus auto (≥63) + total auto.",en:"Auto bonus (≥63) + auto total."},
     yams_cat_uppertotal:{fr:"Total sup",en:"Upper total"},
     yams_cat_bonus:{fr:"Bonus (+35)",en:"Bonus (+35)"},
     yams_cat_three:{fr:"Brelan",en:"Three of a kind"},
@@ -251,24 +318,14 @@
     yams_cat_yams:{fr:"YAMS",en:"YAMS"},
     yams_cat_chance:{fr:"Chance",en:"Chance"},
     yams_cat_totalfinal:{fr:"TOTAL",en:"TOTAL"},
-    g421_check_hint:{fr:"Cochez les dés à relancer",en:"Check the dice to reroll"},
-    g421_reroll_btn:{fr:"Relancer les dés cochés",en:"Reroll checked dice"},
-    g421_next_btn:{fr:"Joueur suivant →",en:"Next player →"},
-    g421_exhausted:{fr:"Lancers épuisés (3/3) — au tour du joueur suivant.",en:"Rolls used up (3/3) — next player's turn."},
-    g421_roll_btn:{fr:"Lancer 3 dés",en:"Roll 3 dice"},
     skyjo_kicker:{fr:"Le score le plus bas gagne. Fin de partie dès qu'un joueur atteint 100 pts.",en:"Lowest score wins. The game ends as soon as a player reaches 100 pts."},
     skyjo_gameover:{fr:"Partie terminée —",en:"Game over —"},
     skyjo_wins_with:{fr:"gagne avec",en:"wins with"},
-    confirm_new_game:{fr:"Nouvelle partie ?",en:"New game?"},
-    petanque_kicker:{fr:"Première équipe à 13 points gagne la partie.",en:"First team to 13 points wins the game."},
-    petanque_won:{fr:"a gagné la partie !",en:"won the game!"},
-    petanque_end_kicker:{fr:"Points de la mène (un seul camp marque à la fois, 1 à 6 pts).",en:"Points for the end (only one side scores at a time, 1 to 6 pts)."},
-    petanque_add_end:{fr:"+ Mène",en:"+ End"},
     victoires_title:{fr:"Compteur de victoires",en:"Win counter"},
     victoires_kicker:{fr:"Pour les jeux sans score chiffré (dames, échecs, puissance 4...). Une victoire = un point.",en:"For games without numeric scores (checkers, chess, Connect 4...). One win = one point."},
     molkky_eliminated:{fr:"💀 Éliminé",en:"💀 Eliminated"},
     molkky_won:{fr:"🏆 Gagné !",en:"🏆 Won!"},
-    molkky_misses_label:{fr:"Ratés:",en:"Misses:"},
+    molkky_misses_label:{fr:"Ratés :",en:"Misses:"},
     molkky_miss_btn:{fr:"RATÉ (X)",en:"MISS (X)"},
     dice_kicker:{fr:"Lancer rapide — choisissez le nombre de dés.",en:"Quick roll — choose the number of dice."},
     dice_roll_btn:{fr:"LANCER",en:"ROLL"},
@@ -293,23 +350,58 @@
     custom_generate_btn:{fr:"GÉNÉRER",en:"GENERATE"},
     custom_reset_sheet_btn:{fr:"Reset feuille",en:"Reset sheet"},
     custom_default_title:{fr:"Tableau custom",en:"Custom sheet"},
-    confirm_reset:{fr:"Reset ?",en:"Reset?"},
-    generic_ok:{fr:"OK.",en:"OK."}
+    settings_title:{fr:"Réglages",en:"Settings"},
+    settings_wake_label:{fr:"Anti-veille",en:"Keep awake"},
+    settings_wake_desc:{fr:"Empêche l'écran de s'éteindre en pleine partie.",en:"Keeps the screen from sleeping mid-game."},
+    settings_fs_label:{fr:"Plein écran",en:"Fullscreen"},
+    settings_fs_desc:{fr:"Masque la barre du navigateur.",en:"Hides the browser bar."},
+    settings_sound_label:{fr:"Sonnerie de fin de minuteur",en:"Timer end sound"},
+    sound_cloche:{fr:"Cloche",en:"Bell"},
+    sound_sifflet:{fr:"Sifflet",en:"Whistle"},
+    sound_tambour:{fr:"Tambour",en:"Drum"},
+    sound_douce:{fr:"Douce",en:"Soft"},
+    sound_custom:{fr:"Personnalisée",en:"Custom"},
+    settings_custom_pick:{fr:"Choisir un fichier",en:"Choose a file"},
+    settings_custom_toobig:{fr:"Fichier trop volumineux (max ~1,5 Mo).",en:"File too large (max ~1.5 MB)."},
+    settings_volume_label:{fr:"Volume",en:"Volume"},
+    settings_flash_label:{fr:"Écran clignotant",en:"Screen flash"},
+    settings_flash_desc:{fr:"Clignote en fin de minuteur.",en:"Flashes when the timer ends."},
+    settings_vibrate_label:{fr:"Vibration",en:"Vibration"},
+    settings_vibrate_desc:{fr:"Vibre en fin de minuteur (si dispo).",en:"Vibrates when the timer ends (if available)."},
+    settings_test_btn:{fr:"Tester le son",en:"Test sound"}
   };
   function t(key){ const e=I18N[key]; if(!e) return key; return e[LANG]||e.fr||key; }
   function turnOf(name){ return LANG==="fr" ? ("Tour de "+name) : (name+"'s turn"); }
+  function armConfirm(btn, action){
+    if(!btn) return;
+    if(btn.dataset.armed==="1"){
+      clearTimeout(Number(btn.dataset.armTimer));
+      delete btn.dataset.armed;
+      btn.textContent = btn.dataset.label;
+      btn.classList.remove("confirming");
+      action();
+      return;
+    }
+    btn.dataset.label = btn.textContent;
+    btn.dataset.armed = "1";
+    btn.textContent = t('confirm_tap_again');
+    btn.classList.add("confirming");
+    const tm = setTimeout(()=>{
+      delete btn.dataset.armed;
+      btn.textContent = btn.dataset.label;
+      btn.classList.remove("confirming");
+    }, 2500);
+    btn.dataset.armTimer = String(tm);
+  }
   function applyStaticI18N(){
     backBtn.title = t('nav_back');
-    wakeIcon.title = t('nav_wake'); wakeIcon.innerHTML = t('nav_wake_label');
-    wakeBtn.title = t('nav_wake');
-    fsIcon.title = t('nav_fs'); fsIcon.innerHTML = t('nav_fs_label');
-    fsBtn.title = t('nav_fs');
+    settingsBtn.title = t('nav_settings');
     homeBtn.title = t('nav_home');
     const rc = $("#rulesClose"); if(rc) rc.title = t('nav_close');
-    const bm = $("#bannerMode"); if(bm) bm.textContent = t('banner_mode');
+    const sc = $("#settingsClose"); if(sc) sc.title = t('nav_close');
+    const st = $("#settingsTitle"); if(st) st.textContent = t('settings_title');
     const bl = $("#bannerLost"); if(bl) bl.textContent = t('banner_lost');
-    const bt = $("#bannerTap"); if(bt) bt.textContent = t('banner_tap');
-    if(bannerFix) bannerFix.textContent = t('banner_btn');
+    if(bannerFix) bannerFix.title = t('banner_btn');
   }
   const RULES = {
     belote:{
@@ -372,16 +464,6 @@
         en:"Each letter has a fixed value (1 to 10 pts depending on rarity). Add up the values of the letters in the word played, then apply the multipliers of the squares used (the \"word\" bonus applies after the \"letter\" bonuses). Playing all 7 letters at once (a \"bingo\") earns a +50 pt bonus for that turn."
       }
     },
-    "421":{
-      r:{
-        fr:"3 dés. Chaque joueur lance jusqu'à 3 fois par tour, en gardant de côté les dés qu'il veut garder entre les lancers, pour former la meilleure combinaison possible. Traditionnellement joué pour désigner qui règle la tournée.",
-        en:"3 dice. Each player rolls up to 3 times per turn, setting aside any dice they want to keep between rolls, to form the best possible combination. Traditionally played to decide who buys the next round."
-      },
-      c:{
-        fr:"Le \"421\" (4-2-1) est la combinaison reine. Viennent ensuite les brelans (trois dés identiques, le plus élevé gagne), puis les suites, puis simplement la somme des dés. Le perdant de chaque manche pose un jeton ou un gage ; celui qui a le plus de jetons à la fin de la partie paie sa tournée.",
-        en:"\"421\" (4-2-1) is the top combination. Next come three-of-a-kinds (highest wins), then straights, then simply the sum of the dice. The loser of each round puts down a token or forfeit; whoever has the most tokens at the end pays for the round."
-      }
-    },
     molkky:{
       r:{
         fr:"Jeu de lancer finlandais. Douze quilles numérotées de 1 à 12 sont plantées debout, groupées serrées. Chaque joueur, à son tour, lance le \"molkky\" (bâton) pour faire tomber une ou plusieurs quilles, à une distance raisonnable.",
@@ -402,16 +484,6 @@
         en:"Each card is worth its printed value, from -2 to 12. A column of 3 matching revealed cards is removed from play and no longer counts (0 pts). As soon as a player reveals their last card, the round ends immediately and everyone else reveals and totals their grid. The lowest total at the end of the game wins; the game stops as soon as a player reaches 100 cumulative points."
       }
     },
-    petanque:{
-      r:{
-        fr:"Deux équipes s'affrontent. Chaque joueur lance ses boules le plus près possible du cochonnet (petite boule cible), en essayant soit de s'en approcher (\"pointer\"), soit de repousser une boule adverse (\"tirer\").",
-        en:"Two teams compete. Each player throws their boules as close as possible to the jack (the small target ball), trying either to get close to it (\"pointing\") or to knock away an opponent's boule (\"shooting\")."
-      },
-      c:{
-        fr:"À la fin de chaque mène, seule l'équipe la plus proche du cochonnet marque des points : elle en gagne autant que de boules à elle plus proches du cochonnet que la meilleure boule adverse (donc 1 à 6 points selon les cas). La première équipe à atteindre 13 points remporte la partie.",
-        en:"At the end of each end, only the team closest to the jack scores points: they score one point for each of their boules that is closer to the jack than the opponent's best boule (so 1 to 6 points depending on the situation). The first team to reach 13 points wins the game."
-      }
-    },
     bac:{
       r:{
         fr:"Chaque joueur a une feuille avec les mêmes catégories (prénom, animal, ville, pays, métier, fruit/légume, objet...). Une lettre est tirée au sort : dans le temps imparti, chacun doit trouver un mot commençant par cette lettre pour chaque catégorie. On s'arrête à la fin du minuteur, ou dès qu'un joueur a tout rempli et crie \"Stop !\".",
@@ -429,13 +501,13 @@
     const g = RULES[key];
     if(!g || !rulesModal) return;
     $("#rulesTitle").textContent = ruleTitleFor(key);
-    $("#rulesBody").innerHTML = '<div style="font-weight:1000;margin-bottom:4px">'+t('rules_heading')+'</div><div style="margin-bottom:14px;line-height:1.4">'+esc(g.r[LANG]||g.r.fr)+'</div>'
-      + '<div style="font-weight:1000;margin-bottom:4px">'+t('scoring_heading')+'</div><div style="line-height:1.4">'+esc(g.c[LANG]||g.c.fr)+'</div>';
+    $("#rulesBody").innerHTML = '<div style="font-weight:700;margin-bottom:4px">'+t('rules_heading')+'</div><div style="margin-bottom:14px;line-height:1.4">'+esc(g.r[LANG]||g.r.fr)+'</div>'
+      + '<div style="font-weight:700;margin-bottom:4px">'+t('scoring_heading')+'</div><div style="line-height:1.4">'+esc(g.c[LANG]||g.c.fr)+'</div>';
     rulesModal.classList.add("show");
   }
   function closeRules(){ if(rulesModal) rulesModal.classList.remove("show"); }
   function ruleTitleFor(key){
-    const names = {belote:t('g_belote_t'), yams:t('g_yams_t'), tarot:t('g_tarot_t'), rami:t('g_rami_t'), uno:t('g_uno_t'), scrabble:t('g_scrabble_t'), "421":t('g_421_t'), molkky:t('g_molkky_t'), skyjo:t('g_skyjo_t'), petanque:t('g_petanque_t'), bac:t('g_bac_t')};
+    const names = {belote:t('g_belote_t'), yams:t('g_yams_t'), tarot:t('g_tarot_t'), rami:t('g_rami_t'), uno:t('g_uno_t'), scrabble:t('g_scrabble_t'), molkky:t('g_molkky_t'), skyjo:t('g_skyjo_t'), bac:t('g_bac_t')};
     return names[key] || key;
   }
   app.addEventListener("click", (e)=>{
@@ -444,6 +516,125 @@
   });
   $("#rulesClose")?.addEventListener("click", closeRules);
   rulesModal?.addEventListener("click", (e)=>{ if(e.target===rulesModal) closeRules(); });
+  function openSettings(){ renderSettingsBody(); $("#settingsModal").classList.add("show"); }
+  function closeSettings(){ $("#settingsModal").classList.remove("show"); }
+  settingsBtn.addEventListener("click", openSettings);
+  $("#settingsClose").addEventListener("click", closeSettings);
+  $("#settingsModal").addEventListener("click", (e)=>{ if(e.target===$("#settingsModal")) closeSettings(); });
+  function renderSettingsBody(){
+    const body = $("#settingsBody");
+    if(!body) return;
+    const soundKeys = ["cloche","sifflet","tambour","douce"];
+    const soundPills = soundKeys.map(k=> '<button class="btn'+(settings.sound===k?'':' sec')+'" data-sound="'+k+'">'+t('sound_'+k)+'</button>').join("");
+    const customActive = settings.sound==="custom";
+    body.innerHTML = `
+      <div class="settings-section">
+        <div class="settings-row">
+          <div><div class="settings-label">☀ ${t('settings_wake_label')}</div><div class="settings-desc">${t('settings_wake_desc')}</div></div>
+          <button class="switch${wantWake?' on':''}" id="swWake">${wantWake?'✔':''}</button>
+        </div>
+        <div class="settings-row">
+          <div><div class="settings-label">⛶ ${t('settings_fs_label')}</div><div class="settings-desc">${t('settings_fs_desc')}</div></div>
+          <button class="switch${wantFS?' on':''}" id="swFS">${wantFS?'✔':''}</button>
+        </div>
+      </div>
+      <div class="settings-section">
+        <div class="settings-label">🔔 ${t('settings_sound_label')}</div>
+        <div class="sound-pills">
+          ${soundPills}
+          <button class="btn${customActive?'':' sec'}" id="soundCustomBtn">${t('sound_custom')}</button>
+        </div>
+        <div class="actions" style="margin-top:10px">
+          <label class="btn sec" style="cursor:pointer;text-align:center" id="customPickLabel">📁 ${t('settings_custom_pick')}<input type="file" accept="audio/*" id="customSoundInput" style="display:none"></label>
+          ${settings.customName ? '<button class="btn sec red" id="customSoundClear">✕ '+esc(settings.customName)+'</button>' : ""}
+        </div>
+        <div class="actions">
+          <button class="btn sec" id="soundTestBtn">🔊 ${t('settings_test_btn')}</button>
+        </div>
+      </div>
+      <div class="settings-section">
+        <div class="settings-label">🔊 ${t('settings_volume_label')} — <span id="volumeLabel">${settings.volume}</span>%</div>
+        <input type="range" id="volumeRange" min="0" max="100" value="${settings.volume}">
+      </div>
+      <div class="settings-section">
+        <div class="settings-row">
+          <div><div class="settings-label">💡 ${t('settings_flash_label')}</div><div class="settings-desc">${t('settings_flash_desc')}</div></div>
+          <button class="switch${settings.flash?' on':''}" id="swFlash">${settings.flash?'✔':''}</button>
+        </div>
+        <div class="settings-row">
+          <div><div class="settings-label">📳 ${t('settings_vibrate_label')}</div><div class="settings-desc">${t('settings_vibrate_desc')}</div></div>
+          <button class="switch${settings.vibrate?' on':''}" id="swVibrate">${settings.vibrate?'✔':''}</button>
+        </div>
+      </div>
+    `;
+    $("#swWake").addEventListener("click", async ()=>{
+      wantWake = !wantWake;
+      savePref(PREF_WAKE, wantWake);
+      if(wantWake) await tryWakeLock(); else await releaseWakeLock();
+      showBanner(false);
+      renderSettingsBody();
+    });
+    $("#swFS").addEventListener("click", async ()=>{
+      wantFS = !wantFS;
+      savePref(PREF_FS, wantFS);
+      if(wantFS) await tryFullscreen();
+      else{ try{ if(document.fullscreenElement) await document.exitFullscreen(); }catch(e){} }
+      setFSUI(!!document.fullscreenElement);
+      showBanner(false);
+      renderSettingsBody();
+    });
+    body.querySelectorAll("[data-sound]").forEach(b=> b.addEventListener("click", ()=>{
+      settings.sound = b.getAttribute("data-sound");
+      saveStr(PREF_SOUND, settings.sound);
+      renderSettingsBody();
+    }));
+    $("#soundCustomBtn").addEventListener("click", ()=>{
+      if(!settings.customData){ $("#customSoundInput").click(); return; }
+      settings.sound = "custom";
+      saveStr(PREF_SOUND, "custom");
+      renderSettingsBody();
+    });
+    $("#customSoundInput").addEventListener("change", (e)=>{
+      const file = e.target.files && e.target.files[0];
+      if(!file) return;
+      if(file.size > 1500000){ alert(t('settings_custom_toobig')); e.target.value=""; return; }
+      const reader = new FileReader();
+      reader.onload = ()=>{
+        settings.customData = reader.result;
+        settings.customName = file.name;
+        settings.sound = "custom";
+        const okData = saveStr(PREF_CUSTOM_DATA, settings.customData);
+        saveStr(PREF_CUSTOM_NAME, settings.customName);
+        saveStr(PREF_SOUND, "custom");
+        if(!okData) alert(t('settings_custom_toobig'));
+        renderSettingsBody();
+      };
+      reader.readAsDataURL(file);
+    });
+    const clearBtn = $("#customSoundClear");
+    if(clearBtn) clearBtn.addEventListener("click", ()=>{
+      settings.customData = null; settings.customName = null;
+      saveStr(PREF_CUSTOM_DATA, null); saveStr(PREF_CUSTOM_NAME, null);
+      if(settings.sound==="custom"){ settings.sound="cloche"; saveStr(PREF_SOUND,"cloche"); }
+      renderSettingsBody();
+    });
+    $("#soundTestBtn").addEventListener("click", ()=> previewSound());
+    $("#volumeRange").addEventListener("input", (e)=>{
+      settings.volume = Number(e.target.value);
+      const lbl = $("#volumeLabel"); if(lbl) lbl.textContent = settings.volume;
+      saveStr(PREF_VOLUME, String(settings.volume));
+    });
+    $("#swFlash").addEventListener("click", ()=>{
+      settings.flash = !settings.flash;
+      savePref(PREF_FLASH, settings.flash);
+      renderSettingsBody();
+    });
+    $("#swVibrate").addEventListener("click", ()=>{
+      settings.vibrate = !settings.vibrate;
+      savePref(PREF_VIBRATE, settings.vibrate);
+      renderSettingsBody();
+    });
+  }
   function showBanner(force){
     const inMenu = (currentView || "#home") === "#home";
     if(inMenu){ banner.classList.remove("show"); return; }
@@ -518,21 +709,6 @@
       showBanner(false);
     }
   });
-  wakeBtn.addEventListener("click", async ()=>{
-    wantWake = !wantWake;
-    savePref(PREF_WAKE, wantWake);
-    if(wantWake) await tryWakeLock();
-    else await releaseWakeLock();
-    showBanner(false);
-  });
-  fsBtn.addEventListener("click", async ()=>{
-    wantFS = !wantFS;
-    savePref(PREF_FS, wantFS);
-    if(wantFS) await tryFullscreen();
-    else{ try{ if(document.fullscreenElement) await document.exitFullscreen(); }catch(e){} }
-    setFSUI(!!document.fullscreenElement);
-    showBanner(false);
-  });
   bannerFix.addEventListener("click", async ()=>{ await releaseWakeLock(); await tryWakeLock(); await tryFullscreen(); showBanner(false); });
   let currentView = "#home";
   function stripUrlHash(){
@@ -563,15 +739,17 @@
     if(sharedAudioCtx.state === "suspended") sharedAudioCtx.resume().catch(()=>{});
     return sharedAudioCtx;
   }
+  function sfxVol(){ return Math.max(0, Math.min(1, settings.volume/100)); }
   function ding(){
     const c=unlockAudioCtx(); if(!c) return;
-    const t=c.currentTime;
+    const v=sfxVol(); if(v<=0.001) return;
+    const tm=c.currentTime;
     const o=c.createOscillator(); const g=c.createGain();
     o.connect(g); g.connect(c.destination);
-    o.frequency.setValueAtTime(1200,t);
-    g.gain.linearRampToValueAtTime(0.5,t+0.01);
-    g.gain.exponentialRampToValueAtTime(0.01,t+1.2);
-    o.start(t); o.stop(t+1.2);
+    o.frequency.setValueAtTime(1200,tm);
+    g.gain.linearRampToValueAtTime(0.5*v,tm+0.01);
+    g.gain.exponentialRampToValueAtTime(0.01*v,tm+1.2);
+    o.start(tm); o.stop(tm+1.2);
   }
   let noiseBufPool=null;
   function getNoiseBuf(c){
@@ -590,8 +768,9 @@
   }
   function diceClack(){
     const c=unlockAudioCtx(); if(!c) return;
+    const v=sfxVol(); if(v<=0.001) return;
     const n=9+Math.floor(Math.random()*4);
-    let t=c.currentTime+0.005;
+    let tm=c.currentTime+0.005;
     for(let i=0;i<n;i++){
       const buf=getNoiseBuf(c);
       const noise=c.createBufferSource(); noise.buffer=buf;
@@ -602,44 +781,114 @@
       const g=c.createGain();
       const trend=1-0.5*(i/(n-1));
       const jitter=0.4+Math.random()*0.6;
-      g.gain.setValueAtTime(0.55*trend*jitter,t);
+      g.gain.setValueAtTime(0.55*trend*jitter*v,tm);
       noise.connect(bp); bp.connect(g); g.connect(c.destination);
-      noise.start(t); noise.stop(t+buf.duration);
-      t += 0.014+Math.random()*0.045;
+      noise.start(tm); noise.stop(tm+buf.duration);
+      tm += 0.014+Math.random()*0.045;
     }
   }
-  function ringAlarm(){
-    const c=unlockAudioCtx();
-    if(navigator.vibrate) navigator.vibrate([700,300,700,300,700]);
+  function soundBell(v){
+    const c=unlockAudioCtx(); if(!c) return;
     const pulseDur=0.045, pulseGap=0.01, ringPulses=14, ringGap=0.32, rings=3;
-    const ringDur = ringPulses*(pulseDur+pulseGap);
-    const totalMs = Math.round((rings*ringDur+(rings-1)*ringGap)*1000);
-    if(alarmFlashEl){
-      alarmFlashEl.classList.add("flashing");
-      setTimeout(()=> alarmFlashEl.classList.remove("flashing"), totalMs+300);
-    }
-    if(!c) return;
-    let t=c.currentTime+0.03;
+    let tm=c.currentTime+0.03;
     for(let r=0; r<rings; r++){
       for(let i=0;i<ringPulses;i++){
         const o=c.createOscillator(); const g=c.createGain();
         o.type="triangle";
         o.connect(g); g.connect(c.destination);
-        o.frequency.setValueAtTime(i%2===0 ? 1000 : 1122, t);
-        g.gain.setValueAtTime(0.0001, t);
-        g.gain.linearRampToValueAtTime(0.5, t+0.008);
-        g.gain.setValueAtTime(0.5, t+pulseDur-0.012);
-        g.gain.exponentialRampToValueAtTime(0.0001, t+pulseDur);
-        o.start(t); o.stop(t+pulseDur+0.01);
-        t += pulseDur+pulseGap;
+        o.frequency.setValueAtTime(i%2===0 ? 1000 : 1122, tm);
+        g.gain.setValueAtTime(0.0001, tm);
+        g.gain.linearRampToValueAtTime(0.5*v, tm+0.008);
+        g.gain.setValueAtTime(0.5*v, tm+pulseDur-0.012);
+        g.gain.exponentialRampToValueAtTime(0.0001, tm+pulseDur);
+        o.start(tm); o.stop(tm+pulseDur+0.01);
+        tm += pulseDur+pulseGap;
       }
-      t += ringGap;
+      tm += ringGap;
+    }
+  }
+  function soundWhistle(v){
+    const c=unlockAudioCtx(); if(!c) return;
+    let tm=c.currentTime+0.02;
+    for(let i=0;i<2;i++){
+      const o=c.createOscillator(); const g=c.createGain();
+      o.type="sine"; o.connect(g); g.connect(c.destination);
+      o.frequency.setValueAtTime(650,tm);
+      o.frequency.exponentialRampToValueAtTime(1500,tm+0.45);
+      g.gain.setValueAtTime(0.0001,tm);
+      g.gain.linearRampToValueAtTime(0.55*v,tm+0.05);
+      g.gain.exponentialRampToValueAtTime(0.0001,tm+0.5);
+      o.start(tm); o.stop(tm+0.55);
+      tm+=0.65;
+    }
+  }
+  function soundDrum(v){
+    const c=unlockAudioCtx(); if(!c) return;
+    let tm=c.currentTime+0.02;
+    for(let i=0;i<4;i++){
+      const o=c.createOscillator(); const og=c.createGain();
+      o.type="sine";
+      o.frequency.setValueAtTime(170,tm);
+      o.frequency.exponentialRampToValueAtTime(48,tm+0.15);
+      og.gain.setValueAtTime(0.001,tm);
+      og.gain.linearRampToValueAtTime(1*v,tm+0.006);
+      og.gain.exponentialRampToValueAtTime(0.001,tm+0.34);
+      o.connect(og); og.connect(c.destination);
+      o.start(tm); o.stop(tm+0.36);
+      const buf=getNoiseBuf(c);
+      const click=c.createBufferSource(); click.buffer=buf;
+      const cg=c.createGain();
+      cg.gain.setValueAtTime(0.6*v,tm);
+      click.connect(cg); cg.connect(c.destination);
+      click.start(tm);
+      tm+=0.32;
+    }
+  }
+  function soundSoft(v){
+    const c=unlockAudioCtx(); if(!c) return;
+    let tm=c.currentTime+0.02;
+    for(let i=0;i<2;i++){
+      const o=c.createOscillator(); const g=c.createGain();
+      o.type="sine"; o.connect(g); g.connect(c.destination);
+      o.frequency.setValueAtTime(880,tm);
+      g.gain.setValueAtTime(0.0001,tm);
+      g.gain.linearRampToValueAtTime(0.35*v,tm+0.02);
+      g.gain.exponentialRampToValueAtTime(0.0001,tm+1.1);
+      o.start(tm); o.stop(tm+1.15);
+      tm+=1.3;
+    }
+  }
+  function playCustom(v){
+    if(!settings.customData) return soundBell(v);
+    try{
+      const audio = new Audio(settings.customData);
+      audio.volume = v;
+      audio.play().catch(()=>{});
+    }catch(e){}
+  }
+  function playAlarmSound(){
+    const v = sfxVol();
+    if(v<=0.001) return;
+    if(settings.sound==="custom") playCustom(v);
+    else if(settings.sound==="sifflet") soundWhistle(v);
+    else if(settings.sound==="tambour") soundDrum(v);
+    else if(settings.sound==="douce") soundSoft(v);
+    else soundBell(v);
+  }
+  function previewSound(){ playAlarmSound(); }
+  function triggerAlarm(){
+    playAlarmSound();
+    if(settings.vibrate && navigator.vibrate) navigator.vibrate([700,300,700,300,700]);
+    if(settings.flash && alarmFlashEl){
+      alarmFlashEl.classList.add("flashing");
+      setTimeout(()=> alarmFlashEl.classList.remove("flashing"), 1900);
     }
   }
   function rHome(){
     backBtn.style.visibility="hidden"; homeBtn.disabled=true;
     app.innerHTML = `
-      <h2>${t('home_games')}</h2>
+      <h2 class="cat-title">${t('cat_score_t')}</h2>
+      <div class="kicker cat-kicker">${t('cat_score_s')}</div>
       <div class="grid">
         <div class="card drawn" data-go="#belote"><div class="ico">🃏</div><div class="tit">${t('g_belote_t')}</div><div class="sub">${t('g_belote_s')}</div></div>
         <div class="card drawn" data-go="#yams"><div class="ico">🎲</div><div class="tit">${t('g_yams_t')}</div><div class="sub">${t('g_yams_s')}</div></div>
@@ -647,22 +896,55 @@
         <div class="card drawn" data-go="#rami"><div class="ico">🂡</div><div class="tit">${t('g_rami_t')}</div><div class="sub">${t('g_rami_s')}</div></div>
         <div class="card drawn" data-go="#uno"><div class="ico">🔴</div><div class="tit">${t('g_uno_t')}</div><div class="sub">${t('g_uno_s')}</div></div>
         <div class="card drawn" data-go="#scrabble"><div class="ico">🅰️</div><div class="tit">${t('g_scrabble_t')}</div><div class="sub">${t('g_scrabble_s')}</div></div>
-        <div class="card drawn" data-go="#bac"><div class="ico">🔤</div><div class="tit">${t('g_bac_t')}</div><div class="sub">${t('g_bac_s')}</div></div>
-        <div class="card drawn" data-go="#421"><div class="ico">🎲</div><div class="tit">${t('g_421_t')}</div><div class="sub">${t('g_421_s')}</div></div>
-        <div class="card drawn" data-go="#molkky"><div class="ico">🪵</div><div class="tit">${t('g_molkky_t')}</div><div class="sub">${t('g_molkky_s')}</div></div>
         <div class="card drawn" data-go="#skyjo"><div class="ico">🔢</div><div class="tit">${t('g_skyjo_t')}</div><div class="sub">${t('g_skyjo_s')}</div></div>
-        <div class="card drawn" data-go="#petanque"><div class="ico">🎯</div><div class="tit">${t('g_petanque_t')}</div><div class="sub">${t('g_petanque_s')}</div></div>
+        <div class="card drawn" data-go="#molkky"><div class="ico">🪵</div><div class="tit">${t('g_molkky_t')}</div><div class="sub">${t('g_molkky_s')}</div></div>
+      </div>
+      <h2 class="cat-title" style="margin-top:24px">${t('cat_bac_t')}</h2>
+      <div class="kicker cat-kicker">${t('bac_kicker')}</div>
+      <div class="card feature drawn" data-go="#bac">
+        <div class="ico">🔤</div>
+        <div><div class="tit">${t('g_bac_t')}</div><div class="sub">${t('g_bac_s')}</div></div>
+      </div>
+      <h2 class="cat-title" style="margin-top:24px">${t('cat_free_t')}</h2>
+      <div class="kicker cat-kicker">${t('cat_free_s')}</div>
+      <div class="grid">
         <div class="card drawn" data-go="#victoires"><div class="ico">🏆</div><div class="tit">${t('g_victoires_t')}</div><div class="sub">${t('g_victoires_s')}</div></div>
         <div class="card drawn" data-go="#custom"><div class="ico">📋</div><div class="tit">${t('g_custom_t')}</div><div class="sub">${t('g_custom_s')}</div></div>
         <div class="card drawn" data-go="#free"><div class="ico">📝</div><div class="tit">${t('g_free_t')}</div><div class="sub">${t('g_free_s')}</div></div>
       </div>
-      <h2 style="margin-top:18px">${t('home_tools')}</h2>
+      <h2 class="cat-title" style="margin-top:24px">${t('cat_tools_t')}</h2>
+      <div class="kicker cat-kicker">${t('cat_tools_s')}</div>
       <div class="grid">
         <div class="card drawn" data-go="#dice"><div class="ico">🎲</div><div class="tit">${t('t_dice_t')}</div><div class="sub">${t('t_dice_s')}</div></div>
         <div class="card drawn" data-go="#timer"><div class="ico">⏳</div><div class="tit">${t('t_timer_t')}</div><div class="sub">${t('t_timer_s')}</div></div>
       </div>
     `;
     app.querySelectorAll("[data-go]").forEach(el=> el.addEventListener("click", ()=> nav(el.getAttribute("data-go"))) );
+  }
+  function computeSheetStats(d, opts){
+    const totals = d.ps.map((_,i)=> d.r.reduce((acc,row)=> acc + (Number((row.s||[])[i])||0), 0));
+    let leaderIdx = -1, ended = false;
+    if(opts.leader && totals.length){
+      const extreme = opts.leader==="low" ? Math.min(...totals) : Math.max(...totals);
+      leaderIdx = totals.indexOf(extreme);
+      if(opts.endAt) ended = opts.leader==="low" ? totals.some(tv=>tv<=opts.endAt) : totals.some(tv=>tv>=opts.endAt);
+    }
+    return {totals, leaderIdx, ended};
+  }
+  function updateSheetStats(key, d, opts){
+    const {totals, leaderIdx, ended} = computeSheetStats(d, opts);
+    totals.forEach((tv,i)=>{
+      const cell = $("#"+key+"-tot-"+i);
+      if(cell){ cell.textContent = tv; cell.style.color = (i===leaderIdx ? "var(--red)" : ""); }
+      const trophy = $("#"+key+"-trophy-"+i);
+      if(trophy) trophy.textContent = (ended && i===leaderIdx) ? " 🏆" : "";
+    });
+    const bannerEl = $("#"+key+"_endbanner");
+    if(bannerEl){
+      bannerEl.innerHTML = ended
+        ? '<div style="text-align:center;margin-top:8px;font-weight:700;color:var(--red)">🏆 '+esc(d.ps[leaderIdx]||"?")+' '+t('sheet_win_banner')+' '+totals[leaderIdx]+' pts!</div>'
+        : "";
+    }
   }
   function renderSheet(key, title, opts){
     opts = opts || {};
@@ -672,16 +954,10 @@
     if(!Array.isArray(d.ps) || d.ps.length<1) d.ps = opts.defaultPlayers || ["J1","J2"];
     if(!Array.isArray(d.r)) d.r = [];
     if(!d.meta) d.meta = {date:""};
-    const totals = d.ps.map((_,i)=> d.r.reduce((acc,row)=> acc + (Number((row.s||[])[i])||0), 0));
-    let leaderIdx = -1, ended = false;
-    if(opts.leader && totals.length){
-      const extreme = opts.leader==="low" ? Math.min(...totals) : Math.max(...totals);
-      leaderIdx = totals.indexOf(extreme);
-      if(opts.endAt) ended = opts.leader==="low" ? totals.some(t=>t<=opts.endAt) : totals.some(t=>t>=opts.endAt);
-    }
-    const head = d.ps.map((p,i)=>'<th><input class="'+key+'-n" data-i="'+i+'" value="'+esc(p)+'">'+(ended && i===leaderIdx?' 🏆':'')+'</th>').join("");
+    const {totals, leaderIdx, ended} = computeSheetStats(d, opts);
+    const head = d.ps.map((p,i)=>'<th><input class="'+key+'-n" data-i="'+i+'" value="'+esc(p)+'"><span id="'+key+'-trophy-'+i+'">'+(ended && i===leaderIdx?' 🏆':'')+'</span></th>').join("");
     const leftHead = showContract ? '<th class="drawn" style="width:140px">'+esc(contractLabel)+'</th>' : '<th class="drawn" style="width:140px">'+esc(opts.leftHeader || t('sheet_rounds_header'))+'</th>';
-    const body = d.r.map((row,ri)=>{
+    const bodyRows = d.r.map((row,ri)=>{
       const leftCell = showContract
         ? '<td class="drawn"><input class="'+key+'-c" data-r="'+ri+'" value="'+esc(row.k||"")+'" placeholder="'+esc(contractLabel)+'"></td>'
         : '<td class="drawn label">'+t('sheet_round_row')+' '+(ri+1)+'</td>';
@@ -691,30 +967,31 @@
       }).join("");
       return "<tr>"+leftCell+cells+"</tr>";
     }).join("");
-    const foot = '<tr style="font-weight:1000;background:#eee"><td class="drawn label">'+esc(opts.totalLabel||t('sheet_total_label'))+'</td>'
-      + totals.map((t,i)=>'<td class="drawn" style="'+(i===leaderIdx?'color:var(--red)':'')+'">'+t+'</td>').join("")+"</tr>";
-    const endBanner = ended ? '<div style="text-align:center;margin-top:8px;font-weight:900;color:var(--red)">🏆 '+esc(d.ps[leaderIdx]||"?")+' '+t('sheet_win_banner')+' '+totals[leaderIdx]+' pts!</div>' : '';
+    const foot = '<tr style="font-weight:700;background:var(--paper-deep)"><td class="drawn label">'+esc(opts.totalLabel||t('sheet_total_label'))+'</td>'
+      + totals.map((tv,i)=>'<td class="drawn" id="'+key+'-tot-'+i+'" style="'+(i===leaderIdx?'color:var(--red)':'')+'">'+tv+'</td>').join("")+"</tr>";
+    const endBanner = ended ? '<div style="text-align:center;margin-top:8px;font-weight:700;color:var(--red)">🏆 '+esc(d.ps[leaderIdx]||"?")+' '+t('sheet_win_banner')+' '+totals[leaderIdx]+' pts!</div>' : '';
     app.innerHTML = `
       <div class="panel drawn">
         <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;justify-content:space-between">
           <div style="display:flex;gap:8px;align-items:center">
-            <div style="font-weight:1000;font-size:18px">${esc(title)}</div>
+            <div style="font-weight:700;font-size:18px">${esc(title)}</div>
             ${opts.rulesKey ? qbtn(opts.rulesKey) : ""}
           </div>
           <div style="min-width:160px"><input id="${key}_date" placeholder="Date" value="${esc(d.meta.date||"")}"></div>
         </div>
         <div class="kicker">${esc(opts.subtitle || t('sheet_default_subtitle'))}</div>
-        ${endBanner}
+        <div id="${key}_endbanner">${endBanner}</div>
       </div>
       <div style="overflow-x:auto;margin-top:12px">
         <table class="paper-table drawn">
           <thead><tr>${leftHead}${head}</tr></thead>
-          <tbody>${body}${foot}</tbody>
+          <tbody>${bodyRows}${foot}</tbody>
         </table>
       </div>
       <div class="actions">
         <button class="btn" id="${key}_addR">+ ${esc(opts.addRoundLabel||t('sheet_add_round'))}</button>
         <button class="btn sec" id="${key}_addP">${t('sheet_add_player')}</button>
+        <button class="btn sec" id="${key}_remP" ${d.ps.length<=1?"disabled":""}>${t('sheet_remove_player')}</button>
       </div>
       <div class="actions">
         <button class="btn sec" id="${key}_undo">${t('sheet_undo')}</button>
@@ -727,16 +1004,24 @@
       d.r.forEach(r=>{ if(!Array.isArray(r.s)) r.s=[]; r.s.push(0); });
       save(key,d); render();
     });
+    $("#"+key+"_remP").addEventListener("click", (e)=>{
+      if(d.ps.length<=1) return;
+      armConfirm(e.currentTarget, ()=>{
+        d.ps.pop();
+        d.r.forEach(r=>{ if(Array.isArray(r.s)) r.s.pop(); });
+        save(key,d); render();
+      });
+    });
     $("#"+key+"_addR").addEventListener("click", ()=>{
       d.r.push({k:"", s:new Array(d.ps.length).fill(0)});
       save(key,d); render();
     });
     $("#"+key+"_undo").addEventListener("click", ()=>{ d.r.pop(); save(key,d); render(); });
-    $("#"+key+"_reset").addEventListener("click", ()=>{
-      if(confirm(t('confirm_new_sheet'))){
+    $("#"+key+"_reset").addEventListener("click", (e)=>{
+      armConfirm(e.currentTarget, ()=>{
         save(key, {ps: opts.defaultPlayers || ["J1","J2"], r:[], meta:{date:""}});
         render();
-      }
+      });
     });
     app.querySelectorAll("."+key+"-n").forEach(inp=> inp.addEventListener("change",(e)=>{ d.ps[Number(e.target.dataset.i)] = e.target.value; save(key,d); }) );
     if(showContract){
@@ -746,10 +1031,7 @@
       const r=Number(e.target.dataset.r), c=Number(e.target.dataset.c);
       d.r[r].s[c] = e.target.value;
       save(key,d);
-      const sel = "."+key+"-v[data-r='"+r+"'][data-c='"+c+"']";
-      render();
-      const el = document.querySelector(sel);
-      if(el){ el.focus(); }
+      updateSheetStats(key, d, opts);
     }) );
   }
   const Y_CATS = [
@@ -770,16 +1052,16 @@
       ["br","ca","fu","ps","gs","ya","ch"].forEach(k=> l += Number(s[k]||0));
       return {u:u, bo:bo, tot:u+bo+l};
     };
-    let html = '<div class="panel drawn"><div style="display:flex;gap:8px;align-items:center"><div style="font-weight:1000;font-size:18px">'+t('g_yams_t')+'</div>'+qbtn("yams")+'</div><div class="kicker">'+t('yams_kicker')+'</div></div>';
+    let html = '<div class="panel drawn"><div style="display:flex;gap:8px;align-items:center"><div style="font-weight:700;font-size:18px">'+t('g_yams_t')+'</div>'+qbtn("yams")+'</div><div class="kicker">'+t('yams_kicker')+'</div></div>';
     html += '<div style="overflow-x:auto;margin-top:12px"><table class="paper-table drawn"><thead><tr><th class="drawn">'+t('g_yams_t')+'</th>';
     d.ps.forEach((p,i)=>{ html += '<th><input class="y-n" data-i="'+i+'" value="'+esc(p)+'"></th>'; });
     html += '</tr></thead><tbody>';
     Y_CATS.forEach(cat=>{
-      html += '<tr style="'+(cat.bg?'background:#eee;font-weight:1000':'')+'">';
+      html += '<tr style="'+(cat.bg?'background:var(--paper-deep);font-weight:700':'')+'">';
       html += '<td class="drawn label" style="'+(cat.big?'font-size:16px':'')+'">'+esc(cat.l)+'</td>';
       d.ps.forEach((_,i)=>{
         if(cat.auto){
-          html += '<td class="drawn">'+calc(i)[cat.auto]+'</td>';
+          html += '<td class="drawn" id="y-'+cat.auto+'-'+i+'">'+calc(i)[cat.auto]+'</td>';
         }else{
           const val = (d.s[i]||{})[cat.k] || "";
           html += '<td class="drawn"><input type="number" class="y-v" data-p="'+i+'" data-k="'+cat.k+'" value="'+esc(val)+'"></td>';
@@ -788,7 +1070,7 @@
       html += '</tr>';
     });
     html += '</tbody></table></div>';
-    html += '<div class="actions"><button class="btn" id="yAdd">'+t('sheet_add_player')+'</button><button class="btn sec red" id="yReset">'+t('sheet_reset')+'</button></div>';
+    html += '<div class="actions"><button class="btn" id="yAdd">'+t('sheet_add_player')+'</button><button class="btn sec" id="yRemP" '+(d.ps.length<=1?"disabled":"")+'>'+t('sheet_remove_player')+'</button><button class="btn sec red" id="yReset">'+t('sheet_reset')+'</button></div>';
     app.innerHTML = html;
     app.querySelectorAll(".y-n").forEach(inp=> inp.addEventListener("change",(e)=>{ d.ps[Number(e.target.dataset.i)] = e.target.value; save("yams",d); }) );
     app.querySelectorAll(".y-v").forEach(inp=> inp.addEventListener("input",(e)=>{
@@ -796,13 +1078,23 @@
       if(!d.s[p]) d.s[p]={};
       d.s[p][k]=e.target.value;
       save("yams",d);
-      const sel = ".y-v[data-p='"+p+"'][data-k='"+k+"']";
-      render();
-      const el = document.querySelector(sel);
-      if(el){ el.focus(); }
+      const c = calc(p);
+      const uEl=$("#y-u-"+p), boEl=$("#y-bo-"+p), totEl=$("#y-tot-"+p);
+      if(uEl) uEl.textContent = c.u;
+      if(boEl) boEl.textContent = c.bo;
+      if(totEl) totEl.textContent = c.tot;
     }) );
     $("#yAdd").addEventListener("click", ()=>{ d.ps.push("J"+(d.ps.length+1)); save("yams",d); render(); });
-    $("#yReset").addEventListener("click", ()=>{ if(confirm(t('confirm_reset'))){ save("yams",{ps:["J1","J2"], s:{}}); render(); }});
+    $("#yRemP").addEventListener("click", (e)=>{
+      if(d.ps.length<=1) return;
+      armConfirm(e.currentTarget, ()=>{
+        const idx = d.ps.length-1;
+        d.ps.pop();
+        delete d.s[idx];
+        save("yams",d); render();
+      });
+    });
+    $("#yReset").addEventListener("click", (e)=> armConfirm(e.currentTarget, ()=>{ save("yams",{ps:["J1","J2"], s:{}}); render(); }));
   }
   function rBelote(){
     const d = load("belote", {r:[]});
@@ -812,7 +1104,7 @@
     const list = d.r.slice().reverse().map(r=>"<div>"+(Number(r.u)||0)+" - "+(Number(r.t)||0)+"</div>").join("");
     app.innerHTML = `
       <div class="panel drawn" style="display:flex;gap:8px;align-items:center">
-        <div style="font-weight:1000;font-size:18px">${t('g_belote_t')}</div>
+        <div style="font-weight:700;font-size:18px">${t('g_belote_t')}</div>
         ${qbtn("belote")}
       </div>
       <div class="belote-split drawn" style="margin-top:12px">
@@ -824,7 +1116,7 @@
         <div class="belote-col">
           <div class="b-head">${t('belote_them')}</div>
           <div class="b-tot">${totT}</div>
-          <div class="b-list" style="background:#f9f9f9"></div>
+          <div class="b-list" style="background:rgba(236,224,194,.4)"></div>
         </div>
       </div>
       <div class="panel drawn" style="margin-top:14px">
@@ -843,146 +1135,40 @@
       </div>
     `;
     $("#b162").addEventListener("click", ()=>{
-      const u = $("#bU").value, t = $("#bT").value;
+      const u = $("#bU").value, tv = $("#bT").value;
       if(u!=="") $("#bT").value = 162 - Number(u||0);
-      else if(t!=="") $("#bU").value = 162 - Number(t||0);
+      else if(tv!=="") $("#bU").value = 162 - Number(tv||0);
     });
     $("#bAdd").addEventListener("click", ()=>{
-      const u = Number($("#bU").value||0), t = Number($("#bT").value||0);
-      if(!u && !t) return;
-      d.r.push({u:u,t:t}); save("belote",d); render();
+      const u = Number($("#bU").value||0), tv = Number($("#bT").value||0);
+      if(!u && !tv) return;
+      d.r.push({u:u,t:tv}); save("belote",d); render();
     });
     $("#bUndo").addEventListener("click", ()=>{ d.r.pop(); save("belote",d); render(); });
-    $("#bReset").addEventListener("click", ()=>{ if(confirm(t('confirm_reset'))){ save("belote",{r:[]}); render(); }});
+    $("#bReset").addEventListener("click", (e)=> armConfirm(e.currentTarget, ()=>{ save("belote",{r:[]}); render(); }));
   }
   function rTarot(){ renderSheet("tarot",t('g_tarot_t'),{defaultPlayers:["J1","J2","J3","J4"], contract:true, contractLabel:t('tarot_contract_label'), addRoundLabel:t('tarot_deal_label'), leftHeader:t('tarot_deals_header'), subtitle:t('tarot_subtitle'), rulesKey:"tarot"}); }
   function rRami(){ renderSheet("rami",t('g_rami_t'),{defaultPlayers:["J1","J2"], addRoundLabel:t('sheet_add_round'), subtitle:t('rami_subtitle'), leader:"low", rulesKey:"rami"}); }
   function rUno(){ renderSheet("uno",t('g_uno_t'),{defaultPlayers:["J1","J2"], addRoundLabel:t('sheet_add_round'), subtitle:t('uno_subtitle'), leader:"high", endAt:500, rulesKey:"uno"}); }
   function rScrabble(){ renderSheet("scrabble",t('g_scrabble_t'),{defaultPlayers:["J1","J2"], leftHeader:t('scrabble_turns_header'), addRoundLabel:t('scrabble_turn_label'), subtitle:t('scrabble_subtitle'), rulesKey:"scrabble"}); }
   function rFree(){ renderSheet("free",t('g_free_t'),{defaultPlayers:["J1","J2"], addRoundLabel:t('sheet_add_round')}); }
-  function r421(){
-    const d = load("g421",{ps:["J1","J2"], r:[], dice:[4,2,1], throws:0, cur:0});
-    if(!Array.isArray(d.ps) || d.ps.length<1) d.ps=["J1","J2"];
-    if(!Array.isArray(d.r)) d.r=[];
-    if(!Array.isArray(d.dice) || d.dice.length!==3) d.dice=[4,2,1];
-    if(typeof d.throws!=="number") d.throws=0;
-    if(typeof d.cur!=="number" || d.cur>=d.ps.length || d.cur<0) d.cur=0;
-    const rand6 = ()=> 1+Math.floor(Math.random()*6);
+  function updateSkyjoStats(d){
     const totals = d.ps.map((_,i)=> d.r.reduce((acc,row)=> acc + (Number((row.s||[])[i])||0), 0));
-    const head = d.ps.map((p,i)=>'<th><input class="g421-n" data-i="'+i+'" value="'+esc(p)+'"></th>').join("");
-    const body = d.r.map((row,ri)=>{
-      const cells = d.ps.map((_,ci)=>{
-        const v = (row.s||[])[ci] ?? "";
-        return '<td class="drawn"><input type="number" class="g421-v" data-r="'+ri+'" data-c="'+ci+'" value="'+esc(v)+'"></td>';
-      }).join("");
-      return '<tr><td class="drawn label">'+t('sheet_round_row')+' '+(ri+1)+'</td>'+cells+'</tr>';
-    }).join("");
-    const mid = d.throws>0 && d.throws<3;
-    const done = d.throws>=3;
-    const curName = esc(d.ps[d.cur] || "?");
-    const rollZone = d.throws===0
-      ? '<div class="actions"><button class="btn" id="gRoll">'+t('g421_roll_btn')+'</button></div>'
-      : '<div class="d3-check">'
-        + [0,1,2].map(i=>'<div style="width:74px;text-align:center"><input type="checkbox" class="g421-chk" data-die="'+i+'" style="width:22px;height:22px"></div>').join("")
-        + '</div>'
-        + '<div style="font-size:12px;color:var(--muted);margin-top:4px">'+t('g421_check_hint')+'</div>'
-        + '<div class="actions">'
-        +   (mid ? '<button class="btn" id="gReroll" disabled>'+t('g421_reroll_btn')+'</button>' : '')
-        +   '<button class="btn sec" id="gNext">'+t('g421_next_btn')+'</button>'
-        + '</div>'
-        + (done ? '<div style="text-align:center;font-weight:900;color:var(--red);margin-top:6px">'+t('g421_exhausted')+'</div>' : '');
-    app.innerHTML = `
-      <div class="panel drawn">
-        <div style="display:flex;gap:8px;align-items:center">
-          <div style="font-weight:1000;font-size:18px">${t('g_421_t')}</div>
-          ${qbtn("421")}
-        </div>
-        <div class="kicker">${LANG==="fr" ? ("Tour de <b>"+curName+"</b> — lancer "+d.throws+"/3.") : ("<b>"+curName+"</b>'s turn — roll "+d.throws+"/3.")}</div>
-        <div class="d3">
-          <div class="die drawn" id="g421Die0">${d.dice[0]}</div>
-          <div class="die drawn" id="g421Die1">${d.dice[1]}</div>
-          <div class="die drawn" id="g421Die2">${d.dice[2]}</div>
-        </div>
-        ${rollZone}
-        <div class="actions">
-          <button class="btn sec" id="gAddR">+ ${t('sheet_add_round')}</button>
-          <button class="btn sec" id="gAddP">${t('sheet_add_player')}</button>
-        </div>
-        <div class="actions">
-          <button class="btn sec" id="gUndo">${t('sheet_undo')}</button>
-          <button class="btn sec red" id="gReset">${t('sheet_reset')}</button>
-        </div>
-      </div>
-      <div style="overflow-x:auto;margin-top:12px">
-        <table class="paper-table drawn">
-          <thead><tr><th class="drawn" style="width:140px">${t('sheet_rounds_header')}</th>${head}</tr></thead>
-          <tbody>${body}<tr style="font-weight:1000;background:#eee"><td class="drawn label">${t('sheet_total_label')}</td>${totals.map(tv=>'<td class="drawn">'+tv+'</td>').join("")}</tr></tbody>
-        </table>
-      </div>
-    `;
-    $("#gRoll")?.addEventListener("click", ()=>{
-      diceClack();
-      const els=[0,1,2].map(i=> $("#g421Die"+i));
-      let i=0, last=null;
-      function frame(now){
-        if(last===null) last=now;
-        if(now-last>=50){
-          els.forEach(el=> el.textContent = rand6());
-          last=now; i++;
-        }
-        if(i<11) requestAnimationFrame(frame);
-        else{
-          d.dice = els.map(el=> Number(el.textContent));
-          d.throws=1;
-          save("g421",d); render();
-        }
-      }
-      requestAnimationFrame(frame);
+    const minTot = totals.length ? Math.min(...totals) : 0;
+    const ended = totals.some(tv=> tv>=100);
+    const winnerIdx = ended ? totals.indexOf(minTot) : -1;
+    totals.forEach((tv,i)=>{
+      const cell = $("#sk-tot-"+i);
+      if(cell){ cell.textContent = tv; cell.style.color = (tv===minTot ? "var(--red)" : ""); }
+      const trophy = $("#sk-trophy-"+i);
+      if(trophy) trophy.textContent = (i===winnerIdx) ? " 🏆" : "";
     });
-    $("#gReroll")?.addEventListener("click", ()=>{
-      const checks = Array.from(app.querySelectorAll(".g421-chk:checked"));
-      if(checks.length===0) return;
-      diceClack();
-      const idxs = checks.map(chk=> Number(chk.getAttribute("data-die")));
-      const els = idxs.map(idx=> $("#g421Die"+idx));
-      let i=0, last=null;
-      function frame(now){
-        if(last===null) last=now;
-        if(now-last>=50){
-          els.forEach(el=> el.textContent = rand6());
-          last=now; i++;
-        }
-        if(i<11) requestAnimationFrame(frame);
-        else{
-          idxs.forEach((idx,k)=> d.dice[idx] = Number(els[k].textContent));
-          d.throws++;
-          save("g421",d); render();
-        }
-      }
-      requestAnimationFrame(frame);
-    });
-    app.querySelectorAll(".g421-chk").forEach(chk=> chk.addEventListener("change", ()=>{
-      const any = app.querySelector(".g421-chk:checked");
-      const btn=$("#gReroll"); if(btn) btn.disabled=!any;
-    }));
-    $("#gNext")?.addEventListener("click", ()=>{
-      d.cur = (d.cur+1) % d.ps.length;
-      d.throws = 0;
-      save("g421",d); render();
-    });
-    $("#gAddR").addEventListener("click", ()=>{ d.r.push({s:new Array(d.ps.length).fill(0)}); save("g421",d); render(); });
-    $("#gAddP").addEventListener("click", ()=>{ d.ps.push("J"+(d.ps.length+1)); d.r.forEach(r=>{ if(!Array.isArray(r.s)) r.s=[]; r.s.push(0); }); save("g421",d); render(); });
-    $("#gUndo").addEventListener("click", ()=>{ d.r.pop(); save("g421",d); render(); });
-    $("#gReset").addEventListener("click", ()=>{ if(confirm(t('confirm_reset'))){ save("g421",{ps:["J1","J2"], r:[], dice:[4,2,1], throws:0, cur:0}); render(); }});
-    app.querySelectorAll(".g421-n").forEach(inp=> inp.addEventListener("change",(e)=>{ d.ps[Number(e.target.dataset.i)]=e.target.value; save("g421",d); }) );
-    app.querySelectorAll(".g421-v").forEach(inp=> inp.addEventListener("input",(e)=>{
-      const r=Number(e.target.dataset.r), c=Number(e.target.dataset.c);
-      d.r[r].s[c]=e.target.value; save("g421",d);
-      const sel = ".g421-v[data-r='"+r+"'][data-c='"+c+"']";
-      render();
-      const el = document.querySelector(sel);
-      if(el){ el.focus(); }
-    }) );
+    const msg = $("#sk_endmsg");
+    if(msg){
+      msg.innerHTML = ended
+        ? '<div style="text-align:center;margin-top:8px;font-weight:700;color:var(--red)">🏁 '+t('skyjo_gameover')+' '+esc(d.ps[winnerIdx]||"?")+' '+t('skyjo_wins_with')+' '+minTot+' pts!</div>'
+        : "";
+    }
   }
   function rSkyjo(){
     const d = load("skyjo",{ps:["J1","J2"], r:[]});
@@ -990,29 +1176,30 @@
     if(!Array.isArray(d.r)) d.r=[];
     const totals = d.ps.map((_,i)=> d.r.reduce((acc,row)=> acc + (Number((row.s||[])[i])||0), 0));
     const minTot = totals.length ? Math.min(...totals) : 0;
-    const ended = totals.some(t=> t>=100);
+    const ended = totals.some(tv=> tv>=100);
     const winnerIdx = ended ? totals.indexOf(minTot) : -1;
-    const head = d.ps.map((p,i)=>'<th><input class="sk-n" data-i="'+i+'" value="'+esc(p)+'">'+(i===winnerIdx?' 🏆':'')+'</th>').join("");
-    const body = d.r.map((row,ri)=>{
+    const head = d.ps.map((p,i)=>'<th><input class="sk-n" data-i="'+i+'" value="'+esc(p)+'"><span id="sk-trophy-'+i+'">'+(i===winnerIdx?' 🏆':'')+'</span></th>').join("");
+    const bodyRows = d.r.map((row,ri)=>{
       const cells = d.ps.map((_,ci)=>{
         const v = (row.s||[])[ci] ?? "";
         return '<td class="drawn"><input type="number" class="sk-v" data-r="'+ri+'" data-c="'+ci+'" value="'+esc(v)+'"></td>';
       }).join("");
       return '<tr><td class="drawn label">'+t('sheet_round_row')+' '+(ri+1)+'</td>'+cells+'</tr>';
     }).join("");
-    const foot = '<tr style="font-weight:1000;background:#eee"><td class="drawn label">'+t('sheet_total_label')+'</td>'
-      + totals.map(tv=>'<td class="drawn" style="'+(tv===minTot?'color:var(--red)':'')+'">'+tv+'</td>').join("") + '</tr>';
+    const foot = '<tr style="font-weight:700;background:var(--paper-deep)"><td class="drawn label">'+t('sheet_total_label')+'</td>'
+      + totals.map((tv,i)=>'<td class="drawn" id="sk-tot-'+i+'" style="'+(tv===minTot?'color:var(--red)':'')+'">'+tv+'</td>').join("") + '</tr>';
     app.innerHTML = `
       <div class="panel drawn">
         <div style="display:flex;gap:8px;align-items:center">
-          <div style="font-weight:1000;font-size:18px">${t('g_skyjo_t')}</div>
+          <div style="font-weight:700;font-size:18px">${t('g_skyjo_t')}</div>
           ${qbtn("skyjo")}
         </div>
         <div class="kicker">${t('skyjo_kicker')}</div>
-        ${ended ? '<div style="text-align:center;margin-top:8px;font-weight:900;color:var(--red)">🏁 '+t('skyjo_gameover')+' '+esc(d.ps[winnerIdx]||"?")+' '+t('skyjo_wins_with')+' '+minTot+' pts!</div>' : ''}
+        <div id="sk_endmsg">${ended ? '<div style="text-align:center;margin-top:8px;font-weight:700;color:var(--red)">🏁 '+t('skyjo_gameover')+' '+esc(d.ps[winnerIdx]||"?")+' '+t('skyjo_wins_with')+' '+minTot+' pts!</div>' : ''}</div>
         <div class="actions">
           <button class="btn" id="skAddR">+ ${t('sheet_add_round')}</button>
           <button class="btn sec" id="skAddP">${t('sheet_add_player')}</button>
+          <button class="btn sec" id="skRemP" ${d.ps.length<=1?"disabled":""}>${t('sheet_remove_player')}</button>
         </div>
         <div class="actions">
           <button class="btn sec" id="skUndo">${t('sheet_undo')}</button>
@@ -1022,119 +1209,78 @@
       <div style="overflow-x:auto;margin-top:12px">
         <table class="paper-table drawn">
           <thead><tr><th class="drawn" style="width:140px">${t('sheet_rounds_header')}</th>${head}</tr></thead>
-          <tbody>${body}${foot}</tbody>
+          <tbody>${bodyRows}${foot}</tbody>
         </table>
       </div>
     `;
     $("#skAddR").addEventListener("click", ()=>{ d.r.push({s:new Array(d.ps.length).fill(0)}); save("skyjo",d); render(); });
     $("#skAddP").addEventListener("click", ()=>{ d.ps.push("J"+(d.ps.length+1)); d.r.forEach(r=>{ if(!Array.isArray(r.s)) r.s=[]; r.s.push(0); }); save("skyjo",d); render(); });
+    $("#skRemP").addEventListener("click", (e)=>{
+      if(d.ps.length<=1) return;
+      armConfirm(e.currentTarget, ()=>{
+        d.ps.pop();
+        d.r.forEach(r=>{ if(Array.isArray(r.s)) r.s.pop(); });
+        save("skyjo",d); render();
+      });
+    });
     $("#skUndo").addEventListener("click", ()=>{ d.r.pop(); save("skyjo",d); render(); });
-    $("#skReset").addEventListener("click", ()=>{ if(confirm(t('confirm_new_game'))){ save("skyjo",{ps:["J1","J2"], r:[]}); render(); }});
+    $("#skReset").addEventListener("click", (e)=> armConfirm(e.currentTarget, ()=>{ save("skyjo",{ps:["J1","J2"], r:[]}); render(); }));
     app.querySelectorAll(".sk-n").forEach(inp=> inp.addEventListener("change",(e)=>{ d.ps[Number(e.target.dataset.i)]=e.target.value; save("skyjo",d); render(); }) );
     app.querySelectorAll(".sk-v").forEach(inp=> inp.addEventListener("input",(e)=>{
       const r=Number(e.target.dataset.r), c=Number(e.target.dataset.c);
       d.r[r].s[c]=e.target.value; save("skyjo",d);
-      const sel = ".sk-v[data-r='"+r+"'][data-c='"+c+"']";
-      render();
-      const el = document.querySelector(sel);
-      if(el){ el.focus(); }
+      updateSkyjoStats(d);
     }) );
-  }
-  function rPetanque(){
-    const d = load("petanque", {r:[]});
-    if(!Array.isArray(d.r)) d.r = [];
-    const totU = d.r.reduce((a,b)=>a+(Number(b.u)||0),0);
-    const totT = d.r.reduce((a,b)=>a+(Number(b.t)||0),0);
-    const listU = d.r.slice().reverse().map(r=>"<div>+"+(Number(r.u)||0)+"</div>").join("");
-    const listT = d.r.slice().reverse().map(r=>"<div>+"+(Number(r.t)||0)+"</div>").join("");
-    const ended = totU>=13 || totT>=13;
-    const winner = totU>=13 ? t('belote_us') : (totT>=13 ? t('belote_them') : null);
-    app.innerHTML = `
-      <div class="panel drawn">
-        <div style="display:flex;gap:8px;align-items:center">
-          <div style="font-weight:1000;font-size:18px">${t('g_petanque_t')}</div>
-          ${qbtn("petanque")}
-        </div>
-        <div class="kicker">${t('petanque_kicker')}</div>
-        ${ended ? '<div style="text-align:center;margin-top:8px;font-weight:900;color:var(--red)">🏆 '+winner+' '+t('petanque_won')+'</div>' : ''}
-      </div>
-      <div class="belote-split drawn" style="margin-top:12px">
-        <div class="belote-col">
-          <div class="b-head">${t('belote_us')}</div>
-          <div class="b-tot">${totU}</div>
-          <div class="b-list">${listU}</div>
-        </div>
-        <div class="belote-col">
-          <div class="b-head">${t('belote_them')}</div>
-          <div class="b-tot">${totT}</div>
-          <div class="b-list" style="background:#f9f9f9">${listT}</div>
-        </div>
-      </div>
-      <div class="panel drawn" style="margin-top:14px">
-        <div class="kicker">${t('petanque_end_kicker')}</div>
-        <div class="grid" style="grid-template-columns:1fr 1fr">
-          <div><input type="number" id="pU" placeholder="${t('belote_us_ph')}" min="0" max="6"></div>
-          <div><input type="number" id="pT" placeholder="${t('belote_them_ph')}" min="0" max="6"></div>
-        </div>
-        <div class="actions">
-          <button class="btn" id="pAdd">${t('petanque_add_end')}</button>
-        </div>
-        <div class="actions">
-          <button class="btn sec" id="pUndo">${t('sheet_undo')}</button>
-          <button class="btn sec red" id="pReset">${t('sheet_reset')}</button>
-        </div>
-      </div>
-    `;
-    $("#pAdd").addEventListener("click", ()=>{
-      const u = Number($("#pU").value||0), t = Number($("#pT").value||0);
-      if(!u && !t) return;
-      d.r.push({u:u,t:t}); save("petanque",d); render();
-    });
-    $("#pUndo").addEventListener("click", ()=>{ d.r.pop(); save("petanque",d); render(); });
-    $("#pReset").addEventListener("click", ()=>{ if(confirm(t('confirm_reset'))){ save("petanque",{r:[]}); render(); }});
   }
   function rVictoires(){
     const d = load("victoires", {ps:["J1","J2"], w:[0,0]});
     if(!Array.isArray(d.ps) || d.ps.length<1) d.ps=["J1","J2"];
     if(!Array.isArray(d.w)) d.w=[];
     while(d.w.length < d.ps.length) d.w.push(0);
-    let html = '<div class="panel drawn"><div style="font-weight:1000;font-size:18px">'+t('victoires_title')+'</div><div class="kicker">'+t('victoires_kicker')+'</div></div>';
+    let html = '<div class="panel drawn"><div style="font-weight:700;font-size:18px">'+t('victoires_title')+'</div><div class="kicker">'+t('victoires_kicker')+'</div></div>';
     html += '<div class="grid" style="margin-top:12px;grid-template-columns:repeat(auto-fit,minmax(140px,1fr))">';
     d.ps.forEach((p,i)=>{
       html += '<div class="panel drawn" style="text-align:center">'
-        + '<input class="v-n" data-i="'+i+'" value="'+esc(p)+'" style="font-weight:900;text-align:center;margin-bottom:6px">'
-        + '<div style="font-size:44px;font-weight:1000">'+(d.w[i]||0)+'</div>'
+        + '<input class="v-n" data-i="'+i+'" value="'+esc(p)+'" style="font-weight:700;text-align:center;margin-bottom:6px">'
+        + '<div style="font-size:44px;font-weight:700">'+(d.w[i]||0)+'</div>'
         + '<div class="actions" style="margin-top:8px">'
         + '<button class="btn sec" data-minus="'+i+'" style="min-width:0;flex:1">−1</button>'
         + '<button class="btn" data-plus="'+i+'" style="min-width:0;flex:1">+1</button>'
         + '</div></div>';
     });
     html += '</div>';
-    html += '<div class="actions" style="margin-top:14px"><button class="btn sec" id="vAddP">'+t('sheet_add_player')+'</button><button class="btn sec red" id="vReset">'+t('sheet_reset')+'</button></div>';
+    html += '<div class="actions" style="margin-top:14px"><button class="btn sec" id="vAddP">'+t('sheet_add_player')+'</button><button class="btn sec" id="vRemP" '+(d.ps.length<=1?"disabled":"")+'>'+t('sheet_remove_player')+'</button><button class="btn sec red" id="vReset">'+t('sheet_reset')+'</button></div>';
     app.innerHTML = html;
     app.querySelectorAll(".v-n").forEach(inp=> inp.addEventListener("change",(e)=>{ d.ps[Number(e.target.dataset.i)]=e.target.value; save("victoires",d); }) );
     app.querySelectorAll("[data-plus]").forEach(b=> b.addEventListener("click",()=>{ const i=Number(b.getAttribute("data-plus")); d.w[i]=(d.w[i]||0)+1; save("victoires",d); render(); ding(); }) );
     app.querySelectorAll("[data-minus]").forEach(b=> b.addEventListener("click",()=>{ const i=Number(b.getAttribute("data-minus")); d.w[i]=Math.max(0,(d.w[i]||0)-1); save("victoires",d); render(); }) );
     $("#vAddP").addEventListener("click", ()=>{ d.ps.push("J"+(d.ps.length+1)); d.w.push(0); save("victoires",d); render(); });
-    $("#vReset").addEventListener("click", ()=>{ if(confirm(t('confirm_reset'))){ save("victoires",{ps:["J1","J2"], w:[0,0]}); render(); }});
+    $("#vRemP").addEventListener("click", (e)=>{
+      if(d.ps.length<=1) return;
+      armConfirm(e.currentTarget, ()=>{
+        d.ps.pop(); d.w.pop();
+        save("victoires",d); render();
+      });
+    });
+    $("#vReset").addEventListener("click", (e)=> armConfirm(e.currentTarget, ()=>{ save("victoires",{ps:["J1","J2"], w:[0,0]}); render(); }));
   }
   function rMolkky(){
     const d = load("molkky",{ps:[{n:"J1",s:0,m:0},{n:"J2",s:0,m:0}], cur:0});
     if(!Array.isArray(d.ps) || d.ps.length<1) d.ps=[{n:"J1",s:0,m:0},{n:"J2",s:0,m:0}];
     if(typeof d.cur!=="number") d.cur=0;
     const cur = d.ps[d.cur] || d.ps[0];
-    let html = '<div class="panel drawn" style="display:flex;gap:8px;align-items:center"><div style="font-weight:1000;font-size:18px">'+t('g_molkky_t')+'</div>'+qbtn("molkky")+'</div>';
-    html += '<div class="actions"><button class="btn sec" id="mAddP">'+t('sheet_add_player')+'</button><button class="btn sec red" id="mReset">'+t('sheet_reset')+'</button></div><br>';
+    let html = '<div class="panel drawn" style="display:flex;gap:8px;align-items:center"><div style="font-weight:700;font-size:18px">'+t('g_molkky_t')+'</div>'+qbtn("molkky")+'</div>';
+    html += '<div class="actions"><button class="btn sec" id="mAddP">'+t('sheet_add_player')+'</button><button class="btn sec" id="mRemP" '+(d.ps.length<=1?"disabled":"")+'>'+t('sheet_remove_player')+'</button><button class="btn sec red" id="mReset">'+t('sheet_reset')+'</button></div><br>';
     d.ps.forEach((pl,i)=>{
       let state="";
       if(pl.m>=3) state=t('molkky_eliminated');
       else if(pl.s===50) state=t('molkky_won');
       else if(pl.s>50) state="⬇ 25";
       html += '<div class="m-player drawn '+(i===d.cur?'active':'')+'" data-p="'+i+'">'
-        + '<div style="display:flex;justify-content:space-between"><span style="font-weight:1000">'+esc(pl.n)+'</span><span style="font-weight:1000;font-size:18px">'+(pl.s||0)+' / 50</span></div>'
+        + '<div style="display:flex;justify-content:space-between"><span style="font-weight:700">'+esc(pl.n)+'</span><span style="font-weight:700;font-size:18px">'+(pl.s||0)+' / 50</span></div>'
         + '<div style="font-size:11px;color:var(--muted)">'+t('molkky_misses_label')+' '+(pl.m||0)+' '+state+'</div></div>';
     });
-    html += '<div class="panel drawn"><div style="text-align:center;font-weight:1000;margin-bottom:10px">'+turnOf(esc(cur.n))+'</div>'
+    html += '<div class="panel drawn"><div style="text-align:center;font-weight:700;margin-bottom:10px">'+turnOf(esc(cur.n))+'</div>'
       + '<div class="molkky-grid">'+[1,2,3,4,5,6,7,8,9,10,11,12].map(n=>'<div class="pin-btn" data-hit="'+n+'">'+n+'</div>').join("")+'</div>'
       + '<div class="actions"><button class="btn sec red" id="mMiss">'+t('molkky_miss_btn')+'</button></div></div>';
     app.innerHTML = html;
@@ -1157,14 +1303,22 @@
       save("molkky",d); render();
     }
     $("#mAddP").addEventListener("click", ()=>{ d.ps.push({n:"J"+(d.ps.length+1),s:0,m:0}); save("molkky",d); render(); });
-    $("#mReset").addEventListener("click", ()=>{ if(confirm(t('confirm_new_game'))){ save("molkky",{ps:[{n:"J1",s:0,m:0},{n:"J2",s:0,m:0}],cur:0}); render(); }});
+    $("#mRemP").addEventListener("click", (e)=>{
+      if(d.ps.length<=1) return;
+      armConfirm(e.currentTarget, ()=>{
+        d.ps.pop();
+        if(d.cur>=d.ps.length) d.cur=0;
+        save("molkky",d); render();
+      });
+    });
+    $("#mReset").addEventListener("click", (e)=> armConfirm(e.currentTarget, ()=>{ save("molkky",{ps:[{n:"J1",s:0,m:0},{n:"J2",s:0,m:0}],cur:0}); render(); }));
     $("#mMiss").addEventListener("click", ()=> hit(0));
     app.querySelectorAll("[data-hit]").forEach(b=> b.addEventListener("click", ()=> hit(Number(b.getAttribute("data-hit")))) );
   }
   let diceCount = 1;
   function rDice(){
     app.innerHTML = '<div class="panel drawn" style="text-align:center">'
-      + '<div style="font-weight:1000;font-size:18px">'+t('t_dice_t')+'</div>'
+      + '<div style="font-weight:700;font-size:18px">'+t('t_dice_t')+'</div>'
       + '<div class="kicker">'+t('dice_kicker')+'</div>'
       + '<div class="actions" style="justify-content:center">'
       +   [1,2,3,4,5,6].map(n=>'<button class="btn'+(n===diceCount?'':' sec')+'" data-count="'+n+'">'+n+'</button>').join("")
@@ -1172,7 +1326,7 @@
       + '<div id="dGrid" style="display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin:20px 0">'
       +   Array.from({length:diceCount}).map((_,i)=>'<div class="die drawn" id="dDie'+i+'">?</div>').join("")
       + '</div>'
-      + '<div id="dTotal" style="font-weight:1000;font-size:16px;color:var(--muted);min-height:20px"></div>'
+      + '<div id="dTotal" style="font-weight:700;font-size:16px;color:var(--muted);min-height:20px"></div>'
       + '<div class="actions"><button class="btn" id="dRoll">'+t('dice_roll_btn')+'</button></div>'
       + '</div>';
     app.querySelectorAll("[data-count]").forEach(b=> b.addEventListener("click", ()=>{ diceCount=Number(b.getAttribute("data-count")); render(); }) );
@@ -1232,7 +1386,7 @@
     const ctx = cv.getContext("2d");
     ctx.clearRect(0,0,cv.width,cv.height);
     const px = (col,row,color)=>{ ctx.fillStyle=color; ctx.fillRect(col*HG_CELL,row*HG_CELL,HG_CELL,HG_CELL); };
-    const INK="#1a1a2e", WOOD="#8d6e63", SAND="#eba83a", GLASS="#f2f0ea";
+    const INK="#242231", WOOD="#8a6a4f", SAND="#d9a441", GLASS="#f6f1e2";
     const frac = tS.t>0 ? Math.max(0,Math.min(1, tS.r/tS.t)) : 0;
     const atRest = !tS.run && tS.r>=tS.t;
     for(let c=0;c<HG_COLS;c++){ px(c,0,WOOD); px(c,1,WOOD); px(c,HG_ROWS-2,WOOD); px(c,HG_ROWS-1,WOOD); }
@@ -1266,7 +1420,7 @@
     tS.run=true;
     tInt=setInterval(()=>{
       tS.r--;
-      if(tS.r<=0){ tS.r=0; stopTimer(); drawHourglass(); ringAlarm(); updateTimerText(); return; }
+      if(tS.r<=0){ tS.r=0; stopTimer(); drawHourglass(); triggerAlarm(); updateTimerText(); return; }
       updateTimerText();
     }, 1000);
     hgInt=setInterval(()=>{ hgPhase++; drawHourglass(); }, 180);
@@ -1279,22 +1433,21 @@
   function rTimer(){
     const H=Math.floor(tS.t/3600), Mrem=tS.t%3600, M=Math.floor(Mrem/60), S=Mrem%60;
     app.innerHTML = '<div class="panel drawn" style="text-align:center">'
-      + '<div style="font-weight:1000;font-size:18px">'+t('t_timer_t')+'</div>'
+      + '<div style="font-weight:700;font-size:18px">'+t('t_timer_t')+'</div>'
       + '<div id="hgWrap"><canvas id="hgCanvas" width="'+(HG_COLS*HG_CELL)+'" height="'+(HG_ROWS*HG_CELL)+'"></canvas></div>'
-      + '<div id="tTime" style="font-weight:1000;font-size:40px">'+formatTime(tS.r)+'</div>'
+      + '<div id="tTime" style="font-weight:700;font-size:40px">'+formatTime(tS.r)+'</div>'
       + '<div class="actions"><button class="btn" id="tStart">'+(tS.run?t('timer_pause'):t('timer_start'))+'</button><button class="btn sec" id="tReset">'+t('timer_reset_btn')+'</button></div>'
-      + '<div class="actions">'+[30,60,90,120,180,300].map(s=>'<button class="btn sec" data-p="'+s+'">'+(s<60? s+'s' : (s/60)+'m')+'</button>').join("")+'</div>'
       + '</div>'
       + '<div class="panel drawn" style="margin-top:14px">'
       + '<div class="kicker" style="text-align:center">'+t('timer_manual_kicker')+'</div>'
-      + '<div style="display:flex;justify-content:center;gap:22px;margin-top:6px">'
+      + '<div style="display:flex;justify-content:center;gap:18px;margin-top:6px">'
       +   ['h','m','s'].map(u=>{
             const label = u==="h"?t('timer_h'):(u==="m"?t('timer_min'):t('timer_sec'));
             const val = u==="h"?H:(u==="m"?M:S);
             return '<div class="t-unit">'
               + '<button class="qbtn" data-unit="'+u+'" data-dir="1">+</button>'
-              + '<div class="t-val">'+String(val).padStart(2,"0")+'</div>'
-              + '<div style="font-size:10px;color:var(--muted);font-weight:900">'+label+'</div>'
+              + '<input class="t-val" id="t'+u.toUpperCase()+'Input" type="tel" inputmode="numeric" pattern="[0-9]*" maxlength="2" value="'+String(val).padStart(2,"0")+'">'
+              + '<div style="font-size:10px;color:var(--muted);font-weight:700">'+label+'</div>'
               + '<button class="qbtn" data-unit="'+u+'" data-dir="-1">−</button>'
               + '</div>';
           }).join("")
@@ -1323,8 +1476,24 @@
       }
     });
     $("#tReset").addEventListener("click", ()=>{ stopTimer(); tS.r=tS.t; render(); });
-    app.querySelectorAll("[data-p]").forEach(b=> b.addEventListener("click", ()=>{ const s=Number(b.getAttribute("data-p")); stopTimer(); tS.t=s; tS.r=s; render(); }) );
     app.querySelectorAll("[data-unit]").forEach(b=> b.addEventListener("click", ()=>{ adjustTime(b.getAttribute("data-unit"), Number(b.getAttribute("data-dir"))); }) );
+    const tHInput=$("#tHInput"), tMInput=$("#tMInput"), tSInput=$("#tSInput");
+    function finalizeTimerInputs(){
+      let h=parseInt(tHInput.value,10); if(isNaN(h)) h=0;
+      let m=parseInt(tMInput.value,10); if(isNaN(m)) m=0;
+      let s=parseInt(tSInput.value,10); if(isNaN(s)) s=0;
+      h=Math.max(0,Math.min(23,h)); m=Math.max(0,Math.min(59,m)); s=Math.max(0,Math.min(59,s));
+      stopTimer();
+      tS.t = h*3600+m*60+s;
+      tS.r = tS.t;
+      render();
+    }
+    [tHInput,tMInput,tSInput].forEach(inp=>{
+      inp.addEventListener("focus", ()=> inp.select());
+      inp.addEventListener("input", ()=>{ inp.value = inp.value.replace(/[^0-9]/g,"").slice(0,2); });
+      inp.addEventListener("blur", finalizeTimerInputs);
+      inp.addEventListener("keydown", e=>{ if(e.key==="Enter") inp.blur(); });
+    });
   }
   const BAC_ALL = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("");
   const BAC_HARD = ["Q","U","W","X","Y","Z"];
@@ -1343,7 +1512,7 @@
     bacTS.run=true;
     bacInt=setInterval(()=>{
       bacTS.r--;
-      if(bacTS.r<=0){ bacTS.r=0; stopBacTimer(); ringAlarm(); updateBacTimerText(); return; }
+      if(bacTS.r<=0){ bacTS.r=0; stopBacTimer(); triggerAlarm(); updateBacTimerText(); return; }
       updateBacTimerText();
     }, 1000);
     updateBacTimerText();
@@ -1397,13 +1566,13 @@
     const durM = Math.floor(d.duration/60), durS = d.duration%60;
     const timerZone = bacPreVal>0
       ? `
-        <div style="font-weight:1000;font-size:18px">${t('bac_announce')}</div>
-        <div style="font-weight:1000;font-size:56px;margin:10px 0;color:var(--red)">${bacPreVal}</div>
+        <div style="font-weight:700;font-size:18px">${t('bac_announce')}</div>
+        <div style="font-weight:700;font-size:56px;margin:10px 0;color:var(--red)">${bacPreVal}</div>
         <div class="kicker">${t('bac_starts_after')}</div>
       `
       : `
-        <div style="font-weight:1000;font-size:18px">${t('bac_round_timer')}</div>
-        <div id="bacTime" style="font-weight:1000;font-size:40px;margin:10px 0">${formatTime(bacTS.r)}</div>
+        <div style="font-weight:700;font-size:18px">${t('bac_round_timer')}</div>
+        <div id="bacTime" style="font-weight:700;font-size:40px;margin:10px 0">${formatTime(bacTS.r)}</div>
         <div class="actions" style="justify-content:center">
           <button class="btn" id="bacStart">${bacTS.run?t('timer_pause'):t('timer_start')}</button>
           <button class="btn sec" id="bacReset">${t('timer_reset_btn')}</button>
@@ -1413,13 +1582,13 @@
           <div class="t-unit">
             <button class="qbtn" data-bacunit="m" data-bacdir="1">+</button>
             <input class="t-val" id="bacMinInput" type="tel" inputmode="numeric" pattern="[0-9]*" maxlength="2" value="${String(durM).padStart(2,"0")}">
-            <div style="font-size:10px;color:var(--muted);font-weight:900">${t('timer_min')}</div>
+            <div style="font-size:10px;color:var(--muted);font-weight:700">${t('timer_min')}</div>
             <button class="qbtn" data-bacunit="m" data-bacdir="-1">−</button>
           </div>
           <div class="t-unit">
             <button class="qbtn" data-bacunit="s" data-bacdir="1">+</button>
             <input class="t-val" id="bacSecInput" type="tel" inputmode="numeric" pattern="[0-9]*" maxlength="2" value="${String(durS).padStart(2,"0")}">
-            <div style="font-size:10px;color:var(--muted);font-weight:900">${t('timer_sec')}</div>
+            <div style="font-size:10px;color:var(--muted);font-weight:700">${t('timer_sec')}</div>
             <button class="qbtn" data-bacunit="s" data-bacdir="-1">−</button>
           </div>
         </div>
@@ -1427,7 +1596,7 @@
     app.innerHTML = `
       <div class="panel drawn" style="text-align:center">
         <div style="display:flex;gap:8px;align-items:center;justify-content:center">
-          <div style="font-weight:1000;font-size:18px">${t('g_bac_t')}</div>
+          <div style="font-weight:700;font-size:18px">${t('g_bac_t')}</div>
           ${qbtn("bac")}
         </div>
         <div class="kicker">${t('bac_kicker')}</div>
@@ -1516,7 +1685,7 @@
     const cfg = load("custom_cfg",{title:t('custom_default_title'), players:4, rounds:5});
     app.innerHTML = `
       <div class="panel drawn">
-        <div style="font-weight:1000;font-size:18px">${t('g_custom_t')}</div>
+        <div style="font-weight:700;font-size:18px">${t('g_custom_t')}</div>
         <div class="kicker">${t('custom_kicker')}</div>
         <div class="actions" style="margin-top:10px">
           <div style="flex:1;min-width:160px"><div style="font-size:12px;color:var(--muted);margin-bottom:6px">${t('custom_title_label')}</div><input id="ctTitle" value="${esc(cfg.title)}"></div>
@@ -1545,10 +1714,10 @@
       save("custom_sheet",{ps:ps, r:r, meta:{date:"", title:cfg.title}});
       nav("#custom_sheet");
     });
-    $("#ctReset").addEventListener("click", ()=>{ if(confirm(t('confirm_reset'))){ save("custom_sheet",{ps:["J1","J2"], r:[], meta:{date:"", title:t('custom_default_title')}}); alert(t('generic_ok')); }});
+    $("#ctReset").addEventListener("click", (e)=> armConfirm(e.currentTarget, ()=>{ save("custom_sheet",{ps:["J1","J2"], r:[], meta:{date:"", title:t('custom_default_title')}}); }));
   }
   function rCustomSheet(){
-    const d = load("custom_sheet",{ps:["J1","J2"], r:[], meta:{date:"", title:t('custom_default_title')}});
+    const d = load("custom_sheet",{ps:["J1","J2"], r:[], meta:{date:""}});
     renderSheet("custom_sheet", (d.meta && d.meta.title) ? d.meta.title : t('custom_default_title'), {defaultPlayers:d.ps, addRoundLabel:t('sheet_add_round')});
   }
   function render(){
@@ -1567,9 +1736,7 @@
       case "#uno": rUno(); break;
       case "#scrabble": rScrabble(); break;
       case "#free": rFree(); break;
-      case "#421": r421(); break;
       case "#skyjo": rSkyjo(); break;
-      case "#petanque": rPetanque(); break;
       case "#bac": rBac(); break;
       case "#victoires": rVictoires(); break;
       case "#molkky": rMolkky(); break;
@@ -1581,7 +1748,7 @@
     }
   }
   applyStaticI18N();
-  setWakeUI(false); setFSUI(false);
+  updateGearBadge();
   boot();
   if("serviceWorker" in navigator){
     window.addEventListener("load", ()=>{
