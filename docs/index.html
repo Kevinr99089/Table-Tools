@@ -36,7 +36,7 @@
     .logo-text{font-weight:700;font-size:19px;transform:rotate(-1.5deg);white-space:nowrap;
       text-decoration:underline wavy var(--red-soft) 2px;text-underline-offset:5px}
     main{max-width:860px;margin:0 auto;padding:16px 15px}
-    .cat-title{font-weight:700;font-size:22px;margin:10px 0 2px;
+    .cat-title{font-weight:700;font-size:22px;margin:10px 0 12px;
       text-decoration:underline wavy var(--red-soft) 2px;text-underline-offset:6px;display:inline-block}
     .cat-kicker{margin:0 0 12px;font-size:12px}
     .kicker{color:var(--muted);font-style:italic;text-align:center;font-size:12px}
@@ -109,6 +109,7 @@
     .banner button:active{transform:scale(.9)}
     #hgWrap{display:flex;justify-content:center;margin:12px 0}
     #hgCanvas{border:3px solid var(--ink);border-radius:4px;background:var(--card);box-shadow:3px 3px 0 rgba(36,34,49,.18);image-rendering:pixelated}
+    .bac-hg-mini{width:24px;height:40px;image-rendering:pixelated;flex-shrink:0}
     @keyframes hgFlip{ from{transform:rotate(0deg)} to{transform:rotate(180deg)} }
     .hg-flip{animation:hgFlip .45s ease-in-out}
     .t-unit{display:flex;flex-direction:column;align-items:center;gap:6px}
@@ -280,7 +281,7 @@
     g_custom_t:{fr:"Tableau custom",en:"Custom sheet"}, g_custom_s:{fr:"Joueurs + manches",en:"Players + rounds"},
     g_free_t:{fr:"Score libre",en:"Free score"}, g_free_s:{fr:"Tableau générique",en:"Generic sheet"},
     t_dice_t:{fr:"Dé (d6)",en:"Dice (d6)"}, t_dice_s:{fr:"lancer rapide",en:"quick roll"},
-    t_timer_t:{fr:"Sablier",en:"Timer"}, t_timer_s:{fr:"presets",en:"presets"},
+    t_timer_t:{fr:"Sablier",en:"Timer"}, t_timer_s:{fr:"durée réglable",en:"custom duration"},
     rules_heading:{fr:"RÈGLES",en:"RULES"},
     scoring_heading:{fr:"COMPTAGE DES POINTS",en:"SCORING"},
     sheet_rounds_header:{fr:"MANCHES",en:"ROUNDS"},
@@ -1375,15 +1376,15 @@
     const b = reverse ? HG_WIDE : HG_NARROW;
     return { left: Math.round(a[0] + (b[0]-a[0])*f), right: Math.round(a[1] + (b[1]-a[1])*f) };
   }
-  function drawHourglass(){
-    const cv = $("#hgCanvas");
+  function drawHourglassCanvas(canvasId, tTotal, tRemain, running, phase){
+    const cv = $(canvasId);
     if(!cv) return;
     const ctx = cv.getContext("2d");
     ctx.clearRect(0,0,cv.width,cv.height);
     const px = (col,row,color)=>{ ctx.fillStyle=color; ctx.fillRect(col*HG_CELL,row*HG_CELL,HG_CELL,HG_CELL); };
     const INK="#242231", WOOD="#8a6a4f", SAND="#d9a441", GLASS="#f6f1e2";
-    const frac = tS.t>0 ? Math.max(0,Math.min(1, tS.r/tS.t)) : 0;
-    const atRest = !tS.run && tS.r>=tS.t;
+    const frac = tTotal>0 ? Math.max(0,Math.min(1, tRemain/tTotal)) : 0;
+    const atRest = !running && tRemain>=tTotal;
     for(let c=0;c<HG_COLS;c++){ px(c,0,WOOD); px(c,1,WOOD); px(c,HG_ROWS-2,WOOD); px(c,HG_ROWS-1,WOOD); }
     const topN=12, botN=12, topStart=2, neckStart=14, botStart=16;
     const fillTop = atRest ? 0 : Math.round(topN * frac);
@@ -1399,8 +1400,8 @@
       px(HG_NARROW[0],row,INK); px(HG_NARROW[1],row,INK);
       for(let c=HG_NARROW[0]+1;c<HG_NARROW[1];c++) px(c,row,GLASS);
     }
-    if(tS.run && frac>0 && frac<1){
-      const gRow = neckStart + (hgPhase%2);
+    if(running && frac>0 && frac<1){
+      const gRow = neckStart + (phase%2);
       px(HG_NARROW[0]+1, gRow, SAND);
     }
     for(let i=0;i<botN;i++){
@@ -1411,6 +1412,7 @@
       for(let c=left+1;c<right;c++) px(c,row, isSand ? SAND : GLASS);
     }
   }
+  function drawHourglass(){ drawHourglassCanvas("#hgCanvas", tS.t, tS.r, tS.run, hgPhase); }
   function beginRun(){
     tS.run=true;
     tInt=setInterval(()=>{
@@ -1494,11 +1496,12 @@
   const BAC_HARD = ["Q","U","W","X","Y","Z"];
   const BAC_MAX_DURATION = 600;
   function bacPool(d){ return BAC_ALL.filter(l=> !(d.excludeHard && BAC_HARD.includes(l))); }
-  let bacInt=null;
+  let bacInt=null, bacHgInt=null, bacHgPhase=0;
   let bacTS={t:60,r:60,run:false};
   let bacPreInt=null, bacPreVal=0;
-  function stopBacTimer(){ if(bacInt){ clearInterval(bacInt); bacInt=null; } bacTS.run=false; }
+  function stopBacTimer(){ if(bacInt){ clearInterval(bacInt); bacInt=null; } if(bacHgInt){ clearInterval(bacHgInt); bacHgInt=null; } bacTS.run=false; }
   function stopBacPre(){ if(bacPreInt){ clearInterval(bacPreInt); bacPreInt=null; } bacPreVal=0; }
+  function drawBacHourglass(){ drawHourglassCanvas("#bacHgCanvas", bacTS.t, bacTS.r, bacTS.run, bacHgPhase); }
   function updateBacTimerText(){
     const el=$("#bacTime"); if(el) el.textContent = formatTime(bacTS.r);
     const btn=$("#bacStart"); if(btn) btn.textContent = bacTS.run ? t('timer_pause') : t('timer_start');
@@ -1507,9 +1510,10 @@
     bacTS.run=true;
     bacInt=setInterval(()=>{
       bacTS.r--;
-      if(bacTS.r<=0){ bacTS.r=0; stopBacTimer(); triggerAlarm(); updateBacTimerText(); return; }
+      if(bacTS.r<=0){ bacTS.r=0; stopBacTimer(); triggerAlarm(); updateBacTimerText(); drawBacHourglass(); return; }
       updateBacTimerText();
     }, 1000);
+    bacHgInt=setInterval(()=>{ bacHgPhase++; drawBacHourglass(); }, 180);
     updateBacTimerText();
   }
   function setBacDuration(d, m, s){
@@ -1566,7 +1570,10 @@
         <div class="kicker">${t('bac_starts_after')}</div>
       `
       : `
-        <div style="font-weight:700;font-size:18px">${t('bac_round_timer')}</div>
+        <div style="display:flex;align-items:center;justify-content:center;gap:8px">
+          <div style="font-weight:700;font-size:18px">${t('bac_round_timer')}</div>
+          <canvas id="bacHgCanvas" width="${HG_COLS*HG_CELL}" height="${HG_ROWS*HG_CELL}" class="bac-hg-mini"></canvas>
+        </div>
         <div id="bacTime" style="font-weight:700;font-size:40px;margin:10px 0">${formatTime(bacTS.r)}</div>
         <div class="actions" style="justify-content:center">
           <button class="btn" id="bacStart">${bacTS.run?t('timer_pause'):t('timer_start')}</button>
@@ -1614,6 +1621,7 @@
         ${timerZone}
       </div>
     `;
+    drawBacHourglass();
     $("#bacDraw").addEventListener("click", ()=>{
       const p = bacPool(d);
       if(p.length===0) return;
@@ -1644,12 +1652,12 @@
     $("#bacUsedReset").addEventListener("click", ()=>{ d.used=[]; d.current=null; save("bac", d); render(); });
     if(bacPreVal<=0){
       $("#bacStart").addEventListener("click", ()=>{
-        if(bacTS.run){ stopBacTimer(); updateBacTimerText(); return; }
+        if(bacTS.run){ stopBacTimer(); updateBacTimerText(); drawBacHourglass(); return; }
         if(bacTS.t<=0) return;
         if(bacTS.r>=bacTS.t || bacTS.r<=0) bacTS.r = bacTS.t;
         beginBacRun();
       });
-      $("#bacReset").addEventListener("click", ()=>{ stopBacTimer(); stopBacPre(); bacTS.r=bacTS.t; updateBacTimerText(); });
+      $("#bacReset").addEventListener("click", ()=>{ stopBacTimer(); stopBacPre(); bacTS.r=bacTS.t; updateBacTimerText(); drawBacHourglass(); });
       app.querySelectorAll("[data-bacunit]").forEach(b=> b.addEventListener("click", ()=>{
         adjustBacDuration(d, b.getAttribute("data-bacunit"), Number(b.getAttribute("data-bacdir")));
       }));
