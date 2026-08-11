@@ -155,7 +155,7 @@
   </video>
   <div id="appWrap">
     <header>
-      <button id="backBtn" class="hbtn drawn" title="Retour">←</button>
+      <button id="homeBtn" class="hbtn drawn" title="Accueil">⌂</button>
       <div class="logo-wrap">
         <svg viewBox="0 0 32 32" width="30" height="30" class="drawn" style="flex-shrink:0">
           <rect x="5" y="3" width="17" height="25" rx="2" fill="var(--card)" stroke="var(--ink)" stroke-width="2"/>
@@ -172,7 +172,6 @@
       </div>
       <div style="flex:1"></div>
       <button id="settingsBtn" class="hbtn drawn" title="Réglages">⚙</button>
-      <button id="homeBtn" class="hbtn drawn" title="Accueil">⌂</button>
     </header>
     <main>
       <div id="banner" class="banner drawn">
@@ -208,7 +207,6 @@
   const vid = $("#hackVid");
   const banner   = $("#banner");
   const bannerFix= $("#bannerFix");
-  const backBtn  = $("#backBtn");
   const homeBtn  = $("#homeBtn");
   const settingsBtn = $("#settingsBtn");
   const alarmFlashEl = $("#alarmFlash");
@@ -254,7 +252,6 @@
   const LANG = SYS_LANG.startsWith("fr") ? "fr" : "en";
   document.documentElement.lang = LANG;
   const I18N = {
-    nav_back:{fr:"Retour",en:"Back"},
     nav_settings:{fr:"Réglages",en:"Settings"},
     nav_home:{fr:"Accueil",en:"Home"},
     nav_close:{fr:"Fermer",en:"Close"},
@@ -394,7 +391,6 @@
     btn.dataset.armTimer = String(tm);
   }
   function applyStaticI18N(){
-    backBtn.title = t('nav_back');
     settingsBtn.title = t('nav_settings');
     homeBtn.title = t('nav_home');
     const rc = $("#rulesClose"); if(rc) rc.title = t('nav_close');
@@ -721,7 +717,6 @@
     currentView = hash;
     render();
   }
-  backBtn.addEventListener("click", ()=> nav("#home"));
   homeBtn.addEventListener("click", ()=> nav("#home"));
   window.addEventListener("popstate", ()=>{
     if(currentView !== "#home"){
@@ -885,7 +880,7 @@
     }
   }
   function rHome(){
-    backBtn.style.visibility="hidden"; homeBtn.disabled=true;
+    homeBtn.disabled=true;
     app.innerHTML = `
       <h2 class="cat-title">${t('cat_score_t')}</h2>
       <div class="kicker cat-kicker">${t('cat_score_s')}</div>
@@ -1722,8 +1717,8 @@
   }
   function render(){
     const h = currentView || "#home";
-    if(h==="#home"){ backBtn.style.visibility="hidden"; homeBtn.disabled=true; }
-    else{ backBtn.style.visibility="visible"; homeBtn.disabled=false; }
+    if(h==="#home"){ homeBtn.disabled=true; }
+    else{ homeBtn.disabled=false; }
     if(h!=="#timer") stopTimer();
     if(h!=="#bac"){ stopBacTimer(); stopBacPre(); }
     showBanner(false);
