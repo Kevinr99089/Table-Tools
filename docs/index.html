@@ -152,7 +152,7 @@
       <feDisplacementMap in="SourceGraphic" in2="noise" scale="2" />
     </filter>
   </svg>
-  <video id="hackVid" playsinline loop muted>
+  <video id="hackVid" playsinline loop muted style="position:fixed;width:1px;height:1px;opacity:0;pointer-events:none;top:-9999px;left:-9999px;">
     <source src="data:video/mp4;base64,AAAAHGZ0eXBNUjRCAAAARU1SNIgAAABhYXJrdWR0YQAAAAxjb3ZlYXJrdWR0YQlmcm9tAAAAGHNvaWFhcnR3cmvDq2xpYnF1aWNrY2hhdAAAAAxtZGF0AAAAAAAAAAAAAA==" type="video/mp4">
   </video>
   <div id="appWrap">
@@ -213,7 +213,6 @@
   const settingsBtn = $("#settingsBtn");
   const alarmFlashEl = $("#alarmFlash");
   const PREF_WAKE = "tt15_pref_wake";
-  const PREF_FS   = "tt15_pref_fs";
   const PREF_SOUND = "tt15_pref_sound";
   const PREF_VOLUME = "tt15_pref_volume";
   const PREF_FLASH = "tt15_pref_flash";
@@ -225,10 +224,9 @@
   const loadStr=(k,d)=>{try{const v=localStorage.getItem(k);return v===null?d:v;}catch(e){return d;}};
   const saveStr=(k,v)=>{try{ if(v===null||v===undefined) localStorage.removeItem(k); else localStorage.setItem(k,v); }catch(e){ return false; } return true;};
   let wantWake = loadPref(PREF_WAKE, true);
-  let wantFS   = loadPref(PREF_FS, true);
   let wakeLock = null;
   let keepAliveTimer = null;
-  let wakeActive = false, fsActive = false;
+  let wakeActive = false;
   let settings = {
     sound: loadStr(PREF_SOUND, "cloche"),
     volume: Number(loadStr(PREF_VOLUME, "80")) || 80,
@@ -238,7 +236,7 @@
     customName: loadStr(PREF_CUSTOM_NAME, null)
   };
   function updateGearBadge(){
-    const degraded = (wantWake && !wakeActive) || (wantFS && !fsActive);
+    const degraded = (wantWake && !wakeActive);
     if(settingsBtn) settingsBtn.classList.toggle("alert", !!degraded);
   }
   function refreshSettingsBody(){
@@ -246,7 +244,6 @@
     if(m && m.classList.contains("show")) renderSettingsBody();
   }
   function setWakeUI(on){ wakeActive = !!on; updateGearBadge(); refreshSettingsBody(); }
-  function setFSUI(on){ fsActive = !!on; updateGearBadge(); refreshSettingsBody(); }
   const load=(k,d)=>{try{ return JSON.parse(localStorage.getItem("tt15_"+k)) || d; }catch(e){ return d; }};
   const save=(k,v)=>{ try{ localStorage.setItem("tt15_"+k, JSON.stringify(v)); }catch(e){} };
   const esc=(s)=>String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#039;");
@@ -352,8 +349,6 @@
     settings_title:{fr:"Réglages",en:"Settings"},
     settings_wake_label:{fr:"Anti-veille",en:"Keep awake"},
     settings_wake_desc:{fr:"Empêche l'écran de s'éteindre en pleine partie.",en:"Keeps the screen from sleeping mid-game."},
-    settings_fs_label:{fr:"Plein écran",en:"Fullscreen"},
-    settings_fs_desc:{fr:"Masque la barre du navigateur.",en:"Hides the browser bar."},
     settings_sound_label:{fr:"Sonnerie de fin de minuteur",en:"Timer end sound"},
     sound_cloche:{fr:"Cloche",en:"Bell"},
     sound_sifflet:{fr:"Sifflet",en:"Whistle"},
@@ -531,10 +526,6 @@
           <div><div class="settings-label">☀ ${t('settings_wake_label')}</div><div class="settings-desc">${t('settings_wake_desc')}</div></div>
           <button class="switch${wantWake?' on':''}" id="swWake">${wantWake?'✔':''}</button>
         </div>
-        <div class="settings-row">
-          <div><div class="settings-label">⛶ ${t('settings_fs_label')}</div><div class="settings-desc">${t('settings_fs_desc')}</div></div>
-          <button class="switch${wantFS?' on':''}" id="swFS">${wantFS?'✔':''}</button>
-        </div>
       </div>
       <div class="settings-section">
         <div class="settings-label">🔔 ${t('settings_sound_label')}</div>
@@ -569,15 +560,6 @@
       wantWake = !wantWake;
       savePref(PREF_WAKE, wantWake);
       if(wantWake) await tryWakeLock(); else await releaseWakeLock();
-      showBanner(false);
-      renderSettingsBody();
-    });
-    $("#swFS").addEventListener("click", async ()=>{
-      wantFS = !wantFS;
-      savePref(PREF_FS, wantFS);
-      if(wantFS) await tryFullscreen();
-      else{ try{ if(document.fullscreenElement) await document.exitFullscreen(); }catch(e){} }
-      setFSUI(!!document.fullscreenElement);
       showBanner(false);
       renderSettingsBody();
     });
@@ -637,16 +619,15 @@
     const inMenu = (currentView || "#home") === "#home";
     if(inMenu){ banner.classList.remove("show"); return; }
     const lostWake = wantWake && ("wakeLock" in navigator) && !wakeLock;
-    const lostFS = wantFS && !document.fullscreenElement;
-    banner.classList.toggle("show", !!force || lostWake || lostFS);
+    banner.classList.toggle("show", !!force || lostWake);
   }
   async function tryVideoKeepAlive(){
     try{ if (vid && vid.paused) await vid.play(); }catch(e){}
   }
   async function tryWakeLock(){
     if(!wantWake){ await releaseWakeLock(); return; }
-    await tryVideoKeepAlive();
     if(!("wakeLock" in navigator) || !window.isSecureContext){
+      await tryVideoKeepAlive();
       setWakeUI(false);
       return;
     }
@@ -658,6 +639,7 @@
       setWakeUI(true);
     }catch(e){
       wakeLock = null;
+      await tryVideoKeepAlive();
       setWakeUI(false);
     }
   }
@@ -666,22 +648,14 @@
     wakeLock=null;
     setWakeUI(false);
   }
-  async function tryFullscreen(){
-    if(!wantFS){ setFSUI(false); return; }
-    try{
-      if(!document.fullscreenElement){ await document.documentElement.requestFullscreen(); }
-    }catch(e){}
-    setFSUI(!!document.fullscreenElement);
-  }
   function scheduleKeepAlive(){
     clearInterval(keepAliveTimer);
     keepAliveTimer = setInterval(async ()=>{
       if(document.visibilityState !== "visible") return;
       if(wantWake){
         if(!wakeLock && ("wakeLock" in navigator)) await tryWakeLock();
-        await tryVideoKeepAlive();
+        if(!wakeLock) await tryVideoKeepAlive();
       }
-      if(wantFS && !document.fullscreenElement) showBanner(true);
     }, 5000);
   }
   async function boot(){
@@ -691,31 +665,26 @@
     pushBackGuard();
     scheduleKeepAlive();
     await tryWakeLock();
-    if(wantFS) await tryFullscreen();
     showBanner(false);
   }
   document.addEventListener("click", async ()=>{
     if(wantWake) await tryWakeLock();
-    if(wantFS && !document.fullscreenElement) await tryFullscreen();
     showBanner(false);
     unlockAudioCtx();
   }, {passive:true});
   document.addEventListener("visibilitychange", async ()=>{
     if(document.visibilityState==="visible"){
       if(wantWake) await tryWakeLock();
-      if(wantFS) setTimeout(()=>tryFullscreen(), 250);
       showBanner(false);
     }
   });
-  bannerFix.addEventListener("click", async ()=>{ await releaseWakeLock(); await tryWakeLock(); await tryFullscreen(); showBanner(false); });
+  bannerFix.addEventListener("click", async ()=>{ await releaseWakeLock(); await tryWakeLock(); showBanner(false); });
   let fsTransTimer = null;
   function handleFsRepaint(){
     document.documentElement.classList.add("fs-transition");
     clearTimeout(fsTransTimer);
-    fsTransTimer = setTimeout(()=>{ document.documentElement.classList.remove("fs-transition"); }, 500);
+    fsTransTimer = setTimeout(()=>{ document.documentElement.classList.remove("fs-transition"); }, 200);
   }
-  document.addEventListener("fullscreenchange", handleFsRepaint);
-  document.addEventListener("webkitfullscreenchange", handleFsRepaint);
   window.addEventListener("resize", handleFsRepaint);
   let currentView = "#home";
   function stripUrlHash(){
@@ -1430,7 +1399,7 @@
       if(tS.r<=0){ tS.r=0; stopTimer(); drawHourglass(); triggerAlarm(); updateTimerText(); return; }
       updateTimerText();
     }, 1000);
-    hgInt=setInterval(()=>{ hgPhase++; drawHourglass(); }, 180);
+    hgInt=setInterval(()=>{ hgPhase++; if(!document.documentElement.classList.contains("fs-transition")) drawHourglass(); }, 180);
     updateTimerText();
   }
   function updateTimerText(){
@@ -1523,7 +1492,7 @@
       if(bacTS.r<=0){ bacTS.r=0; stopBacTimer(); triggerAlarm(); updateBacTimerText(); drawBacHourglass(); return; }
       updateBacTimerText();
     }, 1000);
-    bacHgInt=setInterval(()=>{ bacHgPhase++; drawBacHourglass(); }, 180);
+    bacHgInt=setInterval(()=>{ bacHgPhase++; if(!document.documentElement.classList.contains("fs-transition")) drawBacHourglass(); }, 180);
     updateBacTimerText();
   }
   function setBacDuration(d, m, s){
@@ -1642,6 +1611,7 @@
       const el = $("#bacLetter");
       let i=0, last=null;
       function frame(now){
+        if(currentView !== "#bac") return;
         if(last===null) last=now;
         if(now-last>=50){
           el.textContent = p[Math.floor(Math.random()*p.length)];
