@@ -28,6 +28,7 @@
         linear-gradient(var(--line) 1px,transparent 1px);
       background-size:100% 100%,100% 30px;padding-bottom:90px;}
     .drawn{filter:url('#wiggle')}
+    .fs-transition .drawn{filter:none}
     header{position:sticky;top:0;z-index:50;background:var(--paper);border-bottom:2.5px solid var(--ink);padding:9px 12px;display:flex;align-items:center;gap:8px;box-shadow:0 5px 10px -6px rgba(36,34,49,.35)}
     .hbtn{background:var(--card);border:2.2px solid var(--ink);border-radius:50%;width:38px;height:38px;font-size:16px;cursor:pointer;display:grid;place-items:center;flex-shrink:0;position:relative;box-shadow:2px 2px 0 var(--ink)}
     .hbtn:active{transform:translate(2px,2px);box-shadow:none}
@@ -707,16 +708,15 @@
     }
   });
   bannerFix.addEventListener("click", async ()=>{ await releaseWakeLock(); await tryWakeLock(); await tryFullscreen(); showBanner(false); });
-  function forceRepaint(){
-    requestAnimationFrame(()=>{
-      window.scrollBy(0, 1);
-      window.scrollBy(0, -1);
-      document.body.style.opacity = "0.999";
-      requestAnimationFrame(()=>{ document.body.style.opacity = ""; });
-    });
+  let fsTransTimer = null;
+  function handleFsRepaint(){
+    document.documentElement.classList.add("fs-transition");
+    clearTimeout(fsTransTimer);
+    fsTransTimer = setTimeout(()=>{ document.documentElement.classList.remove("fs-transition"); }, 500);
   }
-  document.addEventListener("fullscreenchange", forceRepaint);
-  document.addEventListener("webkitfullscreenchange", forceRepaint);
+  document.addEventListener("fullscreenchange", handleFsRepaint);
+  document.addEventListener("webkitfullscreenchange", handleFsRepaint);
+  window.addEventListener("resize", handleFsRepaint);
   let currentView = "#home";
   function stripUrlHash(){
     try{ history.replaceState(null, "", location.pathname + location.search); }catch(e){}
