@@ -667,11 +667,27 @@
     wakeLock=null;
     setWakeUI(false);
   }
+  const inStandaloneDisplay = (function(){
+    try{
+      if(window.navigator.standalone === true) return true;
+      if(!window.matchMedia) return false;
+      return matchMedia("(display-mode: standalone)").matches
+        || matchMedia("(display-mode: fullscreen)").matches
+        || matchMedia("(display-mode: minimal-ui)").matches;
+    }catch(e){ return false; }
+  })();
   async function tryFullscreen(){
     if(!wantFS){ setFSUI(false); return; }
+    if(inStandaloneDisplay){
+      setFSUI(true);
+      return;
+    }
     try{
       if(!document.fullscreenElement){ await document.documentElement.requestFullscreen(); }
     }catch(e){}
+    if(document.fullscreenElement && screen.orientation && screen.orientation.lock){
+      try{ await screen.orientation.lock("portrait"); }catch(e){}
+    }
     setFSUI(!!document.fullscreenElement);
   }
   function scheduleKeepAlive(){
@@ -682,7 +698,7 @@
         if(!wakeLock && ("wakeLock" in navigator)) await tryWakeLock();
         if(!wakeLock) await tryVideoKeepAlive();
       }
-      if(wantFS && !document.fullscreenElement) showBanner(true);
+      if(wantFS && !inStandaloneDisplay && !document.fullscreenElement) showBanner(true);
     }, 5000);
   }
   async function boot(){
@@ -697,7 +713,7 @@
   }
   document.addEventListener("click", async ()=>{
     if(wantWake) await tryWakeLock();
-    if(wantFS && !document.fullscreenElement) await tryFullscreen();
+    if(wantFS && !inStandaloneDisplay && !document.fullscreenElement) await tryFullscreen();
     showBanner(false);
     unlockAudioCtx();
   }, {passive:true});
@@ -1431,7 +1447,7 @@
       if(tS.r<=0){ tS.r=0; stopTimer(); drawHourglass(); triggerAlarm(); updateTimerText(); return; }
       updateTimerText();
     }, 1000);
-    hgInt=setInterval(()=>{ hgPhase++; drawHourglass(); }, 180);
+    hgInt=setInterval(()=>{ hgPhase++; if(!document.documentElement.classList.contains("fs-transition")) drawHourglass(); }, 180);
     updateTimerText();
   }
   function updateTimerText(){
@@ -1524,7 +1540,7 @@
       if(bacTS.r<=0){ bacTS.r=0; stopBacTimer(); triggerAlarm(); updateBacTimerText(); drawBacHourglass(); return; }
       updateBacTimerText();
     }, 1000);
-    bacHgInt=setInterval(()=>{ bacHgPhase++; drawBacHourglass(); }, 180);
+    bacHgInt=setInterval(()=>{ bacHgPhase++; if(!document.documentElement.classList.contains("fs-transition")) drawBacHourglass(); }, 180);
     updateBacTimerText();
   }
   function setBacDuration(d, m, s){
@@ -1643,6 +1659,7 @@
       const el = $("#bacLetter");
       let i=0, last=null;
       function frame(now){
+        if(currentView !== "#bac") return;
         if(last===null) last=now;
         if(now-last>=50){
           el.textContent = p[Math.floor(Math.random()*p.length)];
@@ -1770,13 +1787,69 @@
     });
   }
   (function freezeWatchdog(){
+    let __lastUIEvent = {type:"none", time:performance.now(), innerH:window.innerHeight};
+    function trackUIEvent(type){
+      __lastUIEvent = {type, time: performance.now(), innerH: window.innerHeight};
+    }
+    document.addEventListener("fullscreenchange", ()=>trackUIEvent("fullscreenchange"));
+    document.addEventListener("webkitfullscreenchange", ()=>trackUIEvent("webkitfullscreenchange"));
+    window.addEventListener("resize", ()=>trackUIEvent("resize"));
+    document.addEventListener("visibilitychange", ()=>trackUIEvent("visibilitychange"));
+    if(window.visualViewport){
+      window.visualViewport.addEventListener("resize", ()=>trackUIEvent("vv-resize"));
+    }
+    if(window.screen && screen.orientation){
+      try{ screen.orientation.addEventListener("change", ()=>trackUIEvent("orientationchange")); }catch(e){}
+    }
+
+    let __longTasks = [];
+    try{
+      if("PerformanceObserver" in window){
+        const po = new PerformanceObserver((list)=>{
+          list.getEntries().forEach(e=>{
+            __longTasks.push({start: e.startTime, dur: Math.round(e.duration)});
+            if(__longTasks.length>12) __longTasks.shift();
+          });
+        });
+        po.observe({type:"longtask", buffered:true});
+      }
+    }catch(e){}
+
+    let __lastError = null;
+    window.addEventListener("error", (e)=>{
+      __lastError = {time:performance.now(), msg: String(e.message||"error").slice(0,90)};
+    });
+    window.addEventListener("unhandledrejection", (e)=>{
+      __lastError = {time:performance.now(), msg: "unhandledrejection: "+String(e.reason).slice(0,90)};
+    });
+
+    function timerState(){
+      const parts = [];
+      if(tInt) parts.push("tInt");
+      if(hgInt) parts.push("hgInt");
+      if(bacInt) parts.push("bacInt");
+      if(bacHgInt) parts.push("bacHgInt");
+      if(bacPreInt) parts.push("bacPreInt");
+      if(keepAliveTimer) parts.push("keepAliveTimer");
+      return parts.length ? parts.join(",") : "none";
+    }
+    function logFreeze(entry){
+      try{
+        const arr = JSON.parse(localStorage.getItem("tt15_freezelog")||"[]");
+        arr.push(entry);
+        while(arr.length>5) arr.shift();
+        localStorage.setItem("tt15_freezelog", JSON.stringify(arr));
+        return arr;
+      }catch(e){ return [entry]; }
+    }
+
     let last = performance.now();
     let box = null;
     function ensureBox(){
       if(box) return box;
       box = document.createElement("div");
       box.id = "freezeDebug";
-      box.style.cssText = "position:fixed;bottom:6px;left:6px;z-index:99999;background:rgba(0,0,0,.8);color:#7CFC7C;font:11px/1.4 monospace;padding:6px 8px;border-radius:6px;max-width:88vw;white-space:pre-wrap;pointer-events:none";
+      box.style.cssText = "position:fixed;bottom:6px;left:6px;z-index:99999;background:rgba(0,0,0,.85);color:#7CFC7C;font:10px/1.35 monospace;padding:6px 8px;border-radius:6px;max-width:92vw;max-height:42vh;overflow:auto;white-space:pre-wrap;pointer-events:none";
       document.body.appendChild(box);
       return box;
     }
@@ -1784,11 +1857,40 @@
       const gap = now - last;
       last = now;
       if(gap > 300){
-        ensureBox().textContent =
-          "FREEZE " + Math.round(gap) + "ms @ " + new Date().toLocaleTimeString() +
-          "\nfullscreen=" + !!document.fullscreenElement +
-          "  visible=" + document.visibilityState +
-          "\ninnerH=" + window.innerHeight + "  view=" + (currentView||"#home");
+        const sinceEvent = Math.round(now - __lastUIEvent.time);
+        const vvH = window.visualViewport ? Math.round(window.visualViewport.height) : "n/a";
+        const active = document.activeElement ? document.activeElement.tagName+(document.activeElement.id?"#"+document.activeElement.id:"") : "none";
+        const orient = (screen.orientation && screen.orientation.type) ? screen.orientation.type : "n/a";
+        const mem = (performance.memory) ? Math.round(performance.memory.usedJSHeapSize/1048576)+"/"+Math.round(performance.memory.jsHeapSizeLimit/1048576)+"MB" : "n/a";
+        const nodeCount = document.getElementsByTagName("*").length;
+        const ltMatches = __longTasks.filter(lt => (now-lt.start)>=0 && (now-lt.start)<3000).slice(-3);
+        const ltStr = ltMatches.length ? ltMatches.map(lt=>lt.dur+"ms").join(",") : "none";
+        const errStr = (__lastError && (now-__lastError.time)<3000) ? __lastError.msg : "none";
+        const entry = {
+          t: new Date().toLocaleTimeString(), gap: Math.round(gap),
+          fs: !!document.fullscreenElement, vis: document.visibilityState,
+          innerH: window.innerHeight, vvH, orient, view: (currentView||"#home"),
+          lastEvent: __lastUIEvent.type, sinceEvent, active, mem, nodeCount,
+          longtasks: ltStr, err: errStr, timers: timerState()
+        };
+        const hist = logFreeze(entry);
+        let txt = "FREEZE " + entry.gap + "ms @ " + entry.t +
+          "\nfullscreen=" + entry.fs + "  visible=" + entry.vis + "  orient=" + entry.orient +
+          "\nstandalonePWA=" + inStandaloneDisplay +
+          "\ninnerH=" + entry.innerH + "  vvH=" + entry.vvH + "  view=" + entry.view +
+          "\nlastEvent=" + entry.lastEvent + " (" + entry.sinceEvent + "ms ago)" +
+          "\nactiveEl=" + entry.active +
+          "\ntimers=" + entry.timers +
+          "\nmem=" + entry.mem + "  nodes=" + entry.nodeCount +
+          "\nlongtasks=" + entry.longtasks +
+          "\nlastErr=" + entry.err;
+        if(hist.length>1){
+          txt += "\n---prev---";
+          hist.slice(0,-1).slice(-2).reverse().forEach(h=>{
+            txt += "\n" + h.t + " " + h.gap + "ms view=" + h.view + " timers=" + h.timers + " err=" + h.err;
+          });
+        }
+        ensureBox().textContent = txt;
       }
       requestAnimationFrame(tick);
     }
