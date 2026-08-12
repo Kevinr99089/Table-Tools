@@ -707,6 +707,16 @@
     }
   });
   bannerFix.addEventListener("click", async ()=>{ await releaseWakeLock(); await tryWakeLock(); await tryFullscreen(); showBanner(false); });
+  function forceRepaint(){
+    requestAnimationFrame(()=>{
+      window.scrollBy(0, 1);
+      window.scrollBy(0, -1);
+      document.body.style.opacity = "0.999";
+      requestAnimationFrame(()=>{ document.body.style.opacity = ""; });
+    });
+  }
+  document.addEventListener("fullscreenchange", forceRepaint);
+  document.addEventListener("webkitfullscreenchange", forceRepaint);
   let currentView = "#home";
   function stripUrlHash(){
     try{ history.replaceState(null, "", location.pathname + location.search); }catch(e){}
