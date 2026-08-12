@@ -575,9 +575,13 @@
     $("#swFS").addEventListener("click", async ()=>{
       wantFS = !wantFS;
       savePref(PREF_FS, wantFS);
-      if(wantFS) await tryFullscreen();
-      else{ try{ if(document.fullscreenElement) await document.exitFullscreen(); }catch(e){} }
-      setFSUI(!!document.fullscreenElement);
+      if(inStandaloneDisplay){
+        setFSUI(wantFS);
+      }else{
+        if(wantFS) await tryFullscreen();
+        else{ try{ if(document.fullscreenElement) await document.exitFullscreen(); }catch(e){} }
+        setFSUI(!!document.fullscreenElement);
+      }
       showBanner(false);
       renderSettingsBody();
     });
@@ -637,7 +641,7 @@
     const inMenu = (currentView || "#home") === "#home";
     if(inMenu){ banner.classList.remove("show"); return; }
     const lostWake = wantWake && ("wakeLock" in navigator) && !wakeLock;
-    const lostFS = wantFS && !document.fullscreenElement;
+    const lostFS = wantFS && !inStandaloneDisplay && !document.fullscreenElement;
     banner.classList.toggle("show", !!force || lostWake || lostFS);
   }
   async function tryVideoKeepAlive(){
