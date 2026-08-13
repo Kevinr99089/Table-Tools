@@ -22,8 +22,9 @@
       --font:"Fredoka",system-ui,sans-serif;
     }
     *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;user-select:none}
-    html{-webkit-text-size-adjust:100%}
+    html{-webkit-text-size-adjust:100%;overscroll-behavior-y:none}
     body{margin:0;color:var(--ink);font-family:var(--font);font-weight:400;background-color:var(--paper);
+      overscroll-behavior-y:none;
       background-image:linear-gradient(90deg,transparent 30px,rgba(193,57,43,.32) 30px,rgba(193,57,43,.32) 31.5px,transparent 31.5px),
         linear-gradient(var(--line) 1px,transparent 1px);
       background-size:100% 100%,100% 30px;padding-bottom:90px;}
@@ -108,6 +109,10 @@
     .banner button{flex-shrink:0;width:24px;height:24px;border-radius:50%;border:1.8px solid var(--red);background:var(--card);
       color:var(--red);font-weight:700;font-size:13px;cursor:pointer;display:grid;place-items:center;padding:0}
     .banner button:active{transform:scale(.9)}
+    .toast{position:fixed;left:50%;bottom:22px;transform:translateX(-50%) translateY(20px);z-index:9999;
+      background:var(--ink);color:#fff;font-size:12px;font-weight:600;padding:9px 16px;border-radius:20px;
+      box-shadow:2px 3px 0 rgba(36,34,49,.25);opacity:0;pointer-events:none;transition:opacity .25s,transform .25s}
+    .toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
     #hgWrap{display:flex;justify-content:center;margin:12px 0}
     #hgCanvas{border:3px solid var(--ink);border-radius:4px;background:var(--card);box-shadow:3px 3px 0 rgba(36,34,49,.18);image-rendering:pixelated}
     .bac-hg-mini{width:24px;height:40px;image-rendering:pixelated;flex-shrink:0}
@@ -177,7 +182,7 @@
     </header>
     <main>
       <div id="banner" class="banner drawn">
-        <span id="bannerLost">anti‑veille / plein écran désactivé</span>
+        <span id="bannerLost">anti‑veille perdu</span>
         <button id="bannerFix" title="Réactiver">↻</button>
       </div>
       <div id="app"></div>
@@ -208,7 +213,7 @@
   const app = $("#app");
   const vid = $("#hackVid");
   const banner   = $("#banner");
-  const bannerFix= $("#bannerFix");
+  const bannerFix = $("#bannerFix");
   const homeBtn  = $("#homeBtn");
   const settingsBtn = $("#settingsBtn");
   const alarmFlashEl = $("#alarmFlash");
@@ -243,7 +248,11 @@
     const m = $("#settingsModal");
     if(m && m.classList.contains("show")) renderSettingsBody();
   }
-  function setWakeUI(on){ wakeActive = !!on; updateGearBadge(); refreshSettingsBody(); }
+  function setWakeUI(on){
+    wakeActive = !!on;
+    updateGearBadge();
+    refreshSettingsBody();
+  }
   const load=(k,d)=>{try{ return JSON.parse(localStorage.getItem("tt15_"+k)) || d; }catch(e){ return d; }};
   const save=(k,v)=>{ try{ localStorage.setItem("tt15_"+k, JSON.stringify(v)); }catch(e){} };
   const esc=(s)=>String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#039;");
@@ -255,7 +264,7 @@
     nav_home:{fr:"Accueil",en:"Home"},
     nav_close:{fr:"Fermer",en:"Close"},
     nav_rules:{fr:"Règles du jeu",en:"Game rules"},
-    banner_lost:{fr:"anti-veille / plein écran désactivé",en:"keep-awake / fullscreen is off"},
+    banner_lost:{fr:"anti-veille perdu",en:"keep-awake lost"},
     banner_btn:{fr:"Réactiver",en:"Re-enable"},
     confirm_tap_again:{fr:"Sûr ?",en:"Sure?"},
     sheet_remove_player:{fr:"− Joueur",en:"− Player"},
@@ -349,6 +358,7 @@
     settings_title:{fr:"Réglages",en:"Settings"},
     settings_wake_label:{fr:"Anti-veille",en:"Keep awake"},
     settings_wake_desc:{fr:"Empêche l'écran de s'éteindre en pleine partie.",en:"Keeps the screen from sleeping mid-game."},
+    toast_wake_off:{fr:"Anti-veille désactivé",en:"Keep-awake is off"},
     settings_sound_label:{fr:"Sonnerie de fin de minuteur",en:"Timer end sound"},
     sound_cloche:{fr:"Cloche",en:"Bell"},
     sound_sifflet:{fr:"Sifflet",en:"Whistle"},
@@ -559,7 +569,8 @@
     $("#swWake").addEventListener("click", async ()=>{
       wantWake = !wantWake;
       savePref(PREF_WAKE, wantWake);
-      if(wantWake) await tryWakeLock(); else await releaseWakeLock();
+      if(wantWake){ await tryWakeLock(); }
+      else{ await releaseWakeLock(); showToast(t('toast_wake_off')); }
       showBanner(false);
       renderSettingsBody();
     });
@@ -621,6 +632,30 @@
     const lostWake = wantWake && ("wakeLock" in navigator) && !wakeLock;
     banner.classList.toggle("show", !!force || lostWake);
   }
+  bannerFix.addEventListener("click", async ()=>{ await releaseWakeLock(); await tryWakeLock(); showBanner(false); });
+  let __ptrStartY = 0;
+  document.addEventListener("touchstart", (e)=>{
+    if(e.touches.length===1) __ptrStartY = e.touches[0].clientY;
+  }, {passive:true});
+  document.addEventListener("touchmove", (e)=>{
+    if(e.touches.length!==1) return;
+    if(e.target.closest(".modal-overlay, .b-list")) return;
+    const y = e.touches[0].clientY;
+    const scrollTop = window.scrollY || document.documentElement.scrollTop || document.body.scrollTop;
+    if(scrollTop<=0 && y>__ptrStartY){ e.preventDefault(); }
+  }, {passive:false});
+  let __toastTimer = null, toastEl = null;
+  function showToast(msg){
+    if(!toastEl){
+      toastEl = document.createElement("div");
+      toastEl.className = "toast";
+      document.body.appendChild(toastEl);
+    }
+    toastEl.textContent = msg;
+    requestAnimationFrame(()=> toastEl.classList.add("show"));
+    clearTimeout(__toastTimer);
+    __toastTimer = setTimeout(()=>{ toastEl.classList.remove("show"); }, 7000);
+  }
   async function tryVideoKeepAlive(){
     try{ if (vid && vid.paused) await vid.play(); }catch(e){}
   }
@@ -678,7 +713,6 @@
       showBanner(false);
     }
   });
-  bannerFix.addEventListener("click", async ()=>{ await releaseWakeLock(); await tryWakeLock(); showBanner(false); });
   let fsTransTimer = null;
   function handleFsRepaint(){
     document.documentElement.classList.add("fs-transition");
