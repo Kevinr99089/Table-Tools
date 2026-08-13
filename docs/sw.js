@@ -1,4 +1,4 @@
-const CACHE_NAME = 'tt-shell-88c2e95f52';
+const CACHE_NAME = 'tt-shell-11e032c9c4';
 const SHELL_FILES = ['./index.html', './manifest.json', './icon-192.png', './icon-512.png'];
 
 self.addEventListener('install', (event) => {
